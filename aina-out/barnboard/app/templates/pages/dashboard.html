@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('Dashboard') }}{% endblock %}
+{% block actions %}
+  <a class="btn" href="{{ feed_url }}" title="Subscribe in your phone's calendar app">📅 {{ t('Reminder feed') }}</a>
+  <a class="btn btn--primary" href="/milk">{{ t('Log milk') }}</a>
+{% endblock %}
+{% block content %}
+  {% if empty_herd %}
+    <div class="card" style="max-width:640px; margin:48px auto">
+      <div class="card__body" style="text-align:center; padding:40px 24px">
+        <div style="font-size:40px">🐄</div>
+        <h2 class="mt-2">Welcome to {{ app_name }}</h2>
+        <p class="muted">Your barn, one screen. Start by adding your herd — or load a
+        realistic demo farm to explore every feature first.</p>
+        <div class="row mt-3" style="justify-content:center; gap:10px">
+          <button class="btn btn--primary" hx-post="/demo-seed">Load demo herd</button>
+          <a class="btn" href="/cows">Add my first cow</a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+
+  {% if withholds %}
+    <div class="banner-danger">
+      <strong>⛔ {{ t('DO NOT TANK') }}</strong> — {{ t('milk from') }}
+      {% for w in withholds %}<strong>#{{ w.tag }} {{ w.name }}</strong> ({{ w.drug }} · {{ t('milk clear from') }} {{ w.clear_date }}){% if not loop.last %}, {% endif %}{% endfor %}
+      {{ t('must be kept out of the bulk tank.') }}
+    </div>
+  {% endif %}
+
+  <div class="grid grid--stats">
+    {% for s in stats %}
+      <div class="card stat">
+        <div class="stat__label">{{ t(s.label) }}</div>
+        <div class="stat__value">{{ s.value }}</div>
+        <div class="stat__delta {{ s.dir }}">{{ s.delta }}</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="grid grid--2 mt-3" style="align-items:start">
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title">{{ t('Milk — last 14 days') }}</div>
+        <a class="btn btn--ghost btn--sm" href="/export/milk_logs.csv">{{ t('Export CSV') }}</a>
+      </div>
+      <div class="card__body chart-wrap">{{ trend_svg|safe }}</div>
+    </div>
+
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title">{{ t('Alerts') }}</div>
+        <span class="badge {% if withholds or drops %}badge--warning{% else %}badge--success{% endif %}">
+          {{ (withholds|length) + (calvings|length) + (drops|length) }} {{ t('active') }}
+        </span>
+      </div>
+      <div class="card__body">
+        {% if not withholds and not calvings and not drops %}
+          <div class="empty"><div class="empty__icon">🌤️</div>{{ t('All quiet in the barn — no alerts.') }}</div>
+        {% endif %}
+        {% for w in withholds %}
+          <div class="alert-item">
+            <span class="badge badge--danger">{{ t('withhold') }}</span>
+            <div><strong>#{{ w.tag }} {{ w.name }}</strong> — {{ w.drug }}<br>
+              <span class="faint">{{ t('milk clear from') }} {{ w.clear_date }} ({{ w.days_left }} {{ t('days left') }})</span></div>
+          </div>
+        {% endfor %}
+        {% for d in drops %}
+          <div class="alert-item">
+            <span class="badge badge--warning">{{ t('yield drop') }}</span>
+            <div><strong>#{{ d.tag }} {{ d.name }}</strong> {{ t('gave') }} {{ d.latest }} L ({{ t('avg') }} {{ d.avg }} L · -{{ d.pct }}%)<br><span class="faint">{{ t('early sign of mastitis or lameness — check her') }}</span></div>
+          </div>
+        {% endfor %}
+        {% for c in calvings %}
+          <div class="alert-item">
+            <span class="badge badge--accent">{{ t('calving') }}</span>
+            <div><strong>#{{ c.tag }} {{ c.name }}</strong> {{ t('due') }} {{ c.due_date }}
+              {% if c.days_left < 0 %}<strong>({{ -c.days_left }} {{ t('d overdue') }})</strong>
+              {% else %}({{ t('in') }} {{ c.days_left }} {{ t('days') }}){% endif %}<br>
+              <span class="faint">{{ t(c.outcome) }} · <a href="/breeding">{{ t('breeding page') }}</a></span></div>
+          </div>
+        {% endfor %}
+        <p class="faint mt-2" style="font-size:12.5px">💡 {{ t('Subscribe to') }} <a href="{{ feed_url }}">{{ t('the reminder feed') }}</a>
+        {{ t("in your phone's calendar app — withholding clear-dates, calvings and dry-offs appear automatically.") }}</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}

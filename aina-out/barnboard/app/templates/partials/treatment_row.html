@@ -1,0 +1,16 @@
+<tr id="treatment-{{ tr.id }}">
+  <td><strong>#{{ tr.tag }}</strong> {{ tr.name }}</td>
+  <td>{{ tr.drug }}</td>
+  <td class="muted">{{ tr.treated_on }}</td>
+  <td class="muted">{{ tr.withhold_days }} d</td>
+  <td>
+    {% if tr.active %}
+      <span class="badge badge--danger">{{ t('withheld until') }} {{ tr.clear_date }}</span>
+    {% elif tr.withhold_days > 0 %}
+      <span class="badge badge--success">{{ t('clear since') }} {{ tr.clear_date }}</span>
+    {% else %}
+      <span class="badge">{{ t('no withhold') }}</span>
+    {% endif %}
+  </td>
+  <td class="muted hide-sm">{{ tr.notes or "" }}</td>
+</tr>

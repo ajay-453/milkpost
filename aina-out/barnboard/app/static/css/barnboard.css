@@ -1,0 +1,112 @@
+/* Barnboard additions on top of the golden-starter design system (app.css).
+   Adds: explicit theme override (the toggle), the DO-NOT-TANK banner,
+   command palette, and a few small domain utilities. Reuses app.css tokens. */
+
+/* Explicit theme choice beats the OS preference (app.css handles the OS case). */
+html[data-theme="dark"] {
+  --bg: #0c0e12;
+  --surface: #15181e;
+  --surface-2: #1c1f27;
+  --border: #272b33;
+  --border-strong: #353a44;
+  --text: #f5f6f8;
+  --text-muted: #98a2b3;
+  --text-faint: #6b7280;
+  --accent-soft: #1e1b39;
+  --shadow-lg: 0 12px 32px -8px rgba(0, 0, 0, 0.55);
+}
+html[data-theme="light"] {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --border: #e4e7ec;
+  --border-strong: #d0d5dd;
+  --text: #101828;
+  --text-muted: #667085;
+  --text-faint: #98a2b3;
+  --accent-soft: #eef2ff;
+  --shadow-lg: 0 12px 32px -8px rgba(16, 24, 40, 0.18);
+}
+
+/* Barnboard brand accent — pasture green (starter allows overriding --accent). */
+:root { --accent: #15803d; --accent-hover: #166534; --accent-soft-bar: #bbe5c8; }
+html[data-theme="dark"] { --accent-soft-bar: #1d3b28; }
+@media (prefers-color-scheme: dark) {
+  :root { --accent-soft-bar: #1d3b28; }
+  html[data-theme="light"] { --accent-soft-bar: #bbe5c8; }
+}
+
+/* DO-NOT-TANK banner — must be impossible to miss. */
+.banner-danger {
+  background: var(--danger-soft);
+  border: 1.5px solid var(--danger);
+  border-left-width: 6px;
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  line-height: 1.55;
+}
+.banner-danger a { color: inherit; }
+html[data-theme="dark"] .banner-danger { background: #2a1210; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .banner-danger { background: #2a1210; }
+}
+
+.row-withheld td { background: var(--danger-soft); }
+html[data-theme="dark"] .row-withheld td { background: #241110; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .row-withheld td { background: #241110; }
+}
+
+@keyframes bb-blink { 50% { opacity: 0.55; } }
+.blink { animation: bb-blink 1.6s ease-in-out infinite; }
+
+/* Milk logging — big touch targets for barn thumbs. */
+.milk-form { gap: 6px; }
+.milk-input { width: 88px; font-size: 16px; } /* 16px stops iOS zoom-on-focus */
+.sel-inline { width: auto; padding: 4px 8px; font-size: 12.5px; }
+
+.alert-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.alert-item:last-of-type { border-bottom: 0; }
+.alert-item .badge { flex-shrink: 0; margin-top: 2px; }
+
+.chart-wrap svg { display: block; }
+
+@media (max-width: 640px) { .hide-sm { display: none; } }
+
+/* Command palette (Ctrl/Cmd+K) */
+.palette-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(10, 12, 16, 0.45); backdrop-filter: blur(2px);
+  display: none; align-items: flex-start; justify-content: center;
+  padding: 12vh 16px 0;
+}
+.palette-overlay.open { display: flex; }
+.palette {
+  width: 100%; max-width: 480px;
+  background: var(--surface); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden;
+}
+.palette input {
+  width: 100%; border: 0; outline: 0; background: transparent;
+  color: var(--text); font: inherit; font-size: 15px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.palette__list { max-height: 320px; overflow-y: auto; padding: 6px; }
+.palette__item {
+  display: flex; justify-content: space-between; gap: 10px; align-items: center;
+  padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer;
+  color: var(--text);
+}
+.palette__item.sel, .palette__item:hover { background: var(--accent-soft); }
+.palette__item .kind { font-size: 11px; color: var(--text-faint); text-transform: uppercase; }
+.palette__empty { padding: 18px; text-align: center; color: var(--text-faint); }
+.kbd {
+  font: 11px/1 var(--font-mono); color: var(--text-muted);
+  border: 1px solid var(--border-strong); border-bottom-width: 2px;
+  border-radius: 5px; padding: 3px 6px; background: var(--surface-2);
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · {{ app_name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/barnboard.css">
+</head>
+<body>
+  <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px">
+    <div class="card" style="width:100%; max-width:380px">
+      <div class="card__body" style="padding:28px">
+        <div style="text-align:center; margin-bottom:20px">
+          <div style="font-size:36px">🐄</div>
+          <h1 style="margin:8px 0 4px; font-size:22px">{{ app_name }}</h1>
+          <p class="muted" style="margin:0">{{ app_tagline }}</p>
+        </div>
+        {% if error %}
+          <div class="banner-danger" style="margin-bottom:14px">{{ t(error) }}</div>
+        {% endif %}
+        {% if info %}
+          <div class="banner-danger" style="margin-bottom:14px; border-color: var(--success); background: var(--success-soft)">{{ t(info) }}</div>
+        {% endif %}
+        <form method="post" action="/login">
+          <div class="field">
+            <label for="username">{{ t('Username') }}</label>
+            <input class="input" id="username" name="username" autocomplete="username" required autofocus>
+          </div>
+          <div class="field">
+            <label for="password">{{ t('Password') }}</label>
+            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+          </div>
+          <button class="btn btn--primary" type="submit" style="width:100%; margin-top:6px">{{ t('Sign in') }}</button>
+        </form>
+        <p class="muted" style="font-size:13px; text-align:center; margin-top:16px">
+          {{ t('New here?') }} <a href="/signup">{{ t('Create an account') }}</a>
+        </p>
+        <p class="muted" style="font-size:13px; text-align:center; margin-top:6px">
+          <a href="/forgot">{{ t('Forgot your password?') }}</a>
+        </p>
+        <p class="faint" style="font-size:12px; text-align:center; margin-top:8px">
+          {{ t('Signed in for 30 days on this device.') }}
+        </p>
+        <p style="font-size:13px; text-align:center; margin-top:10px">
+          <a href="/lang/en?next=/login">English</a> · <a href="/lang/te?next=/login">తెలుగు</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

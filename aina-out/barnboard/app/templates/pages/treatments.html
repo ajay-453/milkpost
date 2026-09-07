@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Health · {{ app_name }}{% endblock %}
+{% block heading %}{{ t('Health & Treatments') }}{% endblock %}
+{% block actions %}
+  <span class="htmx-indicator"><span class="spinner"></span></span>
+  <a class="btn btn--ghost btn--sm" href="/export/treatments.csv">{{ t('Export CSV') }}</a>
+{% endblock %}
+{% block content %}
+  {% set active_list = treatments|selectattr('active')|list %}
+  {% if active_list %}
+    <div class="banner-danger">
+      <strong>⛔ {{ t('Active milk withholding:') }}</strong>
+      {% for tr in active_list %}<strong>#{{ tr.tag }} {{ tr.name }}</strong> {{ t('until') }} {{ tr.clear_date }}{% if not loop.last %}, {% endif %}{% endfor %}
+      — {{ t('keep their milk out of the tank.') }} {{ t('These dates are also in the') }} <a href="{{ feed_url }}">{{ t('the reminder feed') }}</a>.
+    </div>
+  {% endif %}
+
+  <div class="grid grid--2" style="grid-template-columns: 1fr 320px; align-items:start;">
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title">{{ t('Treatment history') }}</div>
+        <span class="badge">{{ treatments|length }} {{ t('records') }}</span>
+      </div>
+      <table class="table">
+        <thead><tr><th>{{ t('Cow') }}</th><th>{{ t('Drug / procedure') }}</th><th>{{ t('Date') }}</th><th>{{ t('Withhold') }}</th><th>{{ t('Milk status') }}</th><th class="hide-sm">{{ t('Notes') }}</th></tr></thead>
+        <tbody id="treatment-list">
+          {% for tr in treatments %}
+            {% include "partials/treatment_row.html" %}
+          {% else %}
+            <tr><td colspan="6"><div class="empty"><div class="empty__icon">💊</div>
+              No treatments recorded — that's a healthy herd.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><div class="card__title">{{ t('Record a treatment') }}</div></div>
+      <div class="card__body">
+        <form hx-post="/treatments" hx-target="#treatment-list" hx-swap="afterbegin" hx-on::after-request="if(event.detail.successful) this.reset()">
+          <div class="field">
+            <label for="t-cow">{{ t('Cow *') }}</label>
+            <select class="input" id="t-cow" name="cow_id" required>
+              {% for c in cows %}<option value="{{ c.id }}">#{{ c.tag }} {{ c.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="t-drug">{{ t('Drug / procedure *') }}</label>
+            <input class="input" id="t-drug" name="drug" placeholder="e.g. Penicillin (mastitis)" required>
+          </div>
+          <div class="field">
+            <label for="t-date">{{ t('Treated on *') }}</label>
+            <input class="input" id="t-date" name="treated_on" type="date" value="{{ today }}" required>
+          </div>
+          <div class="field">
+            <label for="t-days">{{ t('Milk withholding (days)') }}</label>
+            <input class="input" id="t-days" name="withhold_days" type="number" min="0" max="120" value="0">
+            <span class="faint" style="font-size:12px">{{ t('From the drug label or your vet. 0 = no withhold.') }}</span>
+          </div>
+          <div class="field">
+            <label for="t-notes">{{ t('Notes') }}</label>
+            <input class="input" id="t-notes" name="notes" placeholder="e.g. recheck Friday">
+          </div>
+          <button class="btn btn--primary" type="submit" style="width:100%">
+            {{ t('Save treatment') }} <span class="htmx-indicator"><span class="spinner"></span></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

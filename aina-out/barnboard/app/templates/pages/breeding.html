@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Breeding · {{ app_name }}{% endblock %}
+{% block heading %}{{ t('Breeding & Calving') }}{% endblock %}
+{% block actions %}
+  <span class="htmx-indicator"><span class="spinner"></span></span>
+  <a class="btn btn--ghost btn--sm" href="/export/breedings.csv">{{ t('Export CSV') }}</a>
+{% endblock %}
+{% block content %}
+  <div class="grid grid--2" style="grid-template-columns: 1fr 320px; align-items:start;">
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title">{{ t('Breeding records') }}</div>
+        <span class="badge">{{ breedings|length }} {{ t('records') }}</span>
+      </div>
+      <table class="table">
+        <thead><tr><th>{{ t('Cow') }}</th><th>{{ t('Inseminated') }}</th><th>{{ t('Due') }}</th><th>{{ t('Outcome') }}</th><th style="text-align:right">{{ t('Update') }}</th></tr></thead>
+        <tbody id="breeding-list">
+          {% for b in breedings %}
+            {% include "partials/breeding_row.html" %}
+          {% else %}
+            <tr><td colspan="5"><div class="empty"><div class="empty__icon">🍼</div>
+              No breeding records yet — record an insemination →</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="card__body">
+        <p class="faint" style="font-size:12.5px">{{ t('Marking a record calved creates the calf in the herd automatically.') }} {{ t('Due dates and planned dry-offs feed the') }} <a href="{{ feed_url }}">{{ t('the reminder feed') }}</a>.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><div class="card__title">{{ t('Record insemination') }}</div></div>
+      <div class="card__body">
+        <form hx-post="/breeding" hx-target="#breeding-list" hx-swap="afterbegin" hx-on::after-request="if(event.detail.successful) this.reset()">
+          <div class="field">
+            <label for="b-cow">{{ t('Cow *') }}</label>
+            <select class="input" id="b-cow" name="cow_id" required>
+              {% for c in cows %}<option value="{{ c.id }}">#{{ c.tag }} {{ c.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="b-date">{{ t('Inseminated on *') }}</label>
+            <input class="input" id="b-date" name="inseminated_on" type="date" value="{{ today }}" required>
+          </div>
+          <div class="field">
+            <label for="b-due">{{ t('Due date (blank = +283 days)') }}</label>
+            <input class="input" id="b-due" name="due_date" type="date" placeholder="{{ default_due }}">
+          </div>
+          <div class="field">
+            <label for="b-notes">{{ t('Notes') }}</label>
+            <input class="input" id="b-notes" name="notes" placeholder="e.g. AI at govt centre, Gir semen">
+          </div>
+          <button class="btn btn--primary" type="submit" style="width:100%">
+            {{ t('Save record') }} <span class="htmx-indicator"><span class="spinner"></span></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

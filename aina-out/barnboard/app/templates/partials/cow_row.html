@@ -1,0 +1,19 @@
+<tr id="cow-{{ cow.id }}">
+  <td><strong>#{{ cow.tag }}</strong> {{ cow.name }}</td>
+  <td class="muted">{{ cow.breed or "—" }}</td>
+  <td class="muted">
+    {% if cow.dob %}{{ cow.dob }} <span class="faint">(~{{ (today[:4]|int) - (cow.dob[:4]|int) }} yr)</span>{% else %}—{% endif %}
+  </td>
+  <td>
+    {% set cls = {'milking':'badge--accent','dry':'badge--warning','sold':'badge--danger'}.get(cow.status,'') %}
+    <span class="badge {{ cls }}">{{ t(cow.status) }}</span>
+  </td>
+  <td style="text-align:right">
+    <select class="input sel-inline" name="status" title="Change status"
+            hx-post="/cows/{{ cow.id }}/status" hx-target="#cow-{{ cow.id }}" hx-swap="outerHTML">
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if s == cow.status %}selected{% endif %}>{{ t(s) }}</option>
+      {% endfor %}
+    </select>
+  </td>
+</tr>

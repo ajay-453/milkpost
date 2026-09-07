@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Herd · {{ app_name }}{% endblock %}
+{% block heading %}{{ t('Herd') }}{% endblock %}
+{% block actions %}
+  <span class="htmx-indicator"><span class="spinner"></span></span>
+  <a class="btn btn--ghost btn--sm" href="/export/cows.csv">{{ t('Export CSV') }}</a>
+{% endblock %}
+{% block content %}
+  <div class="grid grid--2" style="grid-template-columns: 1fr 320px; align-items:start;">
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title">{{ t('All cattle') }}</div>
+        <span class="badge">{{ cows|length }} {{ t('total') }}</span>
+      </div>
+      <table class="table">
+        <thead><tr><th>{{ t('Tag / Name') }}</th><th>{{ t('Breed') }}</th><th>{{ t('Born') }}</th><th>{{ t('Status') }}</th><th></th></tr></thead>
+        <tbody id="cow-list">
+          {% for cow in cows %}
+            {% include "partials/cow_row.html" %}
+          {% else %}
+            <tr><td colspan="5"><div class="empty"><div class="empty__icon">🐄</div>
+              The barn is empty — add your first cow →</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><div class="card__title">{{ t('Add a cow') }}</div></div>
+      <div class="card__body">
+        <form hx-post="/cows" hx-target="#cow-list" hx-swap="beforeend" hx-on::after-request="if(event.detail.successful) this.reset()">
+          <div class="field">
+            <label for="tag">{{ t('Ear tag *') }}</label>
+            <input class="input" id="tag" name="tag" placeholder="e.g. 113" required>
+          </div>
+          <div class="field">
+            <label for="name">{{ t('Name') }}</label>
+            <input class="input" id="name" name="name" placeholder="e.g. Gauri">
+          </div>
+          <div class="field">
+            <label for="breed">{{ t('Breed') }}</label>
+            <input class="input" id="breed" name="breed" placeholder="e.g. Gir" list="breeds">
+            <datalist id="breeds">
+              <option>Gir</option><option>Sahiwal</option><option>Red Sindhi</option>
+              <option>Tharparkar</option><option>Rathi</option><option>Kankrej</option>
+              <option>HF cross</option><option>Jersey cross</option>
+              <option>Murrah buffalo</option><option>Jaffarabadi buffalo</option><option>Mehsana buffalo</option>
+            </datalist>
+          </div>
+          <div class="field">
+            <label for="dob">{{ t('Date of birth') }}</label>
+            <input class="input" id="dob" name="dob" type="date">
+          </div>
+          <div class="field">
+            <label for="status">{{ t('Status') }}</label>
+            <select class="input" id="status" name="status">
+              {% for s in statuses if s != 'sold' %}
+                <option value="{{ s }}" {% if s == 'milking' %}selected{% endif %}>{{ t(s) }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="btn btn--primary" type="submit" style="width:100%">
+            {{ t('Add to herd') }} <span class="htmx-indicator"><span class="spinner"></span></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% set is_withheld = cow.id in withheld %}
+{% set logged = cow.id in logs %}
+<tr id="milk-{{ cow.id }}" {% if is_withheld %}class="row-withheld"{% endif %}>
+  <td>
+    <strong>#{{ cow.tag }}</strong> {{ cow.name }}
+    {% if is_withheld %}<span class="badge badge--danger blink">{{ t('DO NOT TANK') }}</span>{% endif %}
+  </td>
+  <td class="muted hide-sm">
+    {% if cow.id in prev_logs %}{{ "%.1f"|format(prev_logs[cow.id]) }} {{ t('L last time') }}{% else %}—{% endif %}
+  </td>
+  <td>
+    <form hx-post="/milk/log" hx-target="#milk-{{ cow.id }}" hx-swap="outerHTML" class="row milk-form">
+      <input type="hidden" name="cow_id" value="{{ cow.id }}">
+      <input type="hidden" name="log_date" value="{{ log_date }}">
+      <input type="hidden" name="session" value="{{ session }}">
+      <input class="input milk-input" type="number" inputmode="decimal" step="0.1" min="0" max="80"
+             name="litres" required aria-label="Litres for #{{ cow.tag }}"
+             value="{{ '%.1f'|format(logs[cow.id]) if logged else '' }}"
+             placeholder="{{ '%.1f'|format(prev_logs[cow.id]) if cow.id in prev_logs else 'L' }}">
+      <button class="btn btn--sm {% if logged %}btn--ghost{% else %}btn--primary{% endif %}" type="submit">
+        {{ t("Update") if logged else t("Save") }}
+      </button>
+    </form>
+  </td>
+  <td class="hide-sm">
+    {% if logged %}<span class="badge badge--success">{{ t('logged') }}</span>{% else %}<span class="badge">{{ t('pending') }}</span>{% endif %}
+  </td>
+</tr>

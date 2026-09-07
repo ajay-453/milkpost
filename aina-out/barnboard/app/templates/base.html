@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <meta name="description" content="{{ app_tagline }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/barnboard.css">
+  <script src="/static/js/htmx.min.js" defer></script>
+  <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__brand">
+        <span class="logo">{{ app_name[:1]|upper }}</span>
+        <span>{{ app_name }}</span>
+      </div>
+      <nav class="sidebar__nav">
+        <div class="sidebar__section">{{ t('Workspace') }}</div>
+        {% for item in nav %}
+          <a class="nav-item {% if item.key == active %}active{% endif %}" href="{{ item.href }}">
+            <span class="ico">{{ item.icon|safe }}</span>
+            <span>{{ t(item.label) }}</span>
+          </a>
+        {% endfor %}
+      </nav>
+      <div class="sidebar__footer">
+        <a class="nav-item" href="{{ feed_url }}" title="Subscribe in your calendar app">
+          <span class="ico">📅</span><span>{{ t('Reminder feed') }}</span>
+        </a>
+        <div class="row between" style="margin-bottom:8px">
+          <a href="/account" title="{{ t('My account') }}" style="text-decoration:none; color:inherit">👤 {{ user.username if user else "" }}</a>
+          <form method="post" action="/logout" style="margin:0">
+            <button class="btn btn--ghost btn--sm" type="submit">{{ t('Sign out') }}</button>
+          </form>
+        </div>
+        <div class="row between">
+          <span>v1.6 · barnboard</span>
+          <span class="badge badge--success">healthy</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="row">
+          <button class="btn btn--ghost btn--sm menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+          <div class="topbar__title">
+            <span class="crumb">{{ app_name }}</span>
+            <h1>{% block heading %}Dashboard{% endblock %}</h1>
+          </div>
+        </div>
+        <div class="topbar__actions">
+          {% block actions %}{% endblock %}
+          <button class="btn btn--ghost btn--sm" onclick="bbOpenPalette()" title="Command palette">
+            <span class="kbd">Ctrl K</span>
+          </button>
+          <a class="btn btn--ghost btn--sm" href="/lang/{{ 'en' if lang == 'te' else 'te' }}?next={{ request.url.path }}" title="{{ t('Language') }}">{{ 'EN' if lang == 'te' else 'తె' }}</a>
+          <button class="btn btn--ghost btn--sm" id="theme-toggle" onclick="bbToggleTheme()" title="Toggle light/dark">🌙</button>
+        </div>
+      </header>
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <div class="palette-overlay" id="palette-overlay">
+    <div class="palette">
+      <input id="palette-input" type="text" placeholder="{{ t('Jump to a page or cow…') }}" autocomplete="off">
+      <div class="palette__list" id="palette-list"></div>
+    </div>
+  </div>
+  <script id="palette-data" type="application/json">{{ palette_json|safe }}</script>
+  <div id="toasts"></div>
+  <script>
+    document.body.addEventListener("htmx:afterRequest", (e) => {
+      const msg = e.detail.xhr.getResponseHeader("X-Toast");
+      if (!msg) return;
+      const t = document.createElement("div");
+      t.className = "toast"; t.textContent = msg;
+      document.getElementById("toasts").appendChild(t);
+      setTimeout(() => t.remove(), 3200);
+    });
+  </script>
+</body>
+</html>

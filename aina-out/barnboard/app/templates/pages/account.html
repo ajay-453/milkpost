@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ t('My account') }} · {{ app_name }}{% endblock %}
+{% block heading %}{{ t('My account') }}{% endblock %}
+{% block content %}
+  <div class="grid grid--2" style="grid-template-columns: 380px 320px; align-items:start; justify-content:start">
+    <div class="card">
+      <div class="card__head"><div class="card__title">{{ t('Change password') }}</div></div>
+      <div class="card__body">
+        {% if info %}
+          <div class="banner-danger" style="margin-bottom:14px; border-color: var(--success); background: var(--success-soft)">{{ t(info) }}</div>
+        {% endif %}
+        {% if error %}
+          <div class="banner-danger" style="margin-bottom:14px">{{ t(error) }}</div>
+        {% endif %}
+        <p class="muted" style="margin-top:0">{{ t('Signed in as') }} <strong>{{ user.username }}</strong>
+          · <span class="badge {{ 'badge--accent' if user.role == 'owner' }}">{{ t(user.role) }}</span></p>
+        <form method="post" action="/account/password">
+          <div class="field">
+            <label for="current">{{ t('Current password') }}</label>
+            <input class="input" id="current" name="current" type="password" autocomplete="current-password" required>
+          </div>
+          <div class="field">
+            <label for="new">{{ t('New password (8+ characters)') }}</label>
+            <input class="input" id="new" name="new" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <div class="field">
+            <label for="new2">{{ t('Repeat new password') }}</label>
+            <input class="input" id="new2" name="new2" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <button class="btn btn--primary" type="submit" style="width:100%">{{ t('Update password') }}</button>
+        </form>
+        <p class="faint mt-2" style="font-size:12px">{{ t('Other devices are signed out when you change your password.') }}</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card__head"><div class="card__title">{{ t('Recovery question') }}</div></div>
+        <div class="card__body">
+          {% if q_error %}<div class="banner-danger" style="margin-bottom:12px">{{ t(q_error) }}</div>{% endif %}
+          <p class="muted" style="margin-top:0; font-size:13px">
+            {% if current_question %}{{ t('This lets you reset your own password if you forget it.') }}
+            {% else %}⚠️ {{ t('Set this so you can reset your own password if you forget it.') }}{% endif %}
+          </p>
+          <form method="post" action="/account/security">
+            <div class="field">
+              <label for="question">{{ t('Recovery question') }}</label>
+              <select class="input" id="question" name="question" required>
+                {% for q in questions %}
+                  <option value="{{ q }}" {% if q == current_question %}selected{% endif %}>{{ t(q) }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label for="answer">{{ t('Your answer') }}</label>
+              <input class="input" id="answer" name="answer" autocomplete="off"
+                     placeholder="{% if current_question %}{{ t('Enter a new answer') }}{% endif %}" required>
+            </div>
+            <button class="btn btn--primary" type="submit" style="width:100%">{{ t('Save recovery question') }}</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card__head"><div class="card__title">{{ t('Language') }}</div></div>
+        <div class="card__body">
+          <div class="row" style="gap:8px">
+            <a class="btn {% if lang == 'en' %}btn--primary{% endif %}" href="/lang/en?next=/account">English</a>
+            <a class="btn {% if lang == 'te' %}btn--primary{% endif %}" href="/lang/te?next=/account">తెలుగు</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

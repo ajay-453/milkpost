@@ -1,0 +1,16 @@
+<div id="reset-link-box" class="card" style="border-color: var(--accent); margin-bottom:16px" hx-swap-oob="true">
+  <div class="card__body">
+    <div class="card__title" style="margin-bottom:6px">🔑 {{ t('Reset link for') }} {{ u.username }}</div>
+    <p class="faint" style="font-size:12.5px; margin-top:0">
+      {{ t('Give this one-time link to') }} {{ u.username }} {{ t('in person. It works once and expires in') }} {{ hours }} {{ t('hours') }}.
+    </p>
+    <div class="row" style="gap:8px">
+      <input class="input" id="reset-link-input" value="{{ link }}" readonly onclick="this.select()"
+             style="font-family:var(--font-mono); font-size:12.5px">
+      <button class="btn btn--sm" type="button"
+              onclick="navigator.clipboard.writeText(document.getElementById('reset-link-input').value)">
+        {{ t('Copy') }}
+      </button>
+    </div>
+  </div>
+</div>

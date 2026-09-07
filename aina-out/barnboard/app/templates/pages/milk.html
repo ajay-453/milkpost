@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Milk Log · {{ app_name }}{% endblock %}
+{% block heading %}{{ t('Milk Log') }}{% endblock %}
+{% block actions %}
+  <span class="htmx-indicator"><span class="spinner"></span></span>
+  <a class="btn btn--ghost btn--sm" href="/export/milk_logs.csv">{{ t('Export CSV') }}</a>
+{% endblock %}
+{% block content %}
+  <div class="card">
+    <div class="card__head" style="flex-wrap:wrap; gap:10px">
+      <div class="row" style="gap:8px">
+        <form method="get" action="/milk" class="row" style="gap:8px">
+          <input class="input" type="date" name="d" value="{{ log_date }}" onchange="this.form.submit()" style="width:150px">
+          <input type="hidden" name="session" value="{{ session }}">
+        </form>
+        <div class="row" style="gap:4px">
+          <a class="btn btn--sm {% if session == 'AM' %}btn--primary{% endif %}" href="/milk?d={{ log_date }}&session=AM">🌅 AM</a>
+          <a class="btn btn--sm {% if session == 'PM' %}btn--primary{% endif %}" href="/milk?d={{ log_date }}&session=PM">🌇 PM</a>
+        </div>
+      </div>
+      <div class="row" style="gap:14px">
+        <span class="muted"><span id="logged-count">{{ logged_n }}</span>/{{ cows|length }} {{ t('logged') }}</span>
+        <strong>{{ t('Session total:') }} <span id="session-total">{{ "%.1f"|format(total) }} L</span></strong>
+      </div>
+    </div>
+    <table class="table">
+      <thead><tr><th>{{ t('Cow') }}</th><th class="hide-sm">{{ t('Previous') }}</th><th>{{ t('Litres') }}</th><th class="hide-sm">{{ t('Status') }}</th></tr></thead>
+      <tbody id="milk-list">
+        {% for cow in cows %}
+          {% include "partials/milk_row.html" %}
+        {% else %}
+          <tr><td colspan="4"><div class="empty"><div class="empty__icon">🐄</div>
+            No milking cows in the herd yet — <a href="/cows">add cows</a> and set their status to
+            <span class="badge badge--accent">milking</span>.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if withheld %}
+    <p class="faint mt-2" style="font-size:12.5px">⛔ {{ t('Cows marked') }} <span class="badge badge--danger">{{ t('DO NOT TANK') }}</span>
+    {{ t('are under an active milk withholding — record their yield if you milk them, but dump the milk.') }}</p>
+  {% endif %}
+{% endblock %}

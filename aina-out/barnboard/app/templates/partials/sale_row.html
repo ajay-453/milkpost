@@ -1,0 +1,7 @@
+<tr id="sale-{{ s.id }}">
+  <td class="muted">{{ s.collected_on }}</td>
+  <td><strong>{{ "%.1f"|format(s.litres) }} L</strong></td>
+  <td class="muted">{{ currency }}{{ "%.2f"|format(s.price_per_litre) }}/L</td>
+  <td><strong>{{ currency }}{{ (s.litres * s.price_per_litre)|inr(2) }}</strong></td>
+  <td class="muted hide-sm">{{ s.notes or "" }}</td>
+</tr>

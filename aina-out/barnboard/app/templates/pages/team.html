@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Team · {{ app_name }}{% endblock %}
+{% block heading %}{{ t('Team') }}{% endblock %}
+{% block actions %}
+  <span class="htmx-indicator"><span class="spinner"></span></span>
+{% endblock %}
+{% block content %}
+  <div id="reset-link-box"></div>
+  {% if pending_n %}
+    <div class="banner-danger" style="border-color: var(--warning); background: var(--warning-soft)">
+      <strong>⏳ {{ pending_n }} {{ t('account(s) waiting for approval') }}</strong>
+      — {{ t('new signups cannot use Barnboard until you approve them below.') }}
+    </div>
+  {% endif %}
+
+  <div class="card" style="max-width:820px">
+    <div class="card__head">
+      <div class="card__title">{{ t('Farm team') }}</div>
+      <span class="badge">{{ users|length }} account{{ 's' if users|length != 1 }}</span>
+    </div>
+    <table class="table">
+      <thead><tr><th>{{ t('Username') }}</th><th>{{ t('Role') }}</th><th>{{ t('Status') }}</th><th class="hide-sm">{{ t('Joined') }}</th><th style="text-align:right">{{ t('Actions') }}</th></tr></thead>
+      <tbody id="team-list">
+        {% for u in users %}
+          {% include "partials/team_row.html" %}
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="card__body">
+      <p class="faint" style="font-size:12.5px">
+        <strong>Owners</strong> manage the team; <strong>helpers</strong> can do everything else
+        (log milk, treatments, breeding, sales). New signups from the login page wait here until
+        an owner approves them. The farm always keeps at least one owner.
+      </p>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+<tr id="user-{{ u.id }}">
+  <td>
+    <strong>{{ u.username }}</strong>
+    {% if u.id == me_id %}<span class="faint">{{ t('(you)') }}</span>{% endif %}
+  </td>
+  <td>
+    {% if u.role == 'owner' %}<span class="badge badge--accent">{{ t('owner') }}</span>
+    {% else %}<span class="badge">{{ t('helper') }}</span>{% endif %}
+  </td>
+  <td>
+    {% if u.approved %}<span class="badge badge--success">{{ t('active') }}</span>
+    {% else %}<span class="badge badge--warning">{{ t('waiting approval') }}</span>{% endif %}
+  </td>
+  <td class="muted hide-sm">{{ u.created_at[:10] }}</td>
+  <td style="text-align:right">
+    <div class="row" style="justify-content:flex-end; gap:6px">
+      {% if not u.approved %}
+        <button class="btn btn--sm btn--primary"
+                hx-post="/team/{{ u.id }}/approve" hx-target="#user-{{ u.id }}" hx-swap="outerHTML">
+          {{ t('Approve') }}
+        </button>
+      {% endif %}
+      {% if u.approved %}
+        <button class="btn btn--sm btn--ghost"
+                hx-post="/team/{{ u.id }}/reset" hx-target="#user-{{ u.id }}" hx-swap="none">
+          {{ t('Reset password') }}
+        </button>
+      {% endif %}
+      {% if u.id != me_id %}
+        {% if u.approved %}
+          <form hx-post="/team/{{ u.id }}/role" hx-target="#user-{{ u.id }}" hx-swap="outerHTML" style="margin:0">
+            <input type="hidden" name="role" value="{{ 'helper' if u.role == 'owner' else 'owner' }}">
+            <button class="btn btn--sm btn--ghost" type="submit"
+                    {% if u.role == 'owner' and owner_count <= 1 %}disabled title="The farm needs at least one owner"{% endif %}>
+              {{ t('Make helper') if u.role == 'owner' else t('Make owner') }}
+            </button>
+          </form>
+        {% endif %}
+        <button class="btn btn--sm btn--ghost"
+                hx-post="/team/{{ u.id }}/remove" hx-target="#user-{{ u.id }}" hx-swap="outerHTML"
+                hx-confirm="Remove {{ u.username }}? Their login stops working immediately."
+                {% if u.role == 'owner' and u.approved and owner_count <= 1 %}disabled title="The farm needs at least one owner"{% endif %}>
+          {{ t('Reject') if not u.approved else t('Remove') }}
+        </button>
+      {% endif %}
+    </div>
+  </td>
+</tr>

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Milk Sales · {{ app_name }}{% endblock %}
+{% block heading %}{{ t('Milk Sales') }}{% endblock %}
+{% block actions %}
+  <span class="htmx-indicator"><span class="spinner"></span></span>
+  <a class="btn btn--ghost btn--sm" href="/export/sales.csv">{{ t('Export CSV') }}</a>
+{% endblock %}
+{% block content %}
+  <div class="grid grid--2" style="grid-template-columns: 1fr 320px; align-items:start;">
+    <div>
+      <div class="card">
+        <div class="card__head"><div class="card__title">{{ t('Monthly summary') }}</div></div>
+        <table class="table">
+          <thead><tr><th>{{ t('Month') }}</th><th>{{ t('Litres sold') }}</th><th>{{ t('Revenue') }}</th><th>{{ t('avg') }} {{ currency }}/L</th></tr></thead>
+          <tbody>
+            {% for m in months %}
+              <tr>
+                <td><strong>{{ m.ym }}</strong></td>
+                <td>{{ m.litres|inr }} L</td>
+                <td><strong>{{ currency }}{{ m.revenue|inr(2) }}</strong></td>
+                <td class="muted">{{ currency }}{{ "%.2f"|format(m.revenue / m.litres if m.litres else 0) }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4"><div class="empty"><div class="empty__icon">🧾</div>
+                No collections yet — record the first tanker pickup →</div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card__head">
+          <div class="card__title">{{ t('Collections') }}</div>
+          <span class="badge">{{ sales|length }} {{ t('shown') }}</span>
+        </div>
+        <table class="table">
+          <thead><tr><th>{{ t('Date') }}</th><th>{{ t('Litres') }}</th><th>{{ t('Price') }}</th><th>{{ t('Total') }}</th><th class="hide-sm">{{ t('Notes') }}</th></tr></thead>
+          <tbody id="sale-list">
+            {% for s in sales %}
+              {% include "partials/sale_row.html" %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><div class="card__title">{{ t('Record a collection') }}</div></div>
+      <div class="card__body">
+        <form hx-post="/sales" hx-target="#sale-list" hx-swap="afterbegin" hx-on::after-request="if(event.detail.successful) this.reset()">
+          <div class="field">
+            <label for="s-date">{{ t('Collected on *') }}</label>
+            <input class="input" id="s-date" name="collected_on" type="date" value="{{ today }}" required>
+          </div>
+          <div class="field">
+            <label for="s-litres">{{ t('Litres *') }}</label>
+            <input class="input" id="s-litres" name="litres" type="number" inputmode="decimal" step="0.1" min="0.1" placeholder="e.g. 480" required>
+          </div>
+          <div class="field">
+            <label for="s-price">{{ t('Price per litre (₹) *') }}</label>
+            <input class="input" id="s-price" name="price_per_litre" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="e.g. 42.50" required>
+          </div>
+          <div class="field">
+            <label for="s-notes">{{ t('Notes') }}</label>
+            <input class="input" id="s-notes" name="notes" placeholder="e.g. village dairy society">
+          </div>
+          <button class="btn btn--primary" type="submit" style="width:100%">
+            {{ t('Save collection') }} <span class="htmx-indicator"><span class="spinner"></span></span>
+          </button>
+        </form>
+        <p class="faint mt-2" style="font-size:12.5px">Note the monthly summary refreshes on page reload.</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -2,6 +2,71 @@
   "layer": "semantic",
   "metrics": [
     {
+      "metric": "avg_daily_yield_per_cow",
+      "label": "Avg daily yield per cow",
+      "description": "Average litres one cow gives in one day (AM+PM). Computed as total litres divided by cow-days at the cow-day grain — never by summing per-cow averages.",
+      "aggregation": "derived",
+      "expression": "sum(\"litres\")*1.0/nullif(count(*),0)",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_milk_cow_daily"
+      },
+      "owner": "data-designer",
+      "unit": "L/cow/day",
+      "round": 2,
+      "lineage": [
+        "gold.agg_milk_cow_daily",
+        "silver.milk_logs",
+        "silver.cows"
+      ],
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_proposed": false,
+      "_hash": "sha256:b1bc22019b772743"
+    },
+    {
+      "metric": "cow_days_recorded",
+      "label": "Cow-days recorded",
+      "description": "Data-quality metric: number of cow-days with at least one milk log. Against herd size x days it shows logging coverage. Added via JSON definition alone — zero engine changes (D2.2).",
+      "aggregation": "count",
+      "measure": "litres",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_milk_cow_daily"
+      },
+      "owner": "data-designer",
+      "unit": "cow-days",
+      "round": 0,
+      "lineage": [
+        "gold.agg_milk_cow_daily",
+        "silver.milk_logs"
+      ],
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_proposed": false,
+      "_hash": "sha256:641af86c71b1fa3f"
+    },
+    {
       "metric": "cows",
       "label": "Cows",
       "description": "Count of cows (additive rollup of cows_count).",
@@ -59,11 +124,19 @@
         "gold.agg_milk_logs_daily"
       ],
       "_proposed": true,
-      "version": "v1",
+      "version": "v3",
       "changelog": [
         {
           "version": "v1",
           "change": "created"
+        },
+        {
+          "version": "v2",
+          "change": "definition changed"
+        },
+        {
+          "version": "v3",
+          "change": "definition changed"
         }
       ],
       "_hash": "sha256:ec58e3f3bc06ab09"
@@ -90,14 +163,62 @@
         "gold.agg_sales_daily"
       ],
       "_proposed": true,
-      "version": "v1",
+      "version": "v3",
       "changelog": [
         {
           "version": "v1",
           "change": "created"
+        },
+        {
+          "version": "v2",
+          "change": "definition changed"
+        },
+        {
+          "version": "v3",
+          "change": "definition changed"
         }
       ],
       "_hash": "sha256:1072e5e4f9f96334"
+    },
+    {
+      "metric": "litres",
+      "label": "Litres",
+      "description": "Sum of litres over the agg_milk_cow_daily fact.",
+      "aggregation": "sum",
+      "measure": "litres",
+      "dimensions": [
+        "log_date_day",
+        "cow_id",
+        "tag",
+        "breed"
+      ],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_milk_cow_daily"
+      },
+      "owner": "unassigned",
+      "unit": "",
+      "round": 2,
+      "lineage": [
+        "gold.agg_milk_cow_daily"
+      ],
+      "_proposed": true,
+      "version": "v2",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        },
+        {
+          "version": "v2",
+          "change": "definition changed"
+        }
+      ],
+      "_hash": "sha256:a991c1ca4bd46983"
     },
     {
       "metric": "milk_logs",
@@ -123,21 +244,69 @@
         "gold.agg_milk_logs_daily"
       ],
       "_proposed": true,
-      "version": "v1",
+      "version": "v3",
       "changelog": [
         {
           "version": "v1",
           "change": "created"
+        },
+        {
+          "version": "v2",
+          "change": "definition changed"
+        },
+        {
+          "version": "v3",
+          "change": "definition changed"
         }
       ],
       "_hash": "sha256:305da08cbfe78a12"
     },
     {
-      "metric": "price_per_litre",
-      "label": "Price Per Litre",
-      "description": "Sum of price_per_litre over the agg_sales_daily fact.",
+      "metric": "milk_logs",
+      "label": "Milk Logs",
+      "description": "Count of milk_logs (additive rollup of milk_logs_count).",
       "aggregation": "sum",
-      "measure": "price_per_litre",
+      "measure": "milk_logs_count",
+      "dimensions": [
+        "log_date_day",
+        "cow_id",
+        "tag",
+        "breed"
+      ],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_milk_cow_daily"
+      },
+      "owner": "unassigned",
+      "unit": "count",
+      "round": 0,
+      "lineage": [
+        "gold.agg_milk_cow_daily"
+      ],
+      "_proposed": true,
+      "version": "v2",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        },
+        {
+          "version": "v2",
+          "change": "definition changed"
+        }
+      ],
+      "_hash": "sha256:d23d0df4e2fa6071"
+    },
+    {
+      "metric": "milk_revenue",
+      "label": "Milk sales revenue",
+      "description": "Rupees received for milk: sum of litres times price per litre across collections. Additive in rupee terms; computed from components, never from a pre-averaged price.",
+      "aggregation": "derived",
+      "expression": "sum(\"litres\"*\"price_per_litre\")",
       "dimensions": [],
       "time_grains": [
         "daily",
@@ -147,13 +316,13 @@
       "rollups": {
         "daily": "gold.agg_sales_daily"
       },
-      "owner": "unassigned",
-      "unit": "",
-      "round": 2,
+      "owner": "data-designer",
+      "unit": "INR",
+      "round": 0,
       "lineage": [
-        "gold.agg_sales_daily"
+        "gold.agg_sales_daily",
+        "silver.sales"
       ],
-      "_proposed": true,
       "version": "v1",
       "changelog": [
         {
@@ -161,7 +330,44 @@
           "change": "created"
         }
       ],
-      "_hash": "sha256:0dd90d72257985fe"
+      "_proposed": false,
+      "_hash": "sha256:8ee53d8b66c21b32"
+    },
+    {
+      "metric": "price_per_litre",
+      "label": "Avg price per litre",
+      "description": "Volume-weighted average rupees per litre: total revenue divided by total litres. AUTHORED OVERRIDE of the auto-proposed sum — a price is a ratio and must be recomputed, never summed (the governance guard exists for exactly this).",
+      "aggregation": "derived",
+      "expression": "sum(\"litres\"*\"price_per_litre\")*1.0/nullif(sum(\"litres\"),0)",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_sales_daily"
+      },
+      "owner": "data-designer",
+      "unit": "INR/L",
+      "round": 2,
+      "lineage": [
+        "gold.agg_sales_daily",
+        "silver.sales"
+      ],
+      "version": "v2",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        },
+        {
+          "version": "v2",
+          "change": "definition changed"
+        }
+      ],
+      "_proposed": false,
+      "_hash": "sha256:29769c0f31c77fa2"
     },
     {
       "metric": "sales",
@@ -289,14 +495,52 @@
         }
       ],
       "_hash": "sha256:ead82cdb57d64e46"
+    },
+    {
+      "metric": "yield_by_breed",
+      "label": "Avg daily yield per cow, by breed",
+      "description": "avg_daily_yield_per_cow sliced by the breed dimension. Ratio class: recomputed per group, never summed up a grain.",
+      "aggregation": "derived",
+      "expression": "sum(\"litres\")*1.0/nullif(count(*),0)",
+      "dimensions": [
+        "breed"
+      ],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_milk_cow_daily"
+      },
+      "owner": "data-designer",
+      "unit": "L/cow/day",
+      "round": 2,
+      "lineage": [
+        "gold.agg_milk_cow_daily",
+        "silver.milk_logs",
+        "silver.cows"
+      ],
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_proposed": false,
+      "_hash": "sha256:f17c9d4b65915297"
     }
   ],
   "dimensions": {
     "breed": [],
+    "cow_id": [],
+    "log_date_day": [],
     "session": [],
-    "status": []
+    "status": [],
+    "tag": []
   },
-  "metric_count": 9,
-  "authored": 0,
-  "proposed": 9
+  "metric_count": 15,
+  "authored": 5,
+  "proposed": 10
 }

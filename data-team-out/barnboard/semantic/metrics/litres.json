@@ -1,31 +1,40 @@
 {
   "metric": "litres",
   "label": "Litres",
-  "description": "Sum of litres over the agg_sales_daily fact.",
+  "description": "Sum of litres over the agg_milk_cow_daily fact.",
   "aggregation": "sum",
   "measure": "litres",
-  "dimensions": [],
+  "dimensions": [
+    "log_date_day",
+    "cow_id",
+    "tag",
+    "breed"
+  ],
   "time_grains": [
     "daily",
     "weekly",
     "monthly"
   ],
   "rollups": {
-    "daily": "gold.agg_sales_daily"
+    "daily": "gold.agg_milk_cow_daily"
   },
   "owner": "unassigned",
   "unit": "",
   "round": 2,
   "lineage": [
-    "gold.agg_sales_daily"
+    "gold.agg_milk_cow_daily"
   ],
   "_proposed": true,
-  "version": "v1",
+  "version": "v2",
   "changelog": [
     {
       "version": "v1",
       "change": "created"
+    },
+    {
+      "version": "v2",
+      "change": "definition changed"
     }
   ],
-  "_hash": "sha256:1072e5e4f9f96334"
+  "_hash": "sha256:a991c1ca4bd46983"
 }

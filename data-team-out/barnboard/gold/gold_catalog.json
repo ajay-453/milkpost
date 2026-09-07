@@ -63,6 +63,28 @@
         "price_per_litre": "real"
       },
       "owner": "unassigned"
+    },
+    {
+      "table": "agg_milk_cow_daily",
+      "grain": "cow-day",
+      "dims": [
+        "log_date_day",
+        "cow_id",
+        "tag",
+        "breed"
+      ],
+      "measures": [
+        "litres"
+      ],
+      "count_col": "milk_logs_count",
+      "measure_types": {
+        "litres": "REAL"
+      },
+      "lineage": [
+        "silver.milk_logs",
+        "silver.cows"
+      ],
+      "authored_by": "tools/enrich_gold.py"
     }
   ],
   "dimensions": [

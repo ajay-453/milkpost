@@ -1,6 +1,216 @@
 {
   "edges": [
     {
+      "output": "silver.cows",
+      "from": [
+        "bronze.cows"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'tag', 'name', 'dob'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.milk_logs",
+      "from": [
+        "bronze.milk_logs"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.treatments",
+      "from": [
+        "bronze.treatments"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'cow_id', 'drug', 'treated_on', 'withhold_days', 'notes'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.breedings",
+      "from": [
+        "bronze.breedings"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'cow_id', 'inseminated_on', 'due_date', 'outcome'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.sales",
+      "from": [
+        "bronze.sales"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'collected_on'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "gold.agg_cows_daily",
+      "from": [
+        "silver.cows"
+      ],
+      "logic": "agg by day(dob) x ['breed', 'status']: sum(['tag']), count"
+    },
+    {
+      "output": "gold.agg_milk_logs_daily",
+      "from": [
+        "silver.milk_logs"
+      ],
+      "logic": "agg by day(log_date) x ['session']: sum(['litres']), count"
+    },
+    {
+      "output": "gold.agg_treatments_daily",
+      "from": [
+        "silver.treatments"
+      ],
+      "logic": "agg by day(treated_on) x []: sum(['withhold_days']), count"
+    },
+    {
+      "output": "gold.dim_breedings",
+      "from": [
+        "silver.breedings"
+      ],
+      "logic": "conform dimension (keys ['cow_id', 'due_date', 'id', 'inseminated_on', 'outcome'])"
+    },
+    {
+      "output": "gold.agg_sales_daily",
+      "from": [
+        "silver.sales"
+      ],
+      "logic": "agg by day(collected_on) x []: sum(['litres', 'price_per_litre']), count"
+    },
+    {
+      "output": "metric.avg_daily_yield_per_cow",
+      "from": [
+        "gold.agg_milk_cow_daily"
+      ],
+      "logic": "derived (derived) v1"
+    },
+    {
+      "output": "metric.cow_days_recorded",
+      "from": [
+        "gold.agg_milk_cow_daily"
+      ],
+      "logic": "count (additive) v1"
+    },
+    {
+      "output": "metric.cows",
+      "from": [
+        "gold.agg_cows_daily"
+      ],
+      "logic": "sum (additive) v1"
+    },
+    {
+      "output": "metric.litres",
+      "from": [
+        "gold.agg_milk_logs_daily"
+      ],
+      "logic": "sum (additive) v3"
+    },
+    {
+      "output": "metric.litres",
+      "from": [
+        "gold.agg_sales_daily"
+      ],
+      "logic": "sum (additive) v3"
+    },
+    {
+      "output": "metric.litres",
+      "from": [
+        "gold.agg_milk_cow_daily"
+      ],
+      "logic": "sum (additive) v2"
+    },
+    {
+      "output": "metric.milk_logs",
+      "from": [
+        "gold.agg_milk_logs_daily"
+      ],
+      "logic": "sum (additive) v3"
+    },
+    {
+      "output": "metric.milk_logs",
+      "from": [
+        "gold.agg_milk_cow_daily"
+      ],
+      "logic": "sum (additive) v2"
+    },
+    {
+      "output": "metric.milk_revenue",
+      "from": [
+        "gold.agg_sales_daily"
+      ],
+      "logic": "derived (derived) v1"
+    },
+    {
+      "output": "metric.price_per_litre",
+      "from": [
+        "gold.agg_sales_daily"
+      ],
+      "logic": "derived (derived) v2"
+    },
+    {
+      "output": "metric.sales",
+      "from": [
+        "gold.agg_sales_daily"
+      ],
+      "logic": "sum (additive) v1"
+    },
+    {
+      "output": "metric.tag",
+      "from": [
+        "gold.agg_cows_daily"
+      ],
+      "logic": "sum (additive) v1"
+    },
+    {
+      "output": "metric.treatments",
+      "from": [
+        "gold.agg_treatments_daily"
+      ],
+      "logic": "sum (additive) v1"
+    },
+    {
+      "output": "metric.withhold_days",
+      "from": [
+        "gold.agg_treatments_daily"
+      ],
+      "logic": "sum (additive) v1"
+    },
+    {
+      "output": "metric.yield_by_breed",
+      "from": [
+        "gold.agg_milk_cow_daily"
+      ],
+      "logic": "derived (derived) v1"
+    },
+    {
+      "output": "report.q1",
+      "from": [
+        "metric.cow_days_recorded"
+      ],
+      "logic": "count over gold; additive"
+    },
+    {
+      "output": "report.q2",
+      "from": [
+        "metric.avg_daily_yield_per_cow"
+      ],
+      "logic": "derived over gold; additive"
+    },
+    {
+      "output": "report.q3",
+      "from": [
+        "metric.yield_by_breed"
+      ],
+      "logic": "derived over gold; additive"
+    },
+    {
+      "output": "report.q4",
+      "from": [
+        "metric.milk_revenue"
+      ],
+      "logic": "derived over gold; additive"
+    },
+    {
+      "output": "report.q5",
+      "from": [
+        "metric.price_per_litre"
+      ],
+      "logic": "derived over gold; additive"
+    },
+    {
       "output": "bronze.cows",
       "from": [
         "file:cows.csv"

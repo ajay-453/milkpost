@@ -1,12 +1,55 @@
 {
   "metrics": [
     {
+      "metric": "avg_daily_yield_per_cow",
+      "aggregation": "derived",
+      "class": "derived",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"litres\")*1.0/nullif(count(*),0)",
+      "rollup_guard": {
+        "ok": false,
+        "strategy": "recompute-derived",
+        "guard": "derived",
+        "reason": "derived metric \u2014 recompute from its component metrics at the target grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "cow_days_recorded",
+      "aggregation": "count",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "count(\"litres\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (count) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
       "metric": "cows",
       "aggregation": "sum",
       "class": "additive",
       "issues": [],
       "compiles": true,
       "golden_query": "sum(\"cows_count\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "litres",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"litres\")",
       "rollup_guard": {
         "ok": true,
         "strategy": "sum",
@@ -57,16 +100,46 @@
       "result": "pass"
     },
     {
-      "metric": "price_per_litre",
+      "metric": "milk_logs",
       "aggregation": "sum",
       "class": "additive",
       "issues": [],
       "compiles": true,
-      "golden_query": "sum(\"price_per_litre\")",
+      "golden_query": "sum(\"milk_logs_count\")",
       "rollup_guard": {
         "ok": true,
         "strategy": "sum",
         "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "milk_revenue",
+      "aggregation": "derived",
+      "class": "derived",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"litres\"*\"price_per_litre\")",
+      "rollup_guard": {
+        "ok": false,
+        "strategy": "recompute-derived",
+        "guard": "derived",
+        "reason": "derived metric \u2014 recompute from its component metrics at the target grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "price_per_litre",
+      "aggregation": "derived",
+      "class": "derived",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"litres\"*\"price_per_litre\")*1.0/nullif(sum(\"litres\"),0)",
+      "rollup_guard": {
+        "ok": false,
+        "strategy": "recompute-derived",
+        "guard": "derived",
+        "reason": "derived metric \u2014 recompute from its component metrics at the target grain"
       },
       "result": "pass"
     },
@@ -123,6 +196,21 @@
         "ok": true,
         "strategy": "sum",
         "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "yield_by_breed",
+      "aggregation": "derived",
+      "class": "derived",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"litres\")*1.0/nullif(count(*),0)",
+      "rollup_guard": {
+        "ok": false,
+        "strategy": "recompute-derived",
+        "guard": "derived",
+        "reason": "derived metric \u2014 recompute from its component metrics at the target grain"
       },
       "result": "pass"
     }

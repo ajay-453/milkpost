@@ -1,0 +1,19 @@
+{
+  "metric": "price_per_litre",
+  "label": "Avg price per litre",
+  "description": "Volume-weighted average rupees per litre: total revenue divided by total litres. AUTHORED OVERRIDE of the auto-proposed sum — a price is a ratio and must be recomputed, never summed (the governance guard exists for exactly this).",
+  "aggregation": "derived",
+  "expression": "sum(\"litres\"*\"price_per_litre\")*1.0/nullif(sum(\"litres\"),0)",
+  "dimensions": [],
+  "time_grains": ["daily", "weekly", "monthly"],
+  "rollups": { "daily": "gold.agg_sales_daily" },
+  "owner": "data-designer",
+  "unit": "INR/L",
+  "round": 2,
+  "lineage": ["gold.agg_sales_daily", "silver.sales"],
+  "version": "v2",
+  "changelog": [
+    { "version": "v1", "change": "auto-proposed as sum(price_per_litre) — governance violation" },
+    { "version": "v2", "change": "authored override (D2.1): volume-weighted ratio" }
+  ]
+}

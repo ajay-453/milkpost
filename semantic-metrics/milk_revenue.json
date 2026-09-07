@@ -1,0 +1,16 @@
+{
+  "metric": "milk_revenue",
+  "label": "Milk sales revenue",
+  "description": "Rupees received for milk: sum of litres times price per litre across collections. Additive in rupee terms; computed from components, never from a pre-averaged price.",
+  "aggregation": "derived",
+  "expression": "sum(\"litres\"*\"price_per_litre\")",
+  "dimensions": [],
+  "time_grains": ["daily", "weekly", "monthly"],
+  "rollups": { "daily": "gold.agg_sales_daily" },
+  "owner": "data-designer",
+  "unit": "INR",
+  "round": 0,
+  "lineage": ["gold.agg_sales_daily", "silver.sales"],
+  "version": "v1",
+  "changelog": [{ "version": "v1", "change": "authored (D2.1)" }]
+}

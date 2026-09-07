@@ -1,14 +1,154 @@
 {
   "slug": "barnboard",
-  "generated_at": "2026-09-07T10:06:00Z",
+  "generated_at": "2026-09-07T10:20:28Z",
   "stages": [
-    "architect",
-    "engineer",
     "designer",
-    "analyst"
+    "analyst",
+    "architect",
+    "engineer"
   ],
   "lineage": {
     "edges": [
+      {
+        "output": "metric.avg_daily_yield_per_cow",
+        "from": [
+          "gold.agg_milk_cow_daily"
+        ],
+        "logic": "derived (derived) v1"
+      },
+      {
+        "output": "metric.cow_days_recorded",
+        "from": [
+          "gold.agg_milk_cow_daily"
+        ],
+        "logic": "count (additive) v1"
+      },
+      {
+        "output": "metric.cows",
+        "from": [
+          "gold.agg_cows_daily"
+        ],
+        "logic": "sum (additive) v1"
+      },
+      {
+        "output": "metric.litres",
+        "from": [
+          "gold.agg_milk_logs_daily"
+        ],
+        "logic": "sum (additive) v3"
+      },
+      {
+        "output": "metric.litres",
+        "from": [
+          "gold.agg_sales_daily"
+        ],
+        "logic": "sum (additive) v3"
+      },
+      {
+        "output": "metric.litres",
+        "from": [
+          "gold.agg_milk_cow_daily"
+        ],
+        "logic": "sum (additive) v2"
+      },
+      {
+        "output": "metric.milk_logs",
+        "from": [
+          "gold.agg_milk_logs_daily"
+        ],
+        "logic": "sum (additive) v3"
+      },
+      {
+        "output": "metric.milk_logs",
+        "from": [
+          "gold.agg_milk_cow_daily"
+        ],
+        "logic": "sum (additive) v2"
+      },
+      {
+        "output": "metric.milk_revenue",
+        "from": [
+          "gold.agg_sales_daily"
+        ],
+        "logic": "derived (derived) v1"
+      },
+      {
+        "output": "metric.price_per_litre",
+        "from": [
+          "gold.agg_sales_daily"
+        ],
+        "logic": "derived (derived) v2"
+      },
+      {
+        "output": "metric.sales",
+        "from": [
+          "gold.agg_sales_daily"
+        ],
+        "logic": "sum (additive) v1"
+      },
+      {
+        "output": "metric.tag",
+        "from": [
+          "gold.agg_cows_daily"
+        ],
+        "logic": "sum (additive) v1"
+      },
+      {
+        "output": "metric.treatments",
+        "from": [
+          "gold.agg_treatments_daily"
+        ],
+        "logic": "sum (additive) v1"
+      },
+      {
+        "output": "metric.withhold_days",
+        "from": [
+          "gold.agg_treatments_daily"
+        ],
+        "logic": "sum (additive) v1"
+      },
+      {
+        "output": "metric.yield_by_breed",
+        "from": [
+          "gold.agg_milk_cow_daily"
+        ],
+        "logic": "derived (derived) v1"
+      },
+      {
+        "output": "report.q1",
+        "from": [
+          "metric.cow_days_recorded"
+        ],
+        "logic": "count over gold; additive"
+      },
+      {
+        "output": "report.q2",
+        "from": [
+          "metric.avg_daily_yield_per_cow"
+        ],
+        "logic": "derived over gold; additive"
+      },
+      {
+        "output": "report.q3",
+        "from": [
+          "metric.yield_by_breed"
+        ],
+        "logic": "derived over gold; additive"
+      },
+      {
+        "output": "report.q4",
+        "from": [
+          "metric.milk_revenue"
+        ],
+        "logic": "derived over gold; additive"
+      },
+      {
+        "output": "report.q5",
+        "from": [
+          "metric.price_per_litre"
+        ],
+        "logic": "derived over gold; additive"
+      },
       {
         "output": "bronze.cows",
         "from": [
@@ -113,83 +253,6 @@
           "silver.sales"
         ],
         "logic": "agg by day(collected_on) x []: sum(['litres', 'price_per_litre']), count"
-      },
-      {
-        "output": "metric.cows",
-        "from": [
-          "gold.agg_cows_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.litres",
-        "from": [
-          "gold.agg_milk_logs_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.litres",
-        "from": [
-          "gold.agg_sales_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.milk_logs",
-        "from": [
-          "gold.agg_milk_logs_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.price_per_litre",
-        "from": [
-          "gold.agg_sales_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.sales",
-        "from": [
-          "gold.agg_sales_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.tag",
-        "from": [
-          "gold.agg_cows_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.treatments",
-        "from": [
-          "gold.agg_treatments_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "metric.withhold_days",
-        "from": [
-          "gold.agg_treatments_daily"
-        ],
-        "logic": "sum (additive) v1"
-      },
-      {
-        "output": "report.q1",
-        "from": [
-          "metric.cows"
-        ],
-        "logic": "sum over gold; additive"
-      },
-      {
-        "output": "report.q3",
-        "from": [
-          "metric.price_per_litre"
-        ],
-        "logic": "sum over gold; additive"
       }
     ],
     "roots": [
@@ -197,7 +260,8 @@
       "file:cows.csv",
       "file:milk_logs.csv",
       "file:sales.csv",
-      "file:treatments.csv"
+      "file:treatments.csv",
+      "gold.agg_milk_cow_daily"
     ],
     "outputs": [
       "bronze.breedings",
@@ -210,48 +274,43 @@
       "gold.agg_sales_daily",
       "gold.agg_treatments_daily",
       "gold.dim_breedings",
+      "metric.avg_daily_yield_per_cow",
+      "metric.cow_days_recorded",
       "metric.cows",
       "metric.litres",
       "metric.milk_logs",
+      "metric.milk_revenue",
       "metric.price_per_litre",
       "metric.sales",
       "metric.tag",
       "metric.treatments",
       "metric.withhold_days",
+      "metric.yield_by_breed",
       "report.q1",
+      "report.q2",
       "report.q3",
+      "report.q4",
+      "report.q5",
       "silver.breedings",
       "silver.cows",
       "silver.milk_logs",
       "silver.sales",
       "silver.treatments"
     ],
-    "edge_count": 26
+    "edge_count": 35
   },
   "pii": {
     "columns": [
       {
         "column": "cows.name",
         "class": "name",
-        "first_stage": "architect",
+        "first_stage": "designer",
         "disposition": "flagged \u2014 carried forward"
       }
     ],
     "count": 1
   },
   "contracts": [
-    {
-      "stage": "architect",
-      "name": "barnboard.bronze@1",
-      "honored": true,
-      "violations": []
-    },
-    {
-      "stage": "engineer",
-      "name": "barnboard.gold@1",
-      "honored": true,
-      "violations": []
-    },
     {
       "stage": "designer",
       "name": "barnboard.semantic@1",
@@ -263,11 +322,33 @@
       "name": "barnboard.reports@1",
       "honored": true,
       "violations": []
+    },
+    {
+      "stage": "architect",
+      "name": "barnboard.bronze@1",
+      "honored": true,
+      "violations": []
+    },
+    {
+      "stage": "engineer",
+      "name": "barnboard.gold@1",
+      "honored": true,
+      "violations": []
     }
   ],
   "all_contracts_honored": true,
   "quality": {
     "by_stage": {
+      "designer": {
+        "pass": 15,
+        "warn": 0,
+        "fail": 0
+      },
+      "analyst": {
+        "pass": 5,
+        "warn": 0,
+        "fail": 0
+      },
       "architect": {
         "pass": 13,
         "warn": 2,
@@ -277,21 +358,11 @@
         "pass": 11,
         "warn": 0,
         "fail": 0
-      },
-      "designer": {
-        "pass": 9,
-        "warn": 0,
-        "fail": 0
-      },
-      "analyst": {
-        "pass": 2,
-        "warn": 1,
-        "fail": 0
       }
     },
     "totals": {
-      "pass": 35,
-      "warn": 3,
+      "pass": 44,
+      "warn": 2,
       "fail": 0
     },
     "reconciliation": [
@@ -302,9 +373,14 @@
       "gold.agg_sales_daily.price_per_litre matches raw fact (\u03a3=422.38)"
     ],
     "conformance": {
-      "total": 9,
-      "pass": 9,
-      "non_additive_guarded": []
+      "total": 15,
+      "pass": 15,
+      "non_additive_guarded": [
+        "avg_daily_yield_per_cow",
+        "milk_revenue",
+        "price_per_litre",
+        "yield_by_breed"
+      ]
     }
   },
   "access_policy": null,

@@ -1,0 +1,16 @@
+{
+  "metric": "cow_days_recorded",
+  "label": "Cow-days recorded",
+  "description": "Data-quality metric: number of cow-days with at least one milk log. Against herd size x days it shows logging coverage. Added via JSON definition alone — zero engine changes (D2.2).",
+  "aggregation": "count",
+  "measure": "litres",
+  "dimensions": [],
+  "time_grains": ["daily", "weekly", "monthly"],
+  "rollups": { "daily": "gold.agg_milk_cow_daily" },
+  "owner": "data-designer",
+  "unit": "cow-days",
+  "round": 0,
+  "lineage": ["gold.agg_milk_cow_daily", "silver.milk_logs"],
+  "version": "v1",
+  "changelog": [{ "version": "v1", "change": "authored (D2.2 extension-path demonstration)" }]
+}

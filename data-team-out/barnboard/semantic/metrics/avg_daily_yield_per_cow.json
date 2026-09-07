@@ -1,0 +1,33 @@
+{
+  "metric": "avg_daily_yield_per_cow",
+  "label": "Avg daily yield per cow",
+  "description": "Average litres one cow gives in one day (AM+PM). Computed as total litres divided by cow-days at the cow-day grain \u2014 never by summing per-cow averages.",
+  "aggregation": "derived",
+  "expression": "sum(\"litres\")*1.0/nullif(count(*),0)",
+  "dimensions": [],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_milk_cow_daily"
+  },
+  "owner": "data-designer",
+  "unit": "L/cow/day",
+  "round": 2,
+  "lineage": [
+    "gold.agg_milk_cow_daily",
+    "silver.milk_logs",
+    "silver.cows"
+  ],
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_proposed": false,
+  "_hash": "sha256:b1bc22019b772743"
+}

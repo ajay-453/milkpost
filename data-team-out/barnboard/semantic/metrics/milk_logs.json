@@ -5,7 +5,10 @@
   "aggregation": "sum",
   "measure": "milk_logs_count",
   "dimensions": [
-    "session"
+    "log_date_day",
+    "cow_id",
+    "tag",
+    "breed"
   ],
   "time_grains": [
     "daily",
@@ -13,21 +16,25 @@
     "monthly"
   ],
   "rollups": {
-    "daily": "gold.agg_milk_logs_daily"
+    "daily": "gold.agg_milk_cow_daily"
   },
   "owner": "unassigned",
   "unit": "count",
   "round": 0,
   "lineage": [
-    "gold.agg_milk_logs_daily"
+    "gold.agg_milk_cow_daily"
   ],
   "_proposed": true,
-  "version": "v1",
+  "version": "v2",
   "changelog": [
     {
       "version": "v1",
       "change": "created"
+    },
+    {
+      "version": "v2",
+      "change": "definition changed"
     }
   ],
-  "_hash": "sha256:305da08cbfe78a12"
+  "_hash": "sha256:d23d0df4e2fa6071"
 }

@@ -1,13 +1,13 @@
 id,tag,name,breed,dob,status,notes
-1,101,Gauri,"HF cross",2021-03-04,milking,""
-2,102,Lakshmi,Gir,2024-02-18,milking,""
-3,103,Ganga,Sahiwal,2024-08-13,milking,""
-4,104,Radha,"HF cross",2020-08-07,milking,""
-5,105,Kamala,"Jersey cross",2023-03-20,milking,""
-6,106,Meera,"HF cross",2023-05-21,milking,""
-7,107,Tulsi,"Red Sindhi",2023-07-04,milking,""
-8,108,Nandini,"Murrah buffalo",2023-12-23,milking,""
-9,109,Parvati,"HF cross",2020-08-17,milking,""
-10,110,Shyama,Gir,2024-03-08,milking,""
-11,111,Savitri,Sahiwal,2020-12-18,dry,""
-12,112,Sundari,Gir,2020-08-09,heifer,""
+1,101,Gauri,HF cross,2021-03-04,milking,
+2,102,Lakshmi,Gir,2024-02-18,milking,
+3,103,Ganga,Sahiwal,2024-08-13,milking,
+4,104,Radha,HF cross,2020-08-07,milking,
+5,105,Kamala,Jersey cross,2023-03-20,milking,
+6,106,Meera,HF cross,2023-05-21,milking,
+7,107,Tulsi,Red Sindhi,2023-07-04,milking,
+8,108,Nandini,Murrah buffalo,2023-12-23,milking,
+9,109,Parvati,HF cross,2020-08-17,milking,
+10,110,Shyama,Gir,2024-03-08,milking,
+11,111,Savitri,Sahiwal,2020-12-18,dry,
+12,112,Sundari,Gir,2020-08-09,heifer,

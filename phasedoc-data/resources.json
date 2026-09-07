@@ -1,8 +1,9 @@
 {
   "services": [
     { "name": "Barnboard app (live)", "url": "http://127.0.0.1:8321", "manager": "pm2: barnboard", "note": "the product this data arc feeds and serves inference back into" },
-    { "name": "Data arc cockpit (this window)", "url": "http://127.0.0.1:6790", "manager": "pm2: phasedoc-dataarc", "note": "second process of the ONE cockpit codebase (phasedoc/cockpit.py), parameterized by env" },
-    { "name": "Barnboard v1 cockpit (archive)", "url": "http://127.0.0.1:6789", "manager": "pm2: phasedoc-barnboard", "note": "previous arc, archived in place" }
+    { "name": "Data arc cockpit (this window)", "url": "http://127.0.0.1:6791", "manager": "pm2: phasedoc-dataarc", "note": "second process of the ONE cockpit codebase (phasedoc/cockpit.py), parameterized by env" },
+    { "name": "Barnboard v1 cockpit (archive)", "url": "http://127.0.0.1:6789", "manager": "pm2: phasedoc-barnboard", "note": "previous arc, archived in place" },
+    { "name": "Barnboard betadoc (public face)", "url": "http://127.0.0.1:6790", "manager": "pm2: barnboard-betadoc", "note": "client-facing site + PIN-gated app proxy; owns 6790 permanently" }
   ],
   "documents": [
     { "name": "Plan of record", "path": "phasedoc-data/plan-of-record.md" },
@@ -28,7 +29,8 @@
   ],
   "ports": {
     "8321": "Barnboard app",
-    "6789": "phasedoc cockpit — Barnboard v1 arc (archive)",
-    "6790": "phasedoc cockpit — this data arc"
+    "6789": "phasedoc cockpit — Barnboard v1 arc (day 1)",
+    "6790": "betadoc — Barnboard public face (day 1)",
+    "6791": "phasedoc cockpit — this data arc (day 2); each new doc surface takes the next port, none are reused"
   }
 }

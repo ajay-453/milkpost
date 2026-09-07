@@ -30,6 +30,14 @@ os.environ.setdefault("DB_PATH", "/tmp/barnboard.db")
 os.environ.setdefault("BARNBOARD_SEED", "1")
 os.environ.setdefault("DEMO_LOGIN", "demo:farm12345")
 os.environ.setdefault("BARNBOARD_MODELS", os.path.join(ROOT, "models"))
+# Sessions must survive across lambda instances: each instance has its own
+# /tmp database, so DB-backed sessions bounce users back to /login whenever a
+# click lands on a different instance. Stateless signed-cookie sessions fix
+# that — the signing key comes from the SESSION_SECRET env var (set in the
+# Vercel project); the derived fallback only covers local rehearsal.
+os.environ.setdefault("STATELESS_SESSIONS", "1")
+os.environ.setdefault("SESSION_SECRET", hashlib.sha256(
+    f"bb-v2-session-fallback:{os.environ.get('BETADOC_PIN', '4276')}".encode()).hexdigest())
 
 from app.main import app as barnboard  # noqa: E402
 

@@ -166,6 +166,19 @@ async def require_login(request: Request, call_next):
             or path.startswith("/calendar/") or path.startswith("/lang/")
             or path.startswith("/reset/")):
         return await call_next(request)
+    if path.startswith("/api/v1/"):
+        # Machine consumers: a session cookie OR the feed secret token
+        # (?token=... / Authorization: Bearer ...) — same credential as the
+        # calendar feed. APIs answer 401 JSON, never a login redirect.
+        tok = request.query_params.get("token") or \
+            request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+        with db.get_db() as con:
+            user = db.session_user(con, request.cookies.get(SESSION_COOKIE))
+            expected = db.get_setting(con, "feed_token") or ""
+        if user or (tok and expected and secrets.compare_digest(tok, expected)):
+            return await call_next(request)
+        return Response(json.dumps({"error": "unauthorized"}), status_code=401,
+                        media_type="application/json")
     with db.get_db() as con:
         user = db.session_user(con, request.cookies.get(SESSION_COOKIE))
     if not user:
@@ -994,6 +1007,40 @@ def export_csv(table: str):
         writer.writerow(cols)
     return Response(buf.getvalue(), media_type="text/csv",
                     headers={"Content-Disposition": f'attachment; filename="{table}.csv"'})
+
+
+# ── Open data contracts: versioned read-only JSON API ──────────────────────
+# The machine-readable siblings of the CSV export: same whitelist, same data,
+# plus a schema endpoint any consumer can program against. Auth is handled in
+# the middleware (session or feed token).
+
+DATA_SCHEMA_VERSION = "1.0"
+
+
+def _json(payload: dict, status: int = 200) -> Response:
+    return Response(json.dumps(payload, indent=2, default=str), status_code=status,
+                    media_type="application/json")
+
+
+@app.get("/api/v1/schema")
+def api_schema():
+    tables = {}
+    with db.get_db() as con:
+        for t in db.EXPORT_TABLES:
+            tables[t] = [
+                {"name": c[1], "type": c[2], "notnull": bool(c[3]), "pk": bool(c[5])}
+                for c in con.execute(f"PRAGMA table_info({t})").fetchall()]  # t from whitelist
+    return _json({"schema_version": DATA_SCHEMA_VERSION, "tables": tables})
+
+
+@app.get("/api/v1/{table}.json")
+def api_table(table: str):
+    if table not in db.EXPORT_TABLES:
+        return _json({"error": "unknown table"}, 404)
+    with db.get_db() as con:
+        rows = [dict(r) for r in con.execute(f"SELECT * FROM {table}").fetchall()]
+    return _json({"schema_version": DATA_SCHEMA_VERSION, "table": table,
+                  "row_count": len(rows), "rows": rows})
 
 
 # ── iCal reminder feed ─────────────────────────────────────────────────────

@@ -1,0 +1,18 @@
+# Keep the upload lean: only what api/index.py's includeFiles need.
+aina-out/barnboard/app/.venv
+aina-out/barnboard/app/.pm2
+aina-out/barnboard/app/tests
+aina-out/barnboard/app/barnboard.db
+aina-out/barnboard.zip
+aina-out/barnboard/docs
+data
+data-team-out
+data-team-sources
+betadoc/.pm2
+betadoc/site/assets
+phasedoc
+phasedoc-data
+tools
+semantic-metrics
+*.db
+node_modules

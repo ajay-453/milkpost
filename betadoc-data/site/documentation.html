@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext x='1' y='13' font-size='13'%3E%F0%9F%93%88%3C/text%3E%3C/svg%3E">
+<title>Barnboard Data Platform — Documentation</title>
+<style>
+:root{
+  --bg:#f8f7f4; --fg:#1c1917; --mut:#6b6560; --card:#ffffff; --bd:#e7e5e4;
+  --acc:#15803d; --acc-soft:#e8f3ec; --amber:#d97706; --code:#f1f0ec;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f110f; --fg:#f5f5f4; --mut:#a8a29e; --card:#191c19; --bd:#2b2f2b;
+    --acc:#2fb463; --acc-soft:#15281c; --amber:#f59e0b; --code:#151815;
+  }
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.7 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--bd)}
+nav .in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:14px 24px}
+nav .brand{font-weight:700} nav .brand small{color:var(--mut);font-weight:500}
+nav .links{margin-left:auto;display:flex;gap:18px;font-size:14.5px}
+.wrap{max-width:1080px;margin:0 auto;padding:34px 24px 90px;display:grid;grid-template-columns:230px 1fr;gap:44px}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}.toc{position:static !important}}
+.toc{position:sticky;top:70px;align-self:start;font-size:14px}
+.toc strong{display:block;margin-bottom:8px;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.toc a{display:block;padding:4px 0;color:var(--fg)} .toc a.sub{padding-left:14px;color:var(--mut)}
+article h1{font-size:34px;letter-spacing:-.02em;margin-bottom:8px}
+article h2{font-size:24px;margin:44px 0 12px;padding-top:18px;border-top:1px solid var(--bd);letter-spacing:-.01em}
+article h3{font-size:17.5px;margin:24px 0 8px}
+article p{margin:10px 0;max-width:72ch} article ul,article ol{margin:10px 0 10px 22px;max-width:70ch}
+article li{margin:5px 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;
+  background:var(--code);border:1px solid var(--bd);border-radius:6px;padding:1px 6px}
+pre{background:var(--code);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;
+  overflow-x:auto;margin:14px 0;font:13.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre code{background:none;border:none;padding:0}
+.callout{background:var(--acc-soft);border:1px solid var(--acc);border-radius:12px;padding:14px 18px;margin:16px 0}
+.callout.warn{background:transparent;border-color:var(--amber)}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--bd);vertical-align:top}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.tablewrap{overflow-x:auto}
+.mut{color:var(--mut)}
+</style>
+</head>
+<body>
+<nav><div class="in">
+  <span class="brand">Barnboard <small>· Data Platform docs</small></span>
+  <span class="links"><a href="/">Overview</a><a href="/demo"><strong>Live demo</strong></a></span>
+</div></nav>
+
+<div class="wrap">
+<aside class="toc">
+  <strong>On this page</strong>
+  <a href="#start">Getting started</a>
+  <a class="sub" href="#login">Demo access</a>
+  <a href="#day">A day in the life</a>
+  <a href="#concepts">How it works</a>
+  <a class="sub" href="#medallion">The medallion</a>
+  <a class="sub" href="#semantic">Governed metrics</a>
+  <a class="sub" href="#models">The models</a>
+  <a href="#api">API reference</a>
+  <a class="sub" href="#auth">Authentication</a>
+  <a class="sub" href="#endpoints">Endpoints</a>
+  <a href="#data">Your data &amp; portability</a>
+  <a href="#deploy">Running it yourself</a>
+</aside>
+
+<article>
+<h1>Documentation</h1>
+<p class="mut">Everything you need to drive the demo, read your numbers with confidence,
+and pull data out programmatically.</p>
+
+<h2 id="start">Getting started</h2>
+<ol>
+  <li>Go to <a href="/demo">/demo</a> and enter the access PIN (shared with you separately).</li>
+  <li>You land in the real Barnboard application on a synthetic 12-cow herd.</li>
+  <li>Sign in with the demo account below.</li>
+</ol>
+<div class="callout" id="login">
+  <strong>Username:</strong> <code>demo</code> &nbsp;·&nbsp;
+  <strong>Password:</strong> <code>farm12345</code><br>
+  <span class="mut" style="font-size:14px">A <em>helper</em>-role account. Everything you enter is
+  demo data — log milkings, add treatments, try to break it.</span>
+</div>
+
+<h2 id="day">A day in the life</h2>
+<ol>
+  <li><strong>Morning.</strong> Log each cow's AM litres on the Milk page — one tap, one number.</li>
+  <li><strong>Glance at the dashboard.</strong> Two charts side by side: the last 14 days
+  <em>actual</em>, and the next 7 days <em>forecast</em> (dashed bars, labeled with the model
+  version). The forecast is recomputed from your own records — no cloud involved.</li>
+  <li><strong>Check the flags.</strong> If a cow has run well below her own forecast for
+  3 straight days, she's flagged. In the seeded herd that's cow #102 — her drop
+  pattern is planted so you can see the alert working. Half-logged days (AM entered,
+  PM missing) are ignored by the model, so a busy evening never fakes an alarm.</li>
+  <li><strong>Evening.</strong> Log PM litres; record a milk collection on the Sales page and
+  the month's revenue updates — with a projected month-end figure behind it.</li>
+  <li><strong>Any time.</strong> Pull any table as CSV from the app, or hit the JSON API
+  (below) from your own tools.</li>
+</ol>
+
+<h2 id="concepts">How it works</h2>
+
+<h3 id="medallion">The medallion pipeline</h3>
+<p>Raw records land in <strong>bronze</strong> (typed, cataloged, exactly as entered), get
+cleaned into <strong>silver</strong>, and are modeled into <strong>gold</strong> — analysis-ready
+facts like <em>per-cow per-day litres</em>. Every step records lineage: any number can be
+traced back to the rows that produced it. Authentication tables never enter the
+pipeline (personal data is excluded at the front door). Re-running the pipeline on
+the same inputs yields bit-identical outputs — reproducibility is tested, not assumed.</p>
+
+<h3 id="semantic">Governed metrics</h3>
+<p>A metric here is a <em>versioned definition</em>, not a formula someone typed into a cell.
+Each definition names its owner, its unit, its lineage, and its aggregation class —
+and the class is enforced. Additive things (litres) may be summed up a grain;
+ratios (price per litre, yield per cow-day) are <em>recomputed</em>, never summed.
+Every analyst answer ships a receipt: the definition, the version, the lineage,
+and the exact SQL.</p>
+
+<h3 id="models">The models</h3>
+<div class="tablewrap"><table>
+  <tr><th>Model</th><th>Method</th><th>Evaluated</th></tr>
+  <tr><td>7-day yield forecast</td><td>Per-cow damped level+trend on complete cow-days; standard-library Python, versioned JSON parameters</td>
+      <td>Held-out week: MAE 1.25 L vs naive 1.33 L — beats baseline</td></tr>
+  <tr><td>Drop detection</td><td>Mean deviation of the last 3 complete days vs the cow's own forecast; flag at −20%</td>
+      <td>Catches the seeded decliner; zero false positives across the stable herd</td></tr>
+  <tr><td>Revenue projection</td><td>Month-to-date rate extrapolated to month-end</td>
+      <td>8.1% absolute error with the final week hidden</td></tr>
+</table></div>
+<p class="mut">Honest caveat: these figures come from three weeks of synthetic demo
+data. The methods are deliberately simple and auditable; expect the margins to
+improve — and the evaluation to get harder — with real multi-month history.</p>
+
+<h2 id="api">API reference</h2>
+
+<h3 id="auth">Authentication</h3>
+<p>API calls need either a signed-in browser session or the farm's <strong>feed
+token</strong> — the same secret that powers the calendar feed. An owner finds it in the
+app (the calendar subscription URL contains it). Pass it either way:</p>
+<pre><code>curl "https://&lt;demo-host&gt;/api/v1/cows.json?token=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://&lt;demo-host&gt;/api/v1/cows.json"</code></pre>
+<p>Unauthenticated calls get JSON <code>401</code> — never a login redirect.</p>
+
+<h3 id="endpoints">Endpoints</h3>
+<div class="tablewrap"><table>
+  <tr><th>Endpoint</th><th>Returns</th></tr>
+  <tr><td><code>GET /api/v1/schema</code></td>
+      <td>The versioned data contract: every exportable table with column names, types, and keys — program against this, not guesswork.</td></tr>
+  <tr><td><code>GET /api/v1/{table}.json</code></td>
+      <td>Full rows for <code>cows</code>, <code>milk_logs</code>, <code>treatments</code>, <code>breedings</code>, <code>sales</code> in an envelope: <code>{schema_version, table, row_count, rows}</code>. Anything else → 404 (whitelist).</td></tr>
+  <tr><td><code>GET /api/v1/predict/yield/{cow_id}?days=7</code></td>
+      <td>The cow's forecast: date + litres per day, with the serving model version. Unknown cow → 404. <code>days</code> caps at 30.</td></tr>
+  <tr><td><code>GET /export/{table}.csv</code></td>
+      <td>The same whitelisted tables as headed CSV (browser session).</td></tr>
+</table></div>
+<p>Sample forecast response:</p>
+<pre><code>{
+  "schema_version": "1.0",
+  "model": "yield_forecast", "model_version": "v1",
+  "cow_id": 1, "tag": "101", "breed": "HF cross",
+  "trained_through": "2026-09-03",
+  "forecast": [
+    {"date": "2026-09-04", "litres": 25.7},
+    {"date": "2026-09-05", "litres": 25.5}, …
+  ]
+}</code></pre>
+
+<h2 id="data">Your data &amp; portability</h2>
+<ul>
+  <li><strong>One file.</strong> The entire farm database is a single SQLite file. Backing up
+  is copying the file; the platform ships an online-backup tool that verifies the copy's
+  integrity while the app keeps running.</li>
+  <li><strong>Round-trip guaranteed.</strong> Export all tables to CSV, import them into a fresh
+  database, and you get the same data back — this exact drill is part of the automated
+  test suite.</li>
+  <li><strong>Nothing leaves.</strong> Models train and serve on the same machine. The only
+  outbound traffic the platform ever makes is fetching public reference datasets —
+  once, checksummed, and only when you ask.</li>
+</ul>
+
+<h2 id="deploy">Running it yourself</h2>
+<p>Requirements: Python 3.12 and four pinned packages for the app; the data and model
+layer is standard-library only. One process manager command supervises the app, and
+the same codebase runs on a laptop, a farm PC, or a small VPS — copy the database
+file and start. A container image exists in the repository but is marked
+<em>roadmap</em> until it has been built and verified on a Docker host (see the
+<a href="/#matrix">feature matrix</a> — we don't mark things done that haven't run).</p>
+
+<p class="mut" style="margin-top:44px;border-top:1px solid var(--bd);padding-top:16px">
+Barnboard Data Platform · beta · questions? Come back through the <a href="/demo">demo</a> and poke the real thing.</p>
+</article>
+</div>
+</body>
+</html>

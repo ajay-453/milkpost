@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext x='1' y='13' font-size='13'%3E%F0%9F%93%88%3C/text%3E%3C/svg%3E">
+<title>Barnboard Data Platform — your herd's data, working for you</title>
+<meta name="description" content="The data layer under Barnboard: governed metrics, open APIs, and per-cow milk forecasts — on your hardware, in your language, from your records.">
+<style>
+:root{
+  --bg:#f8f7f4; --fg:#1c1917; --mut:#6b6560; --card:#ffffff; --bd:#e7e5e4;
+  --acc:#15803d; --acc-soft:#e8f3ec; --amber:#d97706; --amber-fg:#ffffff;
+  --ok:#15803d; --part:#d97706; --plan:#6b7280; --code:#f1f0ec;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f110f; --fg:#f5f5f4; --mut:#a8a29e; --card:#191c19; --bd:#2b2f2b;
+    --acc:#2fb463; --acc-soft:#15281c; --amber:#f59e0b; --amber-fg:#1c1300;
+    --ok:#2fb463; --part:#f59e0b; --plan:#9ca3af; --code:#151815;
+  }
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--acc);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--bd)}
+nav .in{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:14px 24px}
+nav .brand{font-weight:700}
+nav .brand small{color:var(--mut);font-weight:500}
+nav .links{margin-left:auto;display:flex;gap:18px;font-size:14.5px;flex-wrap:wrap}
+main{max-width:1040px;margin:0 auto;padding:0 24px 80px}
+section{padding:52px 0;border-bottom:1px solid var(--bd)}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.15;letter-spacing:-.02em}
+h2{font-size:26px;margin-bottom:14px;letter-spacing:-.01em}
+h3{font-size:18px;margin:18px 0 6px}
+p.lead{font-size:19px;color:var(--mut);max-width:56ch}
+.mut{color:var(--mut)}
+.pill{display:inline-block;padding:3px 11px;border-radius:999px;font-size:13px;font-weight:600;
+  background:var(--acc-soft);color:var(--acc);margin-bottom:18px}
+.cta{display:inline-block;background:var(--acc);color:#fff;font-weight:600;border-radius:10px;
+  padding:12px 22px;margin-top:22px}
+.cta:hover{filter:brightness(1.08);text-decoration:none}
+.cta.ghost{background:transparent;color:var(--acc);border:1.5px solid var(--acc);margin-left:10px}
+.grid{display:grid;gap:18px;margin-top:26px}
+.grid.c2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid.c3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px 22px}
+.card h3{margin-top:0}
+.card .mut{font-size:14.5px}
+.hero-receipt{background:var(--code);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;
+  font:13.5px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;margin-top:30px}
+.hero-receipt .q{color:var(--acc);font-weight:700}
+.hero-receipt .r{color:var(--mut)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;
+  background:var(--code);border:1px solid var(--bd);border-radius:6px;padding:1px 6px}
+table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:top}
+th{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.st{font-weight:700;white-space:nowrap}
+.st.ok{color:var(--ok)} .st.part{color:var(--part)} .st.plan{color:var(--plan)}
+.tablewrap{overflow-x:auto}
+figure.arch{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;margin-top:26px}
+figure.arch figcaption{color:var(--mut);font-size:13.5px;margin-top:10px;text-align:center}
+ol.steps{margin:16px 0 0 20px}
+ol.steps li{margin-bottom:10px}
+footer{max-width:1040px;margin:0 auto;padding:30px 24px;color:var(--mut);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<nav><div class="in">
+  <span class="brand">Barnboard <small>· Data Platform</small></span>
+  <span class="links">
+    <a href="#problem">Why</a>
+    <a href="#product">What you get</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#matrix">Feature matrix</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="/documentation.html">Documentation</a>
+    <a href="/demo"><strong>Live demo</strong></a>
+  </span>
+</div></nav>
+
+<main>
+
+<!-- ══ HERO ══ -->
+<section>
+  <span class="pill">Beta · live demo behind this page</span>
+  <h1>Your herd already writes the data.<br>Now it answers back.</h1>
+  <p class="lead">The Barnboard Data Platform turns every milking you log into governed
+  metrics, open APIs, and a per-cow milk forecast — running on the same small
+  computer as Barnboard itself, with nothing sent to anyone's cloud.</p>
+  <a class="cta" href="/demo">Try the live demo</a>
+  <a class="cta ghost" href="/documentation.html">Read the documentation</a>
+
+  <div class="hero-receipt" aria-label="Sample governed answer with receipt">
+    <div><span class="q">Q</span> What is the avg daily yield per cow?</div>
+    <div><strong>23.16 L/cow/day</strong></div>
+    <div class="r">receipt · lineage gold.agg_milk_cow_daily ← silver.milk_logs · owner data-designer · v1</div>
+    <div style="margin-top:10px"><span class="q">Q</span> Show avg daily yield per cow, by breed</div>
+    <div><strong>HF cross 26.64 · Murrah 24.95 · Jersey cross 21.47 · Gir 21.20 · Sahiwal 18.72 …</strong></div>
+    <div class="r">every number carries its SQL and its lineage — answers you can audit</div>
+  </div>
+</section>
+
+<!-- ══ PROBLEM ══ -->
+<section id="problem">
+  <h2>The problem</h2>
+  <p class="lead" style="margin-bottom:8px">A dairy's records usually die in the notebook they were born in.</p>
+  <div class="grid c3">
+    <div class="card"><h3>Numbers without meaning</h3>
+      <p class="mut">Litres get written down twice a day, but "is the herd doing well?"
+      still gets answered by gut feel. Averages computed by hand disagree with each
+      other, and nobody can say where a figure came from.</p></div>
+    <div class="card"><h3>Data locked in</h3>
+      <p class="mut">Records trapped in one app — or one notebook — can't feed a
+      vet's spreadsheet, a co-op's reports, or next year's loan application.
+      Getting data <em>out</em> (and back <em>in</em>) shouldn't be a rewrite.</p></div>
+    <div class="card"><h3>Problems found late</h3>
+      <p class="mut">A cow that slips 20% over three days is telling you something —
+      mastitis, heat, feed. By the time the drop is obvious in the monthly total,
+      the cheap intervention window is gone.</p></div>
+  </div>
+</section>
+
+<!-- ══ PRODUCT ══ -->
+<section id="product">
+  <h2>What you get</h2>
+  <div class="grid c2">
+    <div class="card"><h3>🥇 A governed data pipeline</h3>
+      <p class="mut">Every table flows through a bronze → silver → gold refinery with
+      lineage recorded at each step. Metrics are <em>defined once, governed always</em>:
+      the platform physically refuses to sum a ratio up a grain — the classic
+      spreadsheet mistake that quietly corrupts averages.</p></div>
+    <div class="card"><h3>📈 A forecast on the dashboard</h3>
+      <p class="mut">A per-cow model (trained on your own records, standard-library
+      Python, no GPU, no cloud) projects each cow's next 7 days. The dashboard shows
+      the herd's expected week; a sustained drop against forecast flags the cow —
+      in the demo it catches the seeded decliner with zero false alarms.</p></div>
+    <div class="card"><h3>🔓 Open contracts, not lock-in</h3>
+      <p class="mut">Everything the farm enters is available as CSV <em>and</em> a
+      versioned JSON API with a schema endpoint any consumer can program against.
+      Export, re-import, back up — the round-trip is tested, and the whole database
+      is one portable file.</p></div>
+    <div class="card"><h3>🌍 Benchmarks that fit your herd</h3>
+      <p class="mut">Cited benchmark yields for the breeds Indian farms actually
+      keep — Gir, Sahiwal, Red Sindhi, Murrah buffalo, HF and Jersey crosses —
+      sourced from NDDB, ICAR and peer-reviewed studies, loaded right next to your
+      own numbers for honest comparison.</p></div>
+  </div>
+</section>
+
+<!-- ══ ARCHITECTURE ══ -->
+<section id="architecture">
+  <h2>Architecture</h2>
+  <p class="mut" style="max-width:60ch">One machine, one stack, four layers. Data flows down;
+  every layer is inspectable and every answer carries a receipt.</p>
+  <figure class="arch">
+  <svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif" role="img" aria-label="Data platform architecture">
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="var(--mut)"/></marker></defs>
+    <style>
+      .b{fill:var(--acc-soft);stroke:var(--acc);stroke-width:1.4;rx:10}
+      .n{fill:var(--card);stroke:var(--bd);stroke-width:1.4;rx:10}
+      .t{fill:var(--fg);font-size:13px;font-weight:600}
+      .s{fill:var(--mut);font-size:10.5px}
+      .a{stroke:var(--mut);stroke-width:1.3;fill:none;marker-end:url(#ar)}
+    </style>
+    <rect class="n" x="30" y="18" width="200" height="46" rx="10"/>
+    <text class="t" x="45" y="38">Barnboard app</text>
+    <text class="s" x="45" y="53">milkings · breeding · sales</text>
+    <rect class="n" x="260" y="18" width="200" height="46" rx="10"/>
+    <text class="t" x="275" y="38">Reference data</text>
+    <text class="s" x="275" y="53">open datasets · checksummed</text>
+    <rect class="n" x="490" y="18" width="200" height="46" rx="10"/>
+    <text class="t" x="505" y="38">Breed benchmarks</text>
+    <text class="s" x="505" y="53">NDDB · ICAR · cited per row</text>
+    <rect class="b" x="30" y="104" width="660" height="56" rx="10"/>
+    <text class="t" x="48" y="127">Medallion pipeline — bronze → silver → gold</text>
+    <text class="s" x="48" y="144">typed landing · cleaning · modeled facts · lineage on every step</text>
+    <rect class="b" x="30" y="190" width="320" height="56" rx="10"/>
+    <text class="t" x="48" y="213">Governed semantic layer</text>
+    <text class="s" x="48" y="230">metrics as versioned definitions + guard</text>
+    <rect class="b" x="370" y="190" width="320" height="56" rx="10"/>
+    <text class="t" x="388" y="213">Models</text>
+    <text class="s" x="388" y="230">7-day yield forecast · drop flags · revenue</text>
+    <rect class="n" x="30" y="276" width="320" height="56" rx="10"/>
+    <text class="t" x="48" y="299">Open contracts</text>
+    <text class="s" x="48" y="316">JSON API · schema endpoint · CSV round-trip</text>
+    <rect class="n" x="370" y="276" width="320" height="56" rx="10"/>
+    <text class="t" x="388" y="299">Served inference</text>
+    <text class="s" x="388" y="316">predict API · dashboard forecast panel</text>
+    <rect class="n" x="30" y="352" width="660" height="34" rx="10"/>
+    <text class="t" x="48" y="374">Runs anywhere Python runs — laptop · farm PC · small VPS · (container: on the roadmap)</text>
+    <path class="a" d="M130 64 L130 104"/><path class="a" d="M360 64 L360 104"/><path class="a" d="M590 64 L590 104"/>
+    <path class="a" d="M190 160 L190 190"/><path class="a" d="M530 160 L530 190"/>
+    <path class="a" d="M190 246 L190 276"/><path class="a" d="M530 246 L530 276"/>
+  </svg>
+  <figcaption>Answers flow back up the same path they came down — with lineage attached.</figcaption>
+  </figure>
+</section>
+
+<!-- ══ FEATURE MATRIX ══ -->
+<section id="matrix">
+  <h2>Feature matrix</h2>
+  <p class="mut">What was asked for, what was actually built, and what's still ahead.
+  A matrix that's all green is a matrix nobody believes — this one is honest.</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Requirement</th><th>What exists today</th><th>Status</th></tr>
+    <tr><td>Interoperable — data usable by other systems</td>
+        <td>Versioned JSON API (<code>/api/v1/…</code>), schema endpoint, CSV export <em>and</em> import (round-trip tested), one-file database with a rehearsed backup drill</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Extensible — grow without engine changes</td>
+        <td>A new metric is one JSON definition; governance guard blocks unsafe rollups; extension path documented and demonstrated</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Governed pipeline with lineage</td>
+        <td>Bronze→silver→gold with per-step lineage, PII exclusion at ingest, re-runs proven bit-identical</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Free web data, properly researched</td>
+        <td>16-source inventory with licenses; 3 datasets stored locally with sha256 checksums; gaps recorded openly (no open per-cow desi-breed data exists anywhere)</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Breed benchmarks incl. desi breeds</td>
+        <td>Six breeds with per-row citations (NDDB, ICAR, peer-reviewed), loaded into the gold layer</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Per-cow yield forecasting</td>
+        <td>7-day damped-trend model; beats the naive baseline on a held-out week (MAE 1.25 vs 1.33 L)</td>
+        <td class="st ok">Built <span class="mut">(3 weeks of demo data — margins will grow with history)</span></td></tr>
+    <tr><td>Early-warning drop detection</td>
+        <td>Deviation-vs-forecast flags; catches the seeded decliner, zero false positives; half-logged days excluded so a missed PM entry never fakes an alarm</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Revenue projection</td>
+        <td>Month-end estimate from month-to-date rate; 8.1% holdout error on demo data</td>
+        <td class="st ok">Built <span class="mut">(demo-scale; needs multi-month history to trust for planning)</span></td></tr>
+    <tr><td>Inference served in the product</td>
+        <td>Predict API + dashboard forecast panel; model artifacts versioned and hot-reloadable with zero downtime</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Automated tests</td>
+        <td>23-test suite over contracts, models, auth and rate-limiting — all passing</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Runs on bare metal, supervised</td>
+        <td>PM2-managed processes, state saved; reboot persistence needs a one-time host command</td>
+        <td class="st part">Partial</td></tr>
+    <tr><td>Container deployment</td>
+        <td>Dockerfile ready and committed; unverified — the demo host has no Docker</td>
+        <td class="st plan">Roadmap</td></tr>
+    <tr><td>Milk-price forecasting from market data</td>
+        <td>Sources researched and verified (USDA API et al.); not yet wired in</td>
+        <td class="st plan">Roadmap</td></tr>
+    <tr><td>Multi-farm / co-op analytics</td>
+        <td>Design direction only</td>
+        <td class="st plan">Roadmap</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ══ ROADMAP ══ -->
+<section id="roadmap">
+  <h2>Roadmap</h2>
+  <ol class="steps">
+    <li><strong>Verify the container path</strong> — build and run the existing Docker image on a Docker-capable host; publish the compose file.</li>
+    <li><strong>Deeper history, better models</strong> — as real multi-month data accumulates, add lactation-curve priors seeded from the breed benchmarks and re-baseline the forecasts.</li>
+    <li><strong>Market prices</strong> — wire the verified USDA price series (and Indian sources as they're validated) into a price outlook next to the revenue projection.</li>
+    <li><strong>Co-op view</strong> — the same governed metrics rolled up across farms, with each farm's data staying its own.</li>
+  </ol>
+</section>
+
+<!-- ══ DEPLOYMENT ══ -->
+<section id="deploy">
+  <h2>Deployment notes</h2>
+  <div class="grid c2">
+    <div class="card"><h3>On-premises (the lane you're looking at)</h3>
+      <p class="mut">The whole platform — app, pipeline, models, this site — runs on one
+      modest machine under a process manager. Four pinned Python dependencies for the
+      app; the data and model layer is standard-library only. Your data never leaves
+      the building: models train and infer locally, and the reference datasets are
+      fetched once and checksummed.</p></div>
+    <div class="card"><h3>Cloud twin (when you want it)</h3>
+      <p class="mut">The same codebase runs on a small VPS with no code changes — the
+      database is a single file you copy, and the demo seed makes a walkable synthetic
+      herd on first boot. A <code>deploy/twin</code> compose file exists from the app's
+      earlier package; the data platform's container lane ships when the Docker image
+      is verified (see the matrix — it's marked honestly).</p></div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section style="border-bottom:none;text-align:center">
+  <h2>See it with real motion</h2>
+  <p class="mut" style="max-width:52ch;margin:0 auto">The demo is the actual product on a synthetic
+  12-cow herd — log a milking, watch the forecast panel, pull the API. Ask us for the
+  access PIN if you don't have it.</p>
+  <a class="cta" href="/demo">Enter the live demo</a>
+  <a class="cta ghost" href="/documentation.html">Documentation</a>
+</section>
+
+</main>
+<footer>Barnboard Data Platform · beta · demo data is synthetic — no real farm records on this server.</footer>
+</body>
+</html>

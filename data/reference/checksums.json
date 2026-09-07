@@ -1,0 +1,26 @@
+{
+  "ketosis_risk_cows": {
+    "bytes": 12950313,
+    "file": "ketosis-risk-german-cows.xlsx",
+    "inventory": "#13",
+    "license": "CC BY 4.0",
+    "sha256": "1b4dc35c561c5c9c7302069d7e5b763c4e9c6f46afcf9433b41451ef665f2e49",
+    "url": "https://zenodo.org/api/records/18020925/files/d_tier_new.xlsx/content"
+  },
+  "monthly_milk_production": {
+    "bytes": 2230,
+    "file": "monthly-milk-production-pounds.csv",
+    "inventory": "#15",
+    "license": "public sample data",
+    "sha256": "1567aaf712afb17893aa50a76edf55fd61a13f153d346cc61c39502f3cf6371c",
+    "url": "https://raw.githubusercontent.com/plotly/datasets/master/monthly-milk-production-pounds.csv"
+  },
+  "statcan_milk_production": {
+    "bytes": 198280,
+    "file": "statcan-milk-production-utilization.zip",
+    "inventory": "data-research.md footnote",
+    "license": "Open Government Licence - Canada",
+    "sha256": "33cb4f6c5fdca8f685d6dcde9e52552b3b7e2450494d36c20a801198beed32b3",
+    "url": "https://www150.statcan.gc.ca/n1/tbl/csv/32100113-eng.zip"
+  }
+}

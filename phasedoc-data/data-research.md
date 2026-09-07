@@ -53,6 +53,15 @@ Open Government Licence (https://open.canada.ca/data/en/dataset/bf14a478-7557-43
    references, with ICAR (#6) and FAOSTAT (#5) covering desi breeds and India
    country-level yields.
 
+## Fetcher status (D3.2)
+
+`tools/fetch_reference.py` stores, with sha256 checksums in
+`data/reference/checksums.json`: the plotly monthly-milk series (#15), the
+Zenodo ketosis dataset (#13, CC BY 4.0), and the Statistics Canada milk
+production/utilization CSV (Open Government Licence). **Dryad (#9, #10)
+returns 401/403 to non-browser clients** — those two must be downloaded
+manually in a browser if needed; recorded here rather than hidden.
+
 ## Honest gaps
 
 - **Desi-breed per-cow data**: no open per-cow dataset for Gir, Sahiwal, Red

@@ -1,0 +1,76 @@
+{
+  "threshold": -0.2,
+  "window_days": 3,
+  "scores": [
+    {
+      "cow_id": 2,
+      "tag": 102,
+      "breed": "Gir",
+      "mean_deviation": -0.362,
+      "flagged": true
+    },
+    {
+      "cow_id": 5,
+      "tag": 105,
+      "breed": "Jersey cross",
+      "mean_deviation": -0.106,
+      "flagged": false
+    },
+    {
+      "cow_id": 1,
+      "tag": 101,
+      "breed": "HF cross",
+      "mean_deviation": -0.069,
+      "flagged": false
+    },
+    {
+      "cow_id": 8,
+      "tag": 108,
+      "breed": "Murrah buffalo",
+      "mean_deviation": -0.031,
+      "flagged": false
+    },
+    {
+      "cow_id": 10,
+      "tag": 110,
+      "breed": "Gir",
+      "mean_deviation": -0.018,
+      "flagged": false
+    },
+    {
+      "cow_id": 6,
+      "tag": 106,
+      "breed": "HF cross",
+      "mean_deviation": -0.012,
+      "flagged": false
+    },
+    {
+      "cow_id": 9,
+      "tag": 109,
+      "breed": "HF cross",
+      "mean_deviation": 0.002,
+      "flagged": false
+    },
+    {
+      "cow_id": 3,
+      "tag": 103,
+      "breed": "Sahiwal",
+      "mean_deviation": 0.019,
+      "flagged": false
+    },
+    {
+      "cow_id": 4,
+      "tag": 104,
+      "breed": "HF cross",
+      "mean_deviation": 0.02,
+      "flagged": false
+    },
+    {
+      "cow_id": 7,
+      "tag": 107,
+      "breed": "Red Sindhi",
+      "mean_deviation": 0.032,
+      "flagged": false
+    }
+  ]
+}

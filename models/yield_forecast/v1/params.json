@@ -1,0 +1,96 @@
+{
+  "model": "yield_forecast",
+  "version": "v1",
+  "algorithm": "damped Holt (alpha=0.35, beta=0.15, damp=0.92)",
+  "lineage": [
+    "gold.agg_milk_cow_daily"
+  ],
+  "backtest": {
+    "holdout_days": 7,
+    "points": 70,
+    "mae_model": 1.247,
+    "mae_naive": 1.333
+  },
+  "cows": {
+    "1": {
+      "tag": 101,
+      "breed": "HF cross",
+      "level": 25.907,
+      "trend": -0.1715,
+      "trained_through": "2026-09-03",
+      "n_days": 22
+    },
+    "2": {
+      "tag": 102,
+      "breed": "Gir",
+      "level": 17.291,
+      "trend": -0.8148,
+      "trained_through": "2026-09-03",
+      "n_days": 22
+    },
+    "3": {
+      "tag": 103,
+      "breed": "Sahiwal",
+      "level": 19.884,
+      "trend": 0.0955,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    },
+    "4": {
+      "tag": 104,
+      "breed": "HF cross",
+      "level": 27.865,
+      "trend": -0.0174,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    },
+    "5": {
+      "tag": 105,
+      "breed": "Jersey cross",
+      "level": 20.999,
+      "trend": -0.1855,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    },
+    "6": {
+      "tag": 106,
+      "breed": "HF cross",
+      "level": 25.773,
+      "trend": 0.0063,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    },
+    "7": {
+      "tag": 107,
+      "breed": "Red Sindhi",
+      "level": 17.905,
+      "trend": -0.0012,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    },
+    "8": {
+      "tag": 108,
+      "breed": "Murrah buffalo",
+      "level": 24.916,
+      "trend": -0.0964,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    },
+    "9": {
+      "tag": 109,
+      "breed": "HF cross",
+      "level": 27.558,
+      "trend": -0.0254,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    },
+    "10": {
+      "tag": 110,
+      "breed": "Gir",
+      "level": 20.098,
+      "trend": -0.0155,
+      "trained_through": "2026-09-02",
+      "n_days": 21
+    }
+  }
+}

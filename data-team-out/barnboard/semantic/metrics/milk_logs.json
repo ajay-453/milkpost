@@ -1,0 +1,33 @@
+{
+  "metric": "milk_logs",
+  "label": "Milk Logs",
+  "description": "Count of milk_logs (additive rollup of milk_logs_count).",
+  "aggregation": "sum",
+  "measure": "milk_logs_count",
+  "dimensions": [
+    "session"
+  ],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_milk_logs_daily"
+  },
+  "owner": "unassigned",
+  "unit": "count",
+  "round": 0,
+  "lineage": [
+    "gold.agg_milk_logs_daily"
+  ],
+  "_proposed": true,
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_hash": "sha256:305da08cbfe78a12"
+}

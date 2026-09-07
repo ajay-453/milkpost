@@ -1,0 +1,34 @@
+{
+  "services": [
+    { "name": "Barnboard app (live)", "url": "http://127.0.0.1:8321", "manager": "pm2: barnboard", "note": "the product this data arc feeds and serves inference back into" },
+    { "name": "Data arc cockpit (this window)", "url": "http://127.0.0.1:6790", "manager": "pm2: phasedoc-dataarc", "note": "second process of the ONE cockpit codebase (phasedoc/cockpit.py), parameterized by env" },
+    { "name": "Barnboard v1 cockpit (archive)", "url": "http://127.0.0.1:6789", "manager": "pm2: phasedoc-barnboard", "note": "previous arc, archived in place" }
+  ],
+  "documents": [
+    { "name": "Plan of record", "path": "phasedoc-data/plan-of-record.md" },
+    { "name": "Roles-vs-needs report", "path": "phasedoc-data/roles-vs-needs.md" },
+    { "name": "Free-data research inventory", "path": "phasedoc-data/data-research.md" },
+    { "name": "Architecture", "path": "phasedoc-data/architecture.md" },
+    { "name": "Buildplan mirror (generated)", "path": "phasedoc-data/buildplan.md" }
+  ],
+  "code": [
+    { "name": "Plan script (this arc)", "path": "phasedoc-data/plan.py" },
+    { "name": "Cockpit (shared, one codebase)", "path": "phasedoc/cockpit.py" },
+    { "name": "data-team skill (plugin)", "path": "~/.claude/plugins/cache/claude-data-skills/data-team/0.1.0/skills/run/" },
+    { "name": "App code", "path": "aina-out/barnboard/app/app/" }
+  ],
+  "data": [
+    { "name": "Pipeline run directory", "path": "data-team-out/barnboard/ (bronze/silver/gold/semantic/reports + manifest.json)" },
+    { "name": "Canonical CSV sources", "path": "data-team-sources/" },
+    { "name": "Reference dataset store", "path": "data/reference/ (D3.2 creates it, with sha256 sums)" },
+    { "name": "Live app database", "path": "aina-out/barnboard/app/barnboard.db" }
+  ],
+  "containers": [
+    { "name": "Docker", "status": "not installed on this host", "impact": "D6.1 (container path) stays open until the image is built and run on a Docker-capable machine" }
+  ],
+  "ports": {
+    "8321": "Barnboard app",
+    "6789": "phasedoc cockpit — Barnboard v1 arc (archive)",
+    "6790": "phasedoc cockpit — this data arc"
+  }
+}

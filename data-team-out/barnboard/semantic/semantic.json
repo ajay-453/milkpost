@@ -1,0 +1,302 @@
+{
+  "layer": "semantic",
+  "metrics": [
+    {
+      "metric": "cows",
+      "label": "Cows",
+      "description": "Count of cows (additive rollup of cows_count).",
+      "aggregation": "sum",
+      "measure": "cows_count",
+      "dimensions": [
+        "breed",
+        "status"
+      ],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_cows_daily"
+      },
+      "owner": "unassigned",
+      "unit": "count",
+      "round": 0,
+      "lineage": [
+        "gold.agg_cows_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:32dd9ad58c460115"
+    },
+    {
+      "metric": "litres",
+      "label": "Litres",
+      "description": "Sum of litres over the agg_milk_logs_daily fact.",
+      "aggregation": "sum",
+      "measure": "litres",
+      "dimensions": [
+        "session"
+      ],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_milk_logs_daily"
+      },
+      "owner": "unassigned",
+      "unit": "",
+      "round": 2,
+      "lineage": [
+        "gold.agg_milk_logs_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:ec58e3f3bc06ab09"
+    },
+    {
+      "metric": "litres",
+      "label": "Litres",
+      "description": "Sum of litres over the agg_sales_daily fact.",
+      "aggregation": "sum",
+      "measure": "litres",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_sales_daily"
+      },
+      "owner": "unassigned",
+      "unit": "",
+      "round": 2,
+      "lineage": [
+        "gold.agg_sales_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:1072e5e4f9f96334"
+    },
+    {
+      "metric": "milk_logs",
+      "label": "Milk Logs",
+      "description": "Count of milk_logs (additive rollup of milk_logs_count).",
+      "aggregation": "sum",
+      "measure": "milk_logs_count",
+      "dimensions": [
+        "session"
+      ],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_milk_logs_daily"
+      },
+      "owner": "unassigned",
+      "unit": "count",
+      "round": 0,
+      "lineage": [
+        "gold.agg_milk_logs_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:305da08cbfe78a12"
+    },
+    {
+      "metric": "price_per_litre",
+      "label": "Price Per Litre",
+      "description": "Sum of price_per_litre over the agg_sales_daily fact.",
+      "aggregation": "sum",
+      "measure": "price_per_litre",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_sales_daily"
+      },
+      "owner": "unassigned",
+      "unit": "",
+      "round": 2,
+      "lineage": [
+        "gold.agg_sales_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:0dd90d72257985fe"
+    },
+    {
+      "metric": "sales",
+      "label": "Sales",
+      "description": "Count of sales (additive rollup of sales_count).",
+      "aggregation": "sum",
+      "measure": "sales_count",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_sales_daily"
+      },
+      "owner": "unassigned",
+      "unit": "count",
+      "round": 0,
+      "lineage": [
+        "gold.agg_sales_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:cf274198a318469b"
+    },
+    {
+      "metric": "tag",
+      "label": "Tag",
+      "description": "Sum of tag over the agg_cows_daily fact.",
+      "aggregation": "sum",
+      "measure": "tag",
+      "dimensions": [
+        "breed",
+        "status"
+      ],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_cows_daily"
+      },
+      "owner": "unassigned",
+      "unit": "count",
+      "round": 0,
+      "lineage": [
+        "gold.agg_cows_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:706d8e1763762da0"
+    },
+    {
+      "metric": "treatments",
+      "label": "Treatments",
+      "description": "Count of treatments (additive rollup of treatments_count).",
+      "aggregation": "sum",
+      "measure": "treatments_count",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_treatments_daily"
+      },
+      "owner": "unassigned",
+      "unit": "count",
+      "round": 0,
+      "lineage": [
+        "gold.agg_treatments_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:a6584fc27e2a9735"
+    },
+    {
+      "metric": "withhold_days",
+      "label": "Withhold Days",
+      "description": "Sum of withhold_days over the agg_treatments_daily fact.",
+      "aggregation": "sum",
+      "measure": "withhold_days",
+      "dimensions": [],
+      "time_grains": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "rollups": {
+        "daily": "gold.agg_treatments_daily"
+      },
+      "owner": "unassigned",
+      "unit": "count",
+      "round": 0,
+      "lineage": [
+        "gold.agg_treatments_daily"
+      ],
+      "_proposed": true,
+      "version": "v1",
+      "changelog": [
+        {
+          "version": "v1",
+          "change": "created"
+        }
+      ],
+      "_hash": "sha256:ead82cdb57d64e46"
+    }
+  ],
+  "dimensions": {
+    "breed": [],
+    "session": [],
+    "status": []
+  },
+  "metric_count": 9,
+  "authored": 0,
+  "proposed": 9
+}

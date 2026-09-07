@@ -1,0 +1,459 @@
+{
+  "layer": "bronze",
+  "generated_by": "data-team:architect",
+  "tables": [
+    {
+      "table": "bronze.cows",
+      "source_file": "cows.csv",
+      "kind": "tabular",
+      "rows": 12,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 12,
+          "samples": [
+            "1",
+            "2",
+            "3"
+          ],
+          "min": 1.0,
+          "max": 12.0
+        },
+        {
+          "name": "tag",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 12,
+          "samples": [
+            "101",
+            "102",
+            "103"
+          ],
+          "min": 101.0,
+          "max": 112.0
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 12,
+          "samples": [
+            "Gauri",
+            "Lakshmi",
+            "Ganga"
+          ]
+        },
+        {
+          "name": "breed",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 6,
+          "samples": [
+            "HF cross",
+            "Gir",
+            "Sahiwal"
+          ]
+        },
+        {
+          "name": "dob",
+          "type": "date",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 12,
+          "samples": [
+            "2021-03-04",
+            "2024-02-18",
+            "2024-08-13"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 3,
+          "samples": [
+            "milking",
+            "milking",
+            "milking"
+          ]
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nulls": 12,
+          "null_pct": 1.0,
+          "distinct": 0,
+          "samples": []
+        }
+      ],
+      "candidate_keys": [
+        "id",
+        "tag",
+        "name",
+        "dob"
+      ],
+      "dimensions": [
+        "breed",
+        "status"
+      ],
+      "freshness": "2026-09-07T15:35:52",
+      "owner": "unassigned"
+    },
+    {
+      "table": "bronze.milk_logs",
+      "source_file": "milk_logs.csv",
+      "kind": "tabular",
+      "rows": 432,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 432,
+          "samples": [
+            "1",
+            "2",
+            "3"
+          ],
+          "min": 1.0,
+          "max": 432.0
+        },
+        {
+          "name": "cow_id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 10,
+          "samples": [
+            "1",
+            "1",
+            "2"
+          ],
+          "min": 1.0,
+          "max": 10.0
+        },
+        {
+          "name": "log_date",
+          "type": "date",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 22,
+          "samples": [
+            "2026-08-13",
+            "2026-08-13",
+            "2026-08-13"
+          ]
+        },
+        {
+          "name": "session",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "AM",
+            "PM",
+            "AM"
+          ]
+        },
+        {
+          "name": "litres",
+          "type": "real",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 77,
+          "samples": [
+            "14.6",
+            "12.4",
+            "11.8"
+          ],
+          "min": 7.0,
+          "max": 15.3
+        }
+      ],
+      "candidate_keys": [
+        "id"
+      ],
+      "dimensions": [
+        "session"
+      ],
+      "freshness": "2026-09-07T15:35:52",
+      "owner": "unassigned"
+    },
+    {
+      "table": "bronze.treatments",
+      "source_file": "treatments.csv",
+      "kind": "tabular",
+      "rows": 2,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "1",
+            "2"
+          ],
+          "min": 1.0,
+          "max": 2.0
+        },
+        {
+          "name": "cow_id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "4",
+            "7"
+          ],
+          "min": 4.0,
+          "max": 7.0
+        },
+        {
+          "name": "drug",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "Penicillin (mastitis, LF quarter)",
+            "Hoof trim + topical"
+          ]
+        },
+        {
+          "name": "treated_on",
+          "type": "date",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "2026-09-01",
+            "2026-08-04"
+          ]
+        },
+        {
+          "name": "withhold_days",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "5",
+            "0"
+          ],
+          "min": 0.0,
+          "max": 5.0
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "Vet visit — recheck in a week",
+            "No withhold"
+          ]
+        }
+      ],
+      "candidate_keys": [
+        "id",
+        "cow_id",
+        "drug",
+        "treated_on",
+        "withhold_days",
+        "notes"
+      ],
+      "dimensions": [],
+      "freshness": "2026-09-07T15:35:52",
+      "owner": "unassigned"
+    },
+    {
+      "table": "bronze.breedings",
+      "source_file": "breedings.csv",
+      "kind": "tabular",
+      "rows": 2,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "1",
+            "2"
+          ],
+          "min": 1.0,
+          "max": 2.0
+        },
+        {
+          "name": "cow_id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "11",
+            "6"
+          ],
+          "min": 6.0,
+          "max": 11.0
+        },
+        {
+          "name": "inseminated_on",
+          "type": "date",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "2025-12-06",
+            "2026-07-25"
+          ]
+        },
+        {
+          "name": "due_date",
+          "type": "date",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "2026-09-15",
+            "2027-05-04"
+          ]
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 2,
+          "samples": [
+            "confirmed",
+            "open"
+          ]
+        },
+        {
+          "name": "calf_cow_id",
+          "type": "text",
+          "nulls": 2,
+          "null_pct": 1.0,
+          "distinct": 0,
+          "samples": []
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nulls": 2,
+          "null_pct": 1.0,
+          "distinct": 0,
+          "samples": []
+        }
+      ],
+      "candidate_keys": [
+        "id",
+        "cow_id",
+        "inseminated_on",
+        "due_date",
+        "outcome"
+      ],
+      "dimensions": [],
+      "freshness": "2026-09-07T15:35:52",
+      "owner": "unassigned"
+    },
+    {
+      "table": "bronze.sales",
+      "source_file": "sales.csv",
+      "kind": "tabular",
+      "rows": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 10,
+          "samples": [
+            "1",
+            "2",
+            "3"
+          ],
+          "min": 1.0,
+          "max": 10.0
+        },
+        {
+          "name": "collected_on",
+          "type": "date",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 10,
+          "samples": [
+            "2026-08-14",
+            "2026-08-16",
+            "2026-08-18"
+          ]
+        },
+        {
+          "name": "litres",
+          "type": "real",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 9,
+          "samples": [
+            "460.4",
+            "463.6",
+            "465.8"
+          ],
+          "min": 454.4,
+          "max": 468.4
+        },
+        {
+          "name": "price_per_litre",
+          "type": "real",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 10,
+          "samples": [
+            "39.5",
+            "43.09",
+            "40.74"
+          ],
+          "min": 39.5,
+          "max": 43.93
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nulls": 0,
+          "null_pct": 0.0,
+          "distinct": 1,
+          "samples": [
+            "Village dairy society",
+            "Village dairy society",
+            "Village dairy society"
+          ]
+        }
+      ],
+      "candidate_keys": [
+        "id",
+        "collected_on"
+      ],
+      "dimensions": [],
+      "freshness": "2026-09-07T15:35:52",
+      "owner": "unassigned"
+    }
+  ],
+  "table_count": 5,
+  "skipped": []
+}

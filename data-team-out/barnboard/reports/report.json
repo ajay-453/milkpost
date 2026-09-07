@@ -1,0 +1,75 @@
+{
+  "slug": "barnboard",
+  "answers": [
+    {
+      "question": "Which cows are the top and bottom producers, and is herd yield trending up or down?",
+      "answered": true,
+      "plan": {
+        "question": "Which cows are the top and bottom producers, and is herd yield trending up or down?",
+        "metric": "cows",
+        "breakdown": null,
+        "filters": [],
+        "order": "asc",
+        "limit": null
+      },
+      "columns": [
+        "cows"
+      ],
+      "rows": [
+        [
+          12
+        ]
+      ],
+      "receipt": {
+        "metric": "cows",
+        "definition": "Count of cows (additive rollup of cows_count).",
+        "owner": "unassigned",
+        "version": "v1",
+        "aggregation": "sum",
+        "class": "additive",
+        "lineage": [
+          "gold.agg_cows_daily"
+        ],
+        "sql": "SELECT sum(\"cows_count\") AS \"cows\" FROM \"agg_cows_daily\"",
+        "note": "additive"
+      }
+    },
+    {
+      "question": "What is average daily milk yield per cow and per breed?",
+      "answered": false
+    },
+    {
+      "question": "How much revenue have milk sales generated and at what average price per litre?",
+      "answered": true,
+      "plan": {
+        "question": "How much revenue have milk sales generated and at what average price per litre?",
+        "metric": "price_per_litre",
+        "breakdown": null,
+        "filters": [],
+        "order": "desc",
+        "limit": null
+      },
+      "columns": [
+        "price_per_litre"
+      ],
+      "rows": [
+        [
+          422.38
+        ]
+      ],
+      "receipt": {
+        "metric": "price_per_litre",
+        "definition": "Sum of price_per_litre over the agg_sales_daily fact.",
+        "owner": "unassigned",
+        "version": "v1",
+        "aggregation": "sum",
+        "class": "additive",
+        "lineage": [
+          "gold.agg_sales_daily"
+        ],
+        "sql": "SELECT sum(\"price_per_litre\") AS \"price_per_litre\" FROM \"agg_sales_daily\"",
+        "note": "additive"
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "metric": "treatments",
+  "label": "Treatments",
+  "description": "Count of treatments (additive rollup of treatments_count).",
+  "aggregation": "sum",
+  "measure": "treatments_count",
+  "dimensions": [],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_treatments_daily"
+  },
+  "owner": "unassigned",
+  "unit": "count",
+  "round": 0,
+  "lineage": [
+    "gold.agg_treatments_daily"
+  ],
+  "_proposed": true,
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_hash": "sha256:a6584fc27e2a9735"
+}

@@ -1,0 +1,31 @@
+{
+  "metric": "sales",
+  "label": "Sales",
+  "description": "Count of sales (additive rollup of sales_count).",
+  "aggregation": "sum",
+  "measure": "sales_count",
+  "dimensions": [],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_sales_daily"
+  },
+  "owner": "unassigned",
+  "unit": "count",
+  "round": 0,
+  "lineage": [
+    "gold.agg_sales_daily"
+  ],
+  "_proposed": true,
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_hash": "sha256:cf274198a318469b"
+}

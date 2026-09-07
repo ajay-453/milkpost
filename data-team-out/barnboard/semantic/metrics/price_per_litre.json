@@ -1,0 +1,31 @@
+{
+  "metric": "price_per_litre",
+  "label": "Price Per Litre",
+  "description": "Sum of price_per_litre over the agg_sales_daily fact.",
+  "aggregation": "sum",
+  "measure": "price_per_litre",
+  "dimensions": [],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_sales_daily"
+  },
+  "owner": "unassigned",
+  "unit": "",
+  "round": 2,
+  "lineage": [
+    "gold.agg_sales_daily"
+  ],
+  "_proposed": true,
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_hash": "sha256:0dd90d72257985fe"
+}

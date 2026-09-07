@@ -1,0 +1,109 @@
+{
+  "edges": [
+    {
+      "output": "bronze.cows",
+      "from": [
+        "file:cows.csv"
+      ],
+      "logic": "ingest tabular via architect"
+    },
+    {
+      "output": "bronze.milk_logs",
+      "from": [
+        "file:milk_logs.csv"
+      ],
+      "logic": "ingest tabular via architect"
+    },
+    {
+      "output": "bronze.treatments",
+      "from": [
+        "file:treatments.csv"
+      ],
+      "logic": "ingest tabular via architect"
+    },
+    {
+      "output": "bronze.breedings",
+      "from": [
+        "file:breedings.csv"
+      ],
+      "logic": "ingest tabular via architect"
+    },
+    {
+      "output": "bronze.sales",
+      "from": [
+        "file:sales.csv"
+      ],
+      "logic": "ingest tabular via architect"
+    },
+    {
+      "output": "silver.cows",
+      "from": [
+        "bronze.cows"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'tag', 'name', 'dob'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.milk_logs",
+      "from": [
+        "bronze.milk_logs"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.treatments",
+      "from": [
+        "bronze.treatments"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'cow_id', 'drug', 'treated_on', 'withhold_days', 'notes'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.breedings",
+      "from": [
+        "bronze.breedings"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'cow_id', 'inseminated_on', 'due_date', 'outcome'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "silver.sales",
+      "from": [
+        "bronze.sales"
+      ],
+      "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'collected_on'] (0 dup row(s) dropped)"
+    },
+    {
+      "output": "gold.agg_cows_daily",
+      "from": [
+        "silver.cows"
+      ],
+      "logic": "agg by day(dob) x ['breed', 'status']: sum(['tag']), count"
+    },
+    {
+      "output": "gold.agg_milk_logs_daily",
+      "from": [
+        "silver.milk_logs"
+      ],
+      "logic": "agg by day(log_date) x ['session']: sum(['litres']), count"
+    },
+    {
+      "output": "gold.agg_treatments_daily",
+      "from": [
+        "silver.treatments"
+      ],
+      "logic": "agg by day(treated_on) x []: sum(['withhold_days']), count"
+    },
+    {
+      "output": "gold.dim_breedings",
+      "from": [
+        "silver.breedings"
+      ],
+      "logic": "conform dimension (keys ['cow_id', 'due_date', 'id', 'inseminated_on', 'outcome'])"
+    },
+    {
+      "output": "gold.agg_sales_daily",
+      "from": [
+        "silver.sales"
+      ],
+      "logic": "agg by day(collected_on) x []: sum(['litres', 'price_per_litre']), count"
+    }
+  ]
+}

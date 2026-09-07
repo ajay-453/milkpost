@@ -1,0 +1,3 @@
+id,cow_id,drug,treated_on,withhold_days,notes
+1,4,"Penicillin (mastitis, LF quarter)",2026-09-01,5,"Vet visit — recheck in a week"
+2,7,"Hoof trim + topical",2026-08-04,0,"No withhold"

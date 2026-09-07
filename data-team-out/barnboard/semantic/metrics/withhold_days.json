@@ -1,0 +1,31 @@
+{
+  "metric": "withhold_days",
+  "label": "Withhold Days",
+  "description": "Sum of withhold_days over the agg_treatments_daily fact.",
+  "aggregation": "sum",
+  "measure": "withhold_days",
+  "dimensions": [],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_treatments_daily"
+  },
+  "owner": "unassigned",
+  "unit": "count",
+  "round": 0,
+  "lineage": [
+    "gold.agg_treatments_daily"
+  ],
+  "_proposed": true,
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_hash": "sha256:ead82cdb57d64e46"
+}

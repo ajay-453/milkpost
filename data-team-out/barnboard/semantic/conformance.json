@@ -1,0 +1,130 @@
+{
+  "metrics": [
+    {
+      "metric": "cows",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"cows_count\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "litres",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"litres\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "litres",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"litres\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "milk_logs",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"milk_logs_count\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "price_per_litre",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"price_per_litre\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "sales",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"sales_count\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "tag",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"tag\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "treatments",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"treatments_count\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    },
+    {
+      "metric": "withhold_days",
+      "aggregation": "sum",
+      "class": "additive",
+      "issues": [],
+      "compiles": true,
+      "golden_query": "sum(\"withhold_days\")",
+      "rollup_guard": {
+        "ok": true,
+        "strategy": "sum",
+        "reason": "additive (sum) \u2014 safe to sum up the grain"
+      },
+      "result": "pass"
+    }
+  ]
+}

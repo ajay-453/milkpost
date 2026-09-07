@@ -1,0 +1,605 @@
+{
+  "run": {
+    "slug": "barnboard",
+    "created_at": "2026-09-07T10:06:00Z",
+    "skill_version": "0.1.0"
+  },
+  "plan": {
+    "selection": [
+      "architect",
+      "engineer",
+      "designer",
+      "analyst"
+    ],
+    "supplied": [],
+    "policy": "synthesize",
+    "resolved": [
+      "architect",
+      "engineer",
+      "designer",
+      "analyst"
+    ],
+    "reason": "selection needs no synthesis",
+    "engines": {}
+  },
+  "stages": [
+    {
+      "stage": "architect",
+      "status": "ok",
+      "started_at": "2026-09-07T10:06:00Z",
+      "ended_at": "2026-09-07T10:06:00Z",
+      "engine": {
+        "role": "architect",
+        "model": "local",
+        "provider": "claude"
+      },
+      "consumed": {
+        "sources": [
+          "data-team-sources/cows.csv",
+          "data-team-sources/milk_logs.csv",
+          "data-team-sources/treatments.csv",
+          "data-team-sources/breedings.csv",
+          "data-team-sources/sales.csv"
+        ]
+      },
+      "produced": {
+        "bronze": "bronze",
+        "catalog": "bronze/catalog.json",
+        "bronze_db": "bronze/bronze.db",
+        "bronze_db_hash": "sha256:7b488084b77892cc"
+      },
+      "governance": {
+        "lineage": [
+          {
+            "output": "bronze.cows",
+            "from": [
+              "file:cows.csv"
+            ],
+            "logic": "ingest tabular via architect"
+          },
+          {
+            "output": "bronze.milk_logs",
+            "from": [
+              "file:milk_logs.csv"
+            ],
+            "logic": "ingest tabular via architect"
+          },
+          {
+            "output": "bronze.treatments",
+            "from": [
+              "file:treatments.csv"
+            ],
+            "logic": "ingest tabular via architect"
+          },
+          {
+            "output": "bronze.breedings",
+            "from": [
+              "file:breedings.csv"
+            ],
+            "logic": "ingest tabular via architect"
+          },
+          {
+            "output": "bronze.sales",
+            "from": [
+              "file:sales.csv"
+            ],
+            "logic": "ingest tabular via architect"
+          }
+        ],
+        "pii": [
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          }
+        ],
+        "contract": {
+          "name": "barnboard.bronze@1",
+          "honored": true,
+          "violations": []
+        },
+        "quality": [
+          {
+            "check": "cows row_count > 0",
+            "result": "pass",
+            "detail": "12 rows"
+          },
+          {
+            "check": "cows columns <50% null",
+            "result": "warn",
+            "detail": "notes >50% null"
+          },
+          {
+            "check": "cows has a candidate key",
+            "result": "pass",
+            "detail": "id, tag, name, dob"
+          },
+          {
+            "check": "milk_logs row_count > 0",
+            "result": "pass",
+            "detail": "432 rows"
+          },
+          {
+            "check": "milk_logs columns <50% null",
+            "result": "pass",
+            "detail": "ok"
+          },
+          {
+            "check": "milk_logs has a candidate key",
+            "result": "pass",
+            "detail": "id"
+          },
+          {
+            "check": "treatments row_count > 0",
+            "result": "pass",
+            "detail": "2 rows"
+          },
+          {
+            "check": "treatments columns <50% null",
+            "result": "pass",
+            "detail": "ok"
+          },
+          {
+            "check": "treatments has a candidate key",
+            "result": "pass",
+            "detail": "id, cow_id, drug, treated_on, withhold_days, notes"
+          },
+          {
+            "check": "breedings row_count > 0",
+            "result": "pass",
+            "detail": "2 rows"
+          },
+          {
+            "check": "breedings columns <50% null",
+            "result": "warn",
+            "detail": "calf_cow_id, notes >50% null"
+          },
+          {
+            "check": "breedings has a candidate key",
+            "result": "pass",
+            "detail": "id, cow_id, inseminated_on, due_date, outcome"
+          },
+          {
+            "check": "sales row_count > 0",
+            "result": "pass",
+            "detail": "10 rows"
+          },
+          {
+            "check": "sales columns <50% null",
+            "result": "pass",
+            "detail": "ok"
+          },
+          {
+            "check": "sales has a candidate key",
+            "result": "pass",
+            "detail": "id, collected_on"
+          }
+        ]
+      },
+      "receipts": [
+        "landed 5 table(s), 458 rows into bronze.db"
+      ],
+      "notes": "5 tables; 1 PII column(s) flagged"
+    },
+    {
+      "stage": "engineer",
+      "status": "ok",
+      "started_at": "2026-09-07T10:06:00Z",
+      "ended_at": "2026-09-07T10:06:00Z",
+      "engine": {
+        "role": "engineer",
+        "model": "local",
+        "provider": "claude"
+      },
+      "consumed": {
+        "bronze": "bronze"
+      },
+      "produced": {
+        "silver": "silver",
+        "gold": "gold",
+        "lineage": "lineage/engineer.json",
+        "silver_db_hash": "sha256:aea30a042cda7a22",
+        "gold_db_hash": "sha256:150892d11deed30a"
+      },
+      "governance": {
+        "lineage": [
+          {
+            "output": "silver.cows",
+            "from": [
+              "bronze.cows"
+            ],
+            "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'tag', 'name', 'dob'] (0 dup row(s) dropped)"
+          },
+          {
+            "output": "silver.milk_logs",
+            "from": [
+              "bronze.milk_logs"
+            ],
+            "logic": "clean(trim/null/date-normalize) + dedupe on ['id'] (0 dup row(s) dropped)"
+          },
+          {
+            "output": "silver.treatments",
+            "from": [
+              "bronze.treatments"
+            ],
+            "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'cow_id', 'drug', 'treated_on', 'withhold_days', 'notes'] (0 dup row(s) dropped)"
+          },
+          {
+            "output": "silver.breedings",
+            "from": [
+              "bronze.breedings"
+            ],
+            "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'cow_id', 'inseminated_on', 'due_date', 'outcome'] (0 dup row(s) dropped)"
+          },
+          {
+            "output": "silver.sales",
+            "from": [
+              "bronze.sales"
+            ],
+            "logic": "clean(trim/null/date-normalize) + dedupe on ['id', 'collected_on'] (0 dup row(s) dropped)"
+          },
+          {
+            "output": "gold.agg_cows_daily",
+            "from": [
+              "silver.cows"
+            ],
+            "logic": "agg by day(dob) x ['breed', 'status']: sum(['tag']), count"
+          },
+          {
+            "output": "gold.agg_milk_logs_daily",
+            "from": [
+              "silver.milk_logs"
+            ],
+            "logic": "agg by day(log_date) x ['session']: sum(['litres']), count"
+          },
+          {
+            "output": "gold.agg_treatments_daily",
+            "from": [
+              "silver.treatments"
+            ],
+            "logic": "agg by day(treated_on) x []: sum(['withhold_days']), count"
+          },
+          {
+            "output": "gold.dim_breedings",
+            "from": [
+              "silver.breedings"
+            ],
+            "logic": "conform dimension (keys ['cow_id', 'due_date', 'id', 'inseminated_on', 'outcome'])"
+          },
+          {
+            "output": "gold.agg_sales_daily",
+            "from": [
+              "silver.sales"
+            ],
+            "logic": "agg by day(collected_on) x []: sum(['litres', 'price_per_litre']), count"
+          }
+        ],
+        "pii": [
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          }
+        ],
+        "contract": {
+          "name": "barnboard.gold@1",
+          "honored": true,
+          "violations": []
+        },
+        "quality": [
+          {
+            "check": "silver.cows dedupe",
+            "result": "pass",
+            "detail": "12->12 rows (0 dropped)"
+          },
+          {
+            "check": "silver.milk_logs dedupe",
+            "result": "pass",
+            "detail": "432->432 rows (0 dropped)"
+          },
+          {
+            "check": "silver.treatments dedupe",
+            "result": "pass",
+            "detail": "2->2 rows (0 dropped)"
+          },
+          {
+            "check": "silver.breedings dedupe",
+            "result": "pass",
+            "detail": "2->2 rows (0 dropped)"
+          },
+          {
+            "check": "silver.sales dedupe",
+            "result": "pass",
+            "detail": "10->10 rows (0 dropped)"
+          },
+          {
+            "check": "gold.agg_cows_daily reconciles tag",
+            "result": "pass",
+            "detail": "silver Σ=1278.0 gold Σ=1278.0"
+          },
+          {
+            "check": "gold.agg_milk_logs_daily reconciles litres",
+            "result": "pass",
+            "detail": "silver Σ=5095.1 gold Σ=5095.1"
+          },
+          {
+            "check": "gold.agg_treatments_daily reconciles withhold_days",
+            "result": "pass",
+            "detail": "silver Σ=5.0 gold Σ=5.0"
+          },
+          {
+            "check": "gold.dim_breedings conformed",
+            "result": "pass",
+            "detail": "2 rows; PII dropped: none"
+          },
+          {
+            "check": "gold.agg_sales_daily reconciles litres",
+            "result": "pass",
+            "detail": "silver Σ=4642.9 gold Σ=4642.9"
+          },
+          {
+            "check": "gold.agg_sales_daily reconciles price_per_litre",
+            "result": "pass",
+            "detail": "silver Σ=422.38 gold Σ=422.38"
+          }
+        ]
+      },
+      "receipts": [
+        "gold.agg_cows_daily.tag matches raw fact (Σ=1278.0)",
+        "gold.agg_milk_logs_daily.litres matches raw fact (Σ=5095.1)",
+        "gold.agg_treatments_daily.withhold_days matches raw fact (Σ=5.0)",
+        "gold.agg_sales_daily.litres matches raw fact (Σ=4642.9)",
+        "gold.agg_sales_daily.price_per_litre matches raw fact (Σ=422.38)",
+        "gold: 4 fact(s) + 1 dim(s)"
+      ],
+      "notes": "4 facts, 1 dims; all reconciled"
+    },
+    {
+      "stage": "designer",
+      "status": "ok",
+      "started_at": "2026-09-07T10:06:00Z",
+      "ended_at": "2026-09-07T10:06:00Z",
+      "engine": {
+        "role": "designer",
+        "model": "local",
+        "provider": "claude"
+      },
+      "consumed": {
+        "gold": "gold"
+      },
+      "produced": {
+        "semantic": "semantic",
+        "conformance": "semantic/conformance.json"
+      },
+      "governance": {
+        "lineage": [
+          {
+            "output": "metric.cows",
+            "from": [
+              "gold.agg_cows_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.litres",
+            "from": [
+              "gold.agg_milk_logs_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.litres",
+            "from": [
+              "gold.agg_sales_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.milk_logs",
+            "from": [
+              "gold.agg_milk_logs_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.price_per_litre",
+            "from": [
+              "gold.agg_sales_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.sales",
+            "from": [
+              "gold.agg_sales_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.tag",
+            "from": [
+              "gold.agg_cows_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.treatments",
+            "from": [
+              "gold.agg_treatments_daily"
+            ],
+            "logic": "sum (additive) v1"
+          },
+          {
+            "output": "metric.withhold_days",
+            "from": [
+              "gold.agg_treatments_daily"
+            ],
+            "logic": "sum (additive) v1"
+          }
+        ],
+        "pii": [
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          },
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          }
+        ],
+        "contract": {
+          "name": "barnboard.semantic@1",
+          "honored": true,
+          "violations": []
+        },
+        "quality": [
+          {
+            "check": "metric cows conforms",
+            "result": "pass",
+            "detail": "sum(\"cows_count\")"
+          },
+          {
+            "check": "metric litres conforms",
+            "result": "pass",
+            "detail": "sum(\"litres\")"
+          },
+          {
+            "check": "metric litres conforms",
+            "result": "pass",
+            "detail": "sum(\"litres\")"
+          },
+          {
+            "check": "metric milk_logs conforms",
+            "result": "pass",
+            "detail": "sum(\"milk_logs_count\")"
+          },
+          {
+            "check": "metric price_per_litre conforms",
+            "result": "pass",
+            "detail": "sum(\"price_per_litre\")"
+          },
+          {
+            "check": "metric sales conforms",
+            "result": "pass",
+            "detail": "sum(\"sales_count\")"
+          },
+          {
+            "check": "metric tag conforms",
+            "result": "pass",
+            "detail": "sum(\"tag\")"
+          },
+          {
+            "check": "metric treatments conforms",
+            "result": "pass",
+            "detail": "sum(\"treatments_count\")"
+          },
+          {
+            "check": "metric withhold_days conforms",
+            "result": "pass",
+            "detail": "sum(\"withhold_days\")"
+          }
+        ]
+      },
+      "receipts": [
+        "9 metric(s) governed (9 proposed, 0 authored); 9/9 conform"
+      ],
+      "notes": "9 metrics; 0 rollup-guarded; 0 failing"
+    },
+    {
+      "stage": "analyst",
+      "status": "ok",
+      "started_at": "2026-09-07T10:06:00Z",
+      "ended_at": "2026-09-07T10:06:00Z",
+      "engine": {
+        "role": "analyst",
+        "model": "local",
+        "provider": "claude"
+      },
+      "consumed": {
+        "gold": "gold",
+        "semantic": "semantic"
+      },
+      "produced": {
+        "reports": "reports",
+        "visuals": "visuals"
+      },
+      "governance": {
+        "lineage": [
+          {
+            "output": "report.q1",
+            "from": [
+              "metric.cows"
+            ],
+            "logic": "sum over gold; additive"
+          },
+          {
+            "output": "report.q3",
+            "from": [
+              "metric.price_per_litre"
+            ],
+            "logic": "sum over gold; additive"
+          }
+        ],
+        "pii": [
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          },
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          },
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          },
+          {
+            "column": "cows.name",
+            "class": "name",
+            "action": "flagged"
+          }
+        ],
+        "contract": {
+          "name": "barnboard.reports@1",
+          "honored": true,
+          "violations": []
+        },
+        "quality": [
+          {
+            "check": "Q1 answered",
+            "result": "pass",
+            "detail": "cows"
+          },
+          {
+            "check": "Q2 answered",
+            "result": "warn",
+            "detail": "no metric match"
+          },
+          {
+            "check": "Q3 answered",
+            "result": "pass",
+            "detail": "price_per_litre"
+          }
+        ]
+      },
+      "receipts": [
+        "2/3 question(s) answered; 0 chart(s); every answer carries a receipt"
+      ],
+      "notes": "2 answered, 0 charts"
+    }
+  ],
+  "governance_report": {
+    "path": "governance/report.json",
+    "verdict": {
+      "governed": true,
+      "issues": []
+    },
+    "pii_columns": 1,
+    "generated_at": "2026-09-07T10:06:00Z"
+  }
+}

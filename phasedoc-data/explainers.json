@@ -1,0 +1,9 @@
+{
+  "D0": "The foundation: the data-team pipeline (architect, engineer, designer, analyst) has already run once over the farm's real tables and produced bronze/silver/gold data with lineage. This phase makes that run repeatable from a committed config, and lands the two planning reports in the repo.",
+  "D1": "Interoperability: open contracts so any other system can use the data — a read-only JSON API, CSV import to complete the export round-trip, a versioned schema endpoint to program against, and a rehearsed backup drill proving the single-file database travels.",
+  "D2": "Extensibility: replace the auto-generated placeholder metrics with properly authored, governed ones (yield per cow per day, yield by breed, revenue, average price), document how to add a metric with zero engine changes, and prove re-runs give identical numbers.",
+  "D3": "Free web data: a verified inventory of openly licensed sources (licenses, formats, use-cases), a checksummed fetcher that stores chosen datasets locally, and a breed benchmark table that includes the desi breeds this herd actually has.",
+  "D4": "Models: three small reproducible models on gold — 7-day per-cow yield forecast, yield-drop anomaly scoring, and month-end revenue projection. Each must beat its naive baseline on held-out days before it counts; the eval report is a committed artifact.",
+  "D5": "Inference: predictions served where the farmer already is — a forecast API, a dashboard forecast panel, and versioned model parameters that hot-reload without code changes.",
+  "D6": "Every environment, every platform: Docker image (blocked on this host until a Docker-capable machine runs the build — tracked honestly), PM2 bare-metal with reboot persistence, a pytest suite over contracts and models, and the arc on GitHub with the mirror committed per tick."
+}

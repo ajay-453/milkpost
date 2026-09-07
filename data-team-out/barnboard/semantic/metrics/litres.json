@@ -1,0 +1,31 @@
+{
+  "metric": "litres",
+  "label": "Litres",
+  "description": "Sum of litres over the agg_sales_daily fact.",
+  "aggregation": "sum",
+  "measure": "litres",
+  "dimensions": [],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_sales_daily"
+  },
+  "owner": "unassigned",
+  "unit": "",
+  "round": 2,
+  "lineage": [
+    "gold.agg_sales_daily"
+  ],
+  "_proposed": true,
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_hash": "sha256:1072e5e4f9f96334"
+}

@@ -1,0 +1,82 @@
+{
+  "layer": "gold",
+  "facts": [
+    {
+      "table": "agg_cows_daily",
+      "kind": "fact",
+      "grain": "dob_day",
+      "dims": [
+        "breed",
+        "status"
+      ],
+      "measures": [
+        "tag"
+      ],
+      "count_col": "cows_count",
+      "measure_types": {
+        "tag": "integer"
+      },
+      "owner": "unassigned"
+    },
+    {
+      "table": "agg_milk_logs_daily",
+      "kind": "fact",
+      "grain": "log_date_day",
+      "dims": [
+        "session"
+      ],
+      "measures": [
+        "litres"
+      ],
+      "count_col": "milk_logs_count",
+      "measure_types": {
+        "litres": "real"
+      },
+      "owner": "unassigned"
+    },
+    {
+      "table": "agg_treatments_daily",
+      "kind": "fact",
+      "grain": "treated_on_day",
+      "dims": [],
+      "measures": [
+        "withhold_days"
+      ],
+      "count_col": "treatments_count",
+      "measure_types": {
+        "withhold_days": "integer"
+      },
+      "owner": "unassigned"
+    },
+    {
+      "table": "agg_sales_daily",
+      "kind": "fact",
+      "grain": "collected_on_day",
+      "dims": [],
+      "measures": [
+        "litres",
+        "price_per_litre"
+      ],
+      "count_col": "sales_count",
+      "measure_types": {
+        "litres": "real",
+        "price_per_litre": "real"
+      },
+      "owner": "unassigned"
+    }
+  ],
+  "dimensions": [
+    {
+      "table": "dim_breedings",
+      "kind": "dim",
+      "keys": [
+        "cow_id",
+        "due_date",
+        "id",
+        "inseminated_on",
+        "outcome"
+      ],
+      "owner": "unassigned"
+    }
+  ]
+}

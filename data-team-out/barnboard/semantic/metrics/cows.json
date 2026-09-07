@@ -1,0 +1,34 @@
+{
+  "metric": "cows",
+  "label": "Cows",
+  "description": "Count of cows (additive rollup of cows_count).",
+  "aggregation": "sum",
+  "measure": "cows_count",
+  "dimensions": [
+    "breed",
+    "status"
+  ],
+  "time_grains": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "rollups": {
+    "daily": "gold.agg_cows_daily"
+  },
+  "owner": "unassigned",
+  "unit": "count",
+  "round": 0,
+  "lineage": [
+    "gold.agg_cows_daily"
+  ],
+  "_proposed": true,
+  "version": "v1",
+  "changelog": [
+    {
+      "version": "v1",
+      "change": "created"
+    }
+  ],
+  "_hash": "sha256:32dd9ad58c460115"
+}

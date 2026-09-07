@@ -1,0 +1,7 @@
+breed,avg_lactation_yield_kg,yield_range_kg,basis,approx_daily_l,source,url,year,note
+Gir,2110,800-3300,total lactation; fat 4.6%,,NDDB Dairy Knowledge Portal (AGRI-IS/NBAGR),https://www.dairyknowledge.in/dkp/article/gir,n.d.,lactation length 281-380d per Cambridge AGR breed paper
+Sahiwal,2325,1600-2750,total lactation,,NDDB Dairy Knowledge Portal (AGRI-IS/NBAGR),https://www.dairyknowledge.in/dkp/article/sahiwal,n.d.,up-to-6000L organized-herd claim is a ceiling not a benchmark
+Red Sindhi,1840,1100-2600,total lactation; fat 4.5%,,NDDB Dairy Knowledge Portal (AGRI-IS/NBAGR),https://www.dairyknowledge.in/dkp/article/red-sindhi,n.d.,~296d lactation length only in secondary sources (unverified)
+Murrah buffalo,1752,1003-2057,per lactation; fat 7.3%,,NDDB Dairy Knowledge Portal (AGRI-IS/NBAGR),https://www.dairyknowledge.in/dkp/article/murrah,n.d.,conservative field-level figure; elite herds 1800-2500 in literature
+HF cross,,2700-3200,305-day first lactation (field; no single national avg exists - range is the defensible band),4.61-9.64,ICAR IJAnS 92(8) Frieswal field progeny testing; daily: Al Kalaldeh et al. 2021 GSE 53:73,https://epubs.icar.org.in/index.php/IJAnS/article/view/120229,2022,village-herd 305d yields rose ~2700 (1995) to ~3850 (2020)
+Jersey cross,2394,1549-2480,305-day (75627 records; farmers' herds Tamil Nadu 2012-2022),4.98-9.95,Kasiviswanathan et al. 2024 Animals 14(21):3152,https://pmc.ncbi.nlm.nih.gov/articles/PMC11544852/,2024,older field studies 1549-1696 kg are the conservative floor

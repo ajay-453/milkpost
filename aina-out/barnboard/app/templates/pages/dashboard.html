@@ -47,6 +47,18 @@
       <div class="card__body chart-wrap">{{ trend_svg|safe }}</div>
     </div>
 
+    {% if forecast %}
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title">{{ t('Milk — next 7 days (forecast)') }}</div>
+        <span class="badge badge--neutral" title="{{ t('per-cow model; see /api/v1/predict/yield') }}">
+          {{ t('model') }} {{ forecast.version }}
+        </span>
+      </div>
+      <div class="card__body chart-wrap">{{ forecast_svg|safe }}</div>
+    </div>
+    {% endif %}
+
     <div class="card">
       <div class="card__head">
         <div class="card__title">{{ t('Alerts') }}</div>

@@ -163,6 +163,7 @@ def main() -> int:
     os.makedirs(outdir, exist_ok=True)
     artifact = {"model": "yield_forecast", "version": args.version,
                 "algorithm": f"damped Holt (alpha={ALPHA}, beta={BETA}, damp={DAMP})",
+                "alpha": ALPHA, "beta": BETA, "damp": DAMP,
                 "lineage": ["gold.agg_milk_cow_daily"],
                 "backtest": bt, "cows": params}
     with open(os.path.join(outdir, "params.json"), "w") as f:

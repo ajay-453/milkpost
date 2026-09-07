@@ -704,9 +704,12 @@ def dashboard(request: Request):
          "delta": t("from collections"), "dir": "up"},
     ]
     empty_herd = herd_n == 0
+    forecast = _herd_forecast()
     return templates.TemplateResponse(request, "pages/dashboard.html", ctx(
         request, "dashboard", stats=stats, withholds=withholds, calvings=calvings,
-        drops=drops, trend_svg=_svg_trend(days), empty_herd=empty_herd))
+        drops=drops, trend_svg=_svg_trend(days), empty_herd=empty_herd,
+        forecast=forecast,
+        forecast_svg=_svg_forecast(forecast["days"]) if forecast else ""))
 
 
 @app.post("/demo-seed", response_class=HTMLResponse)
@@ -1041,6 +1044,95 @@ def api_table(table: str):
         rows = [dict(r) for r in con.execute(f"SELECT * FROM {table}").fetchall()]
     return _json({"schema_version": DATA_SCHEMA_VERSION, "table": table,
                   "row_count": len(rows), "rows": rows})
+
+
+# ── Inference: yield forecasts from versioned model artifacts ──────────────
+# Parameters live in models/yield_forecast/<version>/params.json (trained by
+# tools/train_models.py); LATEST names the served version. Both are read per
+# request, so bumping LATEST hot-reloads with zero code changes.
+
+MODELS_DIR = os.environ.get(
+    "BARNBOARD_MODELS", str(Path(__file__).resolve().parents[4] / "models"))
+
+
+def _load_yield_model() -> dict | None:
+    base = Path(MODELS_DIR) / "yield_forecast"
+    try:
+        version = (base / "LATEST").read_text().strip()
+        return json.loads((base / version / "params.json").read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _holt_path(level: float, trend: float, horizon: int, damp: float) -> list[float]:
+    out, cum = [], 0.0
+    for h in range(1, horizon + 1):
+        cum += damp ** h
+        out.append(max(0.0, level + cum * trend))
+    return out
+
+
+@app.get("/api/v1/predict/yield/{cow_id}")
+def api_predict_yield(cow_id: int, days: int = 7):
+    model = _load_yield_model()
+    if not model:
+        return _json({"error": "no model artifact"}, 503)
+    cow = model["cows"].get(str(cow_id))
+    if not cow:
+        return _json({"error": "unknown cow"}, 404)
+    horizon = max(1, min(days, 30))
+    preds = _holt_path(cow["level"], cow["trend"], horizon, model.get("damp", 0.92))
+    start = date.fromisoformat(cow["trained_through"])
+    return _json({
+        "schema_version": DATA_SCHEMA_VERSION,
+        "model": model["model"], "model_version": model["version"],
+        "cow_id": cow_id, "tag": cow["tag"], "breed": cow["breed"],
+        "trained_through": cow["trained_through"],
+        "forecast": [{"date": db.iso(start + timedelta(days=h)),
+                      "litres": round(v, 1)}
+                     for h, v in enumerate(preds, start=1)]})
+
+
+def _herd_forecast(horizon: int = 7) -> dict | None:
+    """Sum per-cow forecasts into a herd daily path for the dashboard panel."""
+    model = _load_yield_model()
+    if not model or not model["cows"]:
+        return None
+    damp = model.get("damp", 0.92)
+    days_total = [0.0] * horizon
+    latest = max(c["trained_through"] for c in model["cows"].values())
+    for c in model["cows"].values():
+        for i, v in enumerate(_holt_path(c["level"], c["trend"], horizon, damp)):
+            days_total[i] += v
+    start = date.fromisoformat(latest)
+    return {"version": model["version"],
+            "days": [{"date": db.iso(start + timedelta(days=i + 1)), "total": round(v, 1)}
+                     for i, v in enumerate(days_total)]}
+
+
+def _svg_forecast(days: list[dict], width: int = 640, height: int = 140) -> str:
+    """Server-rendered forecast bars, same visual language as _svg_trend."""
+    mx = max((d["total"] for d in days), default=0) or 1
+    n = len(days)
+    gap, pad_top, pad_bot = 6, 18, 18
+    bw = (width - gap * (n - 1)) / n
+    parts = [f'<svg viewBox="0 0 {width} {height}" role="img" aria-label="7-day forecast" '
+             f'preserveAspectRatio="none" style="width:100%;height:140px">']
+    for i, d in enumerate(days):
+        h = (d["total"] / mx) * (height - pad_top - pad_bot)
+        x, y = i * (bw + gap), height - pad_bot - h
+        parts.append(
+            f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{max(h, 1):.1f}" rx="3" '
+            f'fill="var(--accent-soft-bar, var(--border-strong))" opacity="0.75" '
+            f'stroke="var(--accent)" stroke-dasharray="3 2">'
+            f'<title>{d["date"]}: {d["total"]} L (forecast)</title></rect>')
+    parts.append(
+        f'<text x="0" y="12" font-size="11" fill="var(--text-faint)">{mx:.0f} L peak</text>')
+    parts.append(
+        f'<text x="{width}" y="{height - 4}" text-anchor="end" font-size="11" '
+        f'fill="var(--text-faint)">+7d</text>')
+    parts.append("</svg>")
+    return "".join(parts)
 
 
 # ── iCal reminder feed ─────────────────────────────────────────────────────

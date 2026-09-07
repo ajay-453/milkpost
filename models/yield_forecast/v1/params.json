@@ -2,6 +2,9 @@
   "model": "yield_forecast",
   "version": "v1",
   "algorithm": "damped Holt (alpha=0.35, beta=0.15, damp=0.92)",
+  "alpha": 0.35,
+  "beta": 0.15,
+  "damp": 0.92,
   "lineage": [
     "gold.agg_milk_cow_daily"
   ],

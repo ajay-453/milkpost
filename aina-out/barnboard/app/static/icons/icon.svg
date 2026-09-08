@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#15803d"/>
+  <text x="256" y="330" font-size="280" text-anchor="middle">🐄</text>
+  <text x="256" y="464" font-size="64" text-anchor="middle" fill="#fff" font-family="Inter,system-ui,sans-serif" font-weight="700">Barnboard</text>
+</svg>

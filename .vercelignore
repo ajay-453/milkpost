@@ -1,18 +1,38 @@
-# Keep the upload lean: only what api/index.py's includeFiles need.
+# Keep the upload lean. NOTE: no blanket excludes over dirs the function needs
+# parts of (gitignore-style negation can't re-include under an excluded dir):
+# gold.db + semantic/metrics ship for the metrics API; tools/train_models.py
+# ships for cold-start training (G2.2/G2.3).
 aina-out/barnboard/app/.venv
 aina-out/barnboard/app/.pm2
 aina-out/barnboard/app/tests
 aina-out/barnboard/app/barnboard.db
 aina-out/barnboard.zip
 aina-out/barnboard/docs
-data
-data-team-out
+data-team-out/barnboard/bronze
+data-team-out/barnboard/silver
+data-team-out/barnboard/sources
+data-team-out/barnboard/reports
+data-team-out/barnboard/visuals
+data-team-out/barnboard/governance
+data-team-out/barnboard/lineage
 data-team-sources
+data
 betadoc/.pm2
 betadoc/site/assets
 phasedoc
 phasedoc-data
-tools
+phasedoc-gaps
 semantic-metrics
-*.db
+tools/make_sources.py
+tools/enrich_gold.py
+tools/import_csv.py
+tools/backup_db.py
+tools/fetch_reference.py
+tools/port_registry.py
+tools/check_registry.py
+tools/*.sh
+backups
+logs
+.secrets
+docs
 node_modules

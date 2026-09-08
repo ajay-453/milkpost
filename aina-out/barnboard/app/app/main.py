@@ -1046,6 +1046,98 @@ def api_table(table: str):
                   "row_count": len(rows), "rows": rows})
 
 
+# ── Governed metrics API (G2.2) ─────────────────────────────────────────────
+# The semantic layer's versioned metric definitions, served with receipts:
+# every value ships its definition, owner, lineage, and the exact SQL. Values
+# are recomputed from the gold layer per request — the governance guard's
+# never-sum-a-ratio rule is honored because the golden expression recomputes
+# ratios from components at whatever grain is asked.
+
+import sqlite3 as _sqlite3
+
+RUN_DIR = os.environ.get(
+    "BARNBOARD_RUNDIR",
+    str(Path(__file__).resolve().parents[4] / "data-team-out" / "barnboard"))
+
+
+def _metric_defs() -> dict[str, dict]:
+    defs: dict[str, dict] = {}
+    try:
+        for f in sorted((Path(RUN_DIR) / "semantic" / "metrics").glob("*.json")):
+            m = json.loads(f.read_text())
+            if m.get("metric"):
+                defs[m["metric"]] = m
+    except OSError:
+        pass
+    return defs
+
+
+def _golden_sql(m: dict, by: str | None) -> str | None:
+    agg, meas = m.get("aggregation"), m.get("measure")
+    if agg == "sum":
+        expr = f'sum("{meas}")'
+    elif agg == "count":
+        expr = f'count("{meas}")' if meas else "count(*)"
+    elif agg in ("min", "max", "avg"):
+        expr = f'{agg}("{meas}")'
+    elif agg == "ratio":
+        expr = f'sum("{m.get("numerator")}")*1.0/nullif(sum("{m.get("denominator")}"),0)'
+    elif agg == "derived":
+        expr = m.get("expression", "")
+    else:
+        return None
+    table = (m.get("rollups") or {}).get("daily", "").removeprefix("gold.")
+    if not (table and expr):
+        return None
+    if by:
+        return (f'SELECT "{by}", {expr} AS "{m["metric"]}" FROM "{table}" '
+                f'GROUP BY "{by}" ORDER BY 2 DESC')
+    return f'SELECT {expr} AS "{m["metric"]}" FROM "{table}"'
+
+
+@app.get("/api/v1/metrics")
+def api_metrics():
+    defs = _metric_defs()
+    return _json({"schema_version": DATA_SCHEMA_VERSION, "count": len(defs), "metrics": [
+        {"metric": k, "label": v.get("label", ""), "version": v.get("version", ""),
+         "aggregation": v.get("aggregation", ""), "owner": v.get("owner", ""),
+         "unit": v.get("unit", ""), "dimensions": v.get("dimensions", [])}
+        for k, v in sorted(defs.items())]})
+
+
+@app.get("/api/v1/metrics/{metric_id}")
+def api_metric(metric_id: str, by: str = ""):
+    m = _metric_defs().get(metric_id)
+    if not m:
+        return _json({"error": "unknown metric"}, 404)
+    dim = by or None
+    if dim and dim not in (m.get("dimensions") or []):
+        return _json({"error": "dimension not declared for this metric"}, 422)
+    sql = _golden_sql(m, dim)
+    if not sql:
+        return _json({"error": "metric not computable"}, 422)
+    gold = Path(RUN_DIR) / "gold" / "gold.db"
+    if not gold.exists():
+        return _json({"error": "gold layer unavailable"}, 503)
+    con = _sqlite3.connect(f"file:{gold}?mode=ro", uri=True)
+    try:
+        rows = con.execute(sql).fetchall()
+    finally:
+        con.close()
+    rnd = int(m.get("round", 2))
+    if dim:
+        value = [[r[0], round(r[1], rnd) if r[1] is not None else None] for r in rows]
+    else:
+        v = rows[0][0] if rows else None
+        value = round(v, rnd) if v is not None else None
+    return _json({"schema_version": DATA_SCHEMA_VERSION, "metric": metric_id,
+                  "value": value, "by": dim, "unit": m.get("unit", ""),
+                  "receipt": {"version": m.get("version"), "owner": m.get("owner"),
+                              "aggregation": m.get("aggregation"),
+                              "definition": m.get("description", ""),
+                              "lineage": m.get("lineage", []), "sql": sql}})
+
+
 # ── Inference: yield forecasts from versioned model artifacts ──────────────
 # Parameters live in models/yield_forecast/<version>/params.json (trained by
 # tools/train_models.py); LATEST names the served version. Both are read per

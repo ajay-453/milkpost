@@ -29,7 +29,11 @@ sys.path.insert(0, APP_DIR)
 os.environ.setdefault("DB_PATH", "/tmp/barnboard.db")
 os.environ.setdefault("BARNBOARD_SEED", "1")
 os.environ.setdefault("DEMO_LOGIN", "demo:farm12345")
-os.environ.setdefault("BARNBOARD_MODELS", os.path.join(ROOT, "models"))
+# On Vercel, models are trained at cold start on the instance's own seeded
+# herd (G2.3) so forecast dates are fresh; locally the repo artifacts serve.
+os.environ.setdefault("BARNBOARD_MODELS",
+                      "/tmp/models" if os.environ.get("VERCEL")
+                      else os.path.join(ROOT, "models"))
 # Sessions must survive across lambda instances: each instance has its own
 # /tmp database, so DB-backed sessions bounce users back to /login whenever a
 # click lands on a different instance. Stateless signed-cookie sessions fix
@@ -43,6 +47,32 @@ os.environ.setdefault("SESSION_SECRET", hashlib.sha256(
     f"bb-v2-session-fallback:{os.environ.get('BETADOC_PIN', '4276')}".encode()).hexdigest())
 
 from app.main import app as barnboard  # noqa: E402
+from app.main import _ensure_seed  # noqa: E402
+
+_models_ready = False
+
+
+def _ensure_models() -> None:
+    """G2.3: train on this instance's seeded herd once per cold start, so the
+    served forecast starts tomorrow instead of at a stale bundled date. The
+    trainer is stdlib and ~100ms at demo scale; failure just hides the panel."""
+    global _models_ready
+    if _models_ready:
+        return
+    _models_ready = True
+    if not os.environ.get("VERCEL"):
+        return
+    try:
+        latest = os.path.join(os.environ["BARNBOARD_MODELS"], "yield_forecast", "LATEST")
+        if not os.path.exists(latest):
+            _ensure_seed()                      # DB must exist before training
+            sys.path.insert(0, os.path.join(ROOT, "tools"))
+            import train_models as _tm
+            cows = _tm.load_series_from_app(os.environ["DB_PATH"])
+            if cows:
+                _tm.run_training(cows, os.environ["BARNBOARD_MODELS"], "v1")
+    except Exception:
+        pass
 
 PIN = os.environ.get("BETADOC_PIN", "4276")
 # The PIN is the credential; the cookie secret only has to be stable across
@@ -125,6 +155,7 @@ async def _site_file(send, name: str):
 async def app(scope, receive, send):
     if scope["type"] != "http":
         return await barnboard(scope, receive, send)
+    _ensure_models()
     path = scope["path"]
     has_pin = _valid(_cookie(scope))
 

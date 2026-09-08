@@ -2,40 +2,6 @@
   "slug": "barnboard",
   "answers": [
     {
-      "question": "What is cow-days recorded?",
-      "answered": true,
-      "plan": {
-        "question": "What is cow-days recorded?",
-        "metric": "cow_days_recorded",
-        "breakdown": null,
-        "filters": [],
-        "order": "desc",
-        "limit": null
-      },
-      "columns": [
-        "cow_days_recorded"
-      ],
-      "rows": [
-        [
-          220
-        ]
-      ],
-      "receipt": {
-        "metric": "cow_days_recorded",
-        "definition": "Data-quality metric: number of cow-days with at least one milk log. Against herd size x days it shows logging coverage. Added via JSON definition alone \u2014 zero engine changes (D2.2).",
-        "owner": "data-designer",
-        "version": "v1",
-        "aggregation": "count",
-        "class": "additive",
-        "lineage": [
-          "gold.agg_milk_cow_daily",
-          "silver.milk_logs"
-        ],
-        "sql": "SELECT count(\"litres\") AS \"cow_days_recorded\" FROM \"agg_milk_cow_daily\"",
-        "note": "additive"
-      }
-    },
-    {
       "question": "What is the avg daily yield per cow?",
       "answered": true,
       "plan": {
@@ -51,7 +17,7 @@
       ],
       "rows": [
         [
-          23.159545454545455
+          23.179615384615385
         ]
       ],
       "receipt": {
@@ -67,98 +33,6 @@
           "silver.cows"
         ],
         "sql": "SELECT sum(\"litres\")*1.0/nullif(count(*),0) AS \"avg_daily_yield_per_cow\" FROM \"agg_milk_cow_daily\"",
-        "note": "additive"
-      }
-    },
-    {
-      "question": "Show avg daily yield per cow, by breed",
-      "answered": true,
-      "plan": {
-        "question": "Show avg daily yield per cow, by breed",
-        "metric": "yield_by_breed",
-        "breakdown": "breed",
-        "filters": [],
-        "order": "desc",
-        "limit": 10
-      },
-      "columns": [
-        "breed",
-        "yield_by_breed"
-      ],
-      "rows": [
-        [
-          "HF cross",
-          26.636363636363637
-        ],
-        [
-          "Murrah buffalo",
-          24.94545454545454
-        ],
-        [
-          "Jersey cross",
-          21.472727272727273
-        ],
-        [
-          "Gir",
-          21.204545454545453
-        ],
-        [
-          "Sahiwal",
-          18.722727272727273
-        ],
-        [
-          "Red Sindhi",
-          17.5
-        ]
-      ],
-      "receipt": {
-        "metric": "yield_by_breed",
-        "definition": "avg_daily_yield_per_cow sliced by the breed dimension. Ratio class: recomputed per group, never summed up a grain.",
-        "owner": "data-designer",
-        "version": "v1",
-        "aggregation": "derived",
-        "class": "derived",
-        "lineage": [
-          "gold.agg_milk_cow_daily",
-          "silver.milk_logs",
-          "silver.cows"
-        ],
-        "sql": "SELECT \"breed\", sum(\"litres\")*1.0/nullif(count(*),0) AS \"yield_by_breed\" FROM \"agg_milk_cow_daily\" GROUP BY \"breed\" ORDER BY \"yield_by_breed\" DESC LIMIT 10",
-        "note": "additive"
-      },
-      "chart": "visuals/q3_yield_by_breed_by_breed.svg"
-    },
-    {
-      "question": "What is total milk sales revenue?",
-      "answered": true,
-      "plan": {
-        "question": "What is total milk sales revenue?",
-        "metric": "milk_revenue",
-        "breakdown": null,
-        "filters": [],
-        "order": "desc",
-        "limit": null
-      },
-      "columns": [
-        "milk_revenue"
-      ],
-      "rows": [
-        [
-          196135.203
-        ]
-      ],
-      "receipt": {
-        "metric": "milk_revenue",
-        "definition": "Rupees received for milk: sum of litres times price per litre across collections. Additive in rupee terms; computed from components, never from a pre-averaged price.",
-        "owner": "data-designer",
-        "version": "v1",
-        "aggregation": "derived",
-        "class": "derived",
-        "lineage": [
-          "gold.agg_sales_daily",
-          "silver.sales"
-        ],
-        "sql": "SELECT sum(\"litres\"*\"price_per_litre\") AS \"milk_revenue\" FROM \"agg_sales_daily\"",
         "note": "additive"
       }
     },

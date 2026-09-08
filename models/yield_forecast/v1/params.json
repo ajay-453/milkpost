@@ -1,7 +1,7 @@
 {
   "model": "yield_forecast",
   "version": "v1",
-  "algorithm": "damped Holt (alpha=0.35, beta=0.15, damp=0.92)",
+  "algorithm": "champion/challenger: damped Holt / EWMA / last-value, champion chosen on the holdout (alpha=0.35, beta=0.15, damp=0.92)",
   "alpha": 0.35,
   "beta": 0.15,
   "damp": 0.92,
@@ -11,89 +11,107 @@
   "backtest": {
     "holdout_days": 7,
     "points": 70,
-    "mae_model": 1.247,
-    "mae_naive": 1.333
+    "maes": {
+      "selected": 1.227,
+      "holt": 1.245,
+      "ewma": 1.142,
+      "last": 1.089
+    },
+    "champion": "last",
+    "mae_model": 1.089,
+    "mae_naive": 1.089
   },
+  "champion": "last",
   "cows": {
     "1": {
       "tag": 101,
       "breed": "HF cross",
-      "level": 25.907,
-      "trend": -0.1715,
-      "trained_through": "2026-09-03",
-      "n_days": 22
+      "level": 26.5,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 26
     },
     "2": {
       "tag": 102,
       "breed": "Gir",
-      "level": 17.291,
-      "trend": -0.8148,
-      "trained_through": "2026-09-03",
-      "n_days": 22
+      "level": 19.8,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 26
     },
     "3": {
       "tag": 103,
       "breed": "Sahiwal",
-      "level": 19.884,
-      "trend": 0.0955,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 19.2,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     },
     "4": {
       "tag": 104,
       "breed": "HF cross",
-      "level": 27.865,
-      "trend": -0.0174,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 27.7,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     },
     "5": {
       "tag": 105,
       "breed": "Jersey cross",
-      "level": 20.999,
-      "trend": -0.1855,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 22.2,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     },
     "6": {
       "tag": 106,
       "breed": "HF cross",
-      "level": 25.773,
-      "trend": 0.0063,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 25.8,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     },
     "7": {
       "tag": 107,
       "breed": "Red Sindhi",
-      "level": 17.905,
-      "trend": -0.0012,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 18.1,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     },
     "8": {
       "tag": 108,
       "breed": "Murrah buffalo",
-      "level": 24.916,
-      "trend": -0.0964,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 24.8,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     },
     "9": {
       "tag": 109,
       "breed": "HF cross",
-      "level": 27.558,
-      "trend": -0.0254,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 27.7,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     },
     "10": {
       "tag": 110,
       "breed": "Gir",
-      "level": 20.098,
-      "trend": -0.0155,
-      "trained_through": "2026-09-02",
-      "n_days": 21
+      "level": 20.6,
+      "trend": 0.0,
+      "method": "last",
+      "trained_through": "2026-09-07",
+      "n_days": 25
     }
   }
 }

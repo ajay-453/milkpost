@@ -84,6 +84,35 @@ def test_schema_matches_pragma(client):
             assert [c["name"] for c in tables[t]] == live
 
 
+# ── G2.2: governed metrics API ─────────────────────────────────────────────
+
+def test_metrics_list(client):
+    r = client.get(f"/api/v1/metrics?token={FEED_TOKEN}")
+    assert r.status_code == 200
+    ids = {m["metric"] for m in r.json()["metrics"]}
+    assert {"avg_daily_yield_per_cow", "price_per_litre", "milk_revenue"} <= ids
+
+
+def test_metric_value_matches_gold(client):
+    import sqlite3 as s3
+    r = client.get(f"/api/v1/metrics/avg_daily_yield_per_cow?token={FEED_TOKEN}")
+    assert r.status_code == 200
+    body = r.json()
+    con = s3.connect(f"file:{HUB}/data-team-out/barnboard/gold/gold.db?mode=ro", uri=True)
+    hand = con.execute('SELECT sum("litres")*1.0/nullif(count(*),0) FROM agg_milk_cow_daily').fetchone()[0]
+    con.close()
+    assert body["value"] == round(hand, 2)
+    assert body["receipt"]["sql"].startswith("SELECT")
+    assert body["receipt"]["lineage"]
+
+
+def test_metric_breakdown_and_errors(client):
+    r = client.get(f"/api/v1/metrics/yield_by_breed?by=breed&token={FEED_TOKEN}")
+    assert r.status_code == 200 and len(r.json()["value"]) >= 5
+    assert client.get(f"/api/v1/metrics/nope?token={FEED_TOKEN}").status_code == 404
+    assert client.get(f"/api/v1/metrics/milk_revenue?by=breed&token={FEED_TOKEN}").status_code == 422
+
+
 # ── D4/D5: model logic + inference serving ─────────────────────────────────
 
 def _fake_artifact(tmpdir: str, version: str, level: float) -> None:

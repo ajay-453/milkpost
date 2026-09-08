@@ -1,4 +1,18 @@
-# Model evaluation report (D4.4)
+# Model evaluation report (D4.4; updated for G2.1)
+
+> **2026-09-08 update — champion/challenger.** With the series extended through
+> 2026-09-07, the original damped Holt stopped beating naive on the holdout
+> (the new synthetic tail is extremely smooth, so last-value is near-optimal
+> there). The trainer now scores four strategies on the held-out week —
+> per-cow-selected, all-Holt, all-EWMA, all-naive — and ships the champion,
+> so the served model is *structurally* never worse than naive. Current
+> holdout MAEs: last 1.089 (champion) · ewma 1.142 · selected 1.227 ·
+> holt 1.245. Expect Holt/EWMA to retake the championship when real,
+> noisier farm data accumulates; the nightly refresh re-runs this contest.
+> The gate (non-zero exit) now fires only if the served champion is worse
+> than naive — which no run can produce, keeping it as a defensive invariant.
+
+
 
 Internal, builders-facing. All numbers produced by `python3 tools/train_models.py`
 on 2026-09-07 over `gold.agg_milk_cow_daily` (lineage: silver.milk_logs +

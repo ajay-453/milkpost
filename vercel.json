@@ -10,7 +10,10 @@
           "aina-out/barnboard/app/templates/**",
           "aina-out/barnboard/app/static/**",
           "betadoc-data/site/**",
-          "models/**"
+          "models/**",
+          "tools/train_models.py",
+          "data-team-out/barnboard/gold/**",
+          "data-team-out/barnboard/semantic/metrics/**"
         ]
       }
     }

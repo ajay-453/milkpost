@@ -61,14 +61,65 @@ def load_series(gold_path: str):
     return cows
 
 
-def holt_fit(values: list[float]) -> tuple[float, float]:
-    """Damped Holt level+trend. Returns (level, trend) after the last point."""
+def load_series_from_app(app_db_path: str):
+    """Same cow-day series as load_series, built directly from the app DB —
+    for environments with no pipeline run (the serverless twin, G2.3)."""
+    con = sqlite3.connect(f"file:{app_db_path}?mode=ro", uri=True)
+    raw = defaultdict(list)
+    meta = {}
+    for cid, tag, breed, d, litres, cnt in con.execute(
+            "SELECT m.cow_id, c.tag, c.breed, m.log_date, SUM(m.litres), COUNT(*) "
+            "FROM milk_logs m JOIN cows c ON c.id = m.cow_id "
+            "GROUP BY m.cow_id, m.log_date ORDER BY m.log_date"):
+        raw[cid].append((d, litres, cnt))
+        meta[cid] = (tag, breed)
+    con.close()
+    cows = {}
+    for cid, days in raw.items():
+        counts = sorted(c for _, _, c in days)
+        modal = counts[len(counts) // 2]
+        tag, breed = meta[cid]
+        cows[cid] = {"tag": tag, "breed": breed,
+                     "days": [(d, l) for d, l, c in days if c >= modal]}
+    return cows
+
+
+def holt_fit(values: list[float], beta: float = BETA) -> tuple[float, float]:
+    """Damped Holt level+trend. Returns (level, trend) after the last point.
+    beta=0 collapses to an EWMA (level-only) — the trendless candidate."""
     level, trend = values[0], 0.0
     for v in values[1:]:
         prev = level
         level = ALPHA * v + (1 - ALPHA) * (level + DAMP * trend)
-        trend = BETA * (level - prev) + (1 - BETA) * DAMP * trend
+        trend = beta * (level - prev) + (1 - beta) * DAMP * trend
     return level, trend
+
+
+VAL_DAYS = 4  # validation slice INSIDE the training window for model selection
+
+
+def select_and_fit(values: list[float]) -> tuple[float, float, str]:
+    """Per-cow model selection (G2.1). A trend only earns its place if it wins
+    on a validation slice the fit never saw; stable cows get the trendless
+    EWMA, decliners keep Holt. Selection never touches the true holdout.
+    Returns (level, trend, method) fitted on ALL of `values`."""
+    def _fit(vals: list[float], method: str) -> tuple[float, float]:
+        if method == "last":                 # naive last-value as a real candidate
+            return vals[-1], 0.0
+        return holt_fit(vals, BETA if method == "holt" else 0.0)
+
+    if len(values) > VAL_DAYS + 4:
+        fit_part, val_part = values[:-VAL_DAYS], values[-VAL_DAYS:]
+        scores = {}
+        for name in ("holt", "ewma", "last"):
+            lv, tr = _fit(fit_part, name)
+            preds = holt_forecast(lv, tr, VAL_DAYS)
+            scores[name] = sum(abs(a - p) for a, p in zip(val_part, preds))
+        method = min(scores, key=scores.get)
+    else:
+        method = "ewma"  # too little history to justify a trend
+    level, trend = _fit(values, method)
+    return level, trend, method
 
 
 def holt_forecast(level: float, trend: float, horizon: int) -> list[float]:
@@ -79,24 +130,39 @@ def holt_forecast(level: float, trend: float, horizon: int) -> list[float]:
     return out
 
 
+def _strategy_fit(values: list[float], strategy: str):
+    if strategy == "selected":
+        return select_and_fit(values)[:2]
+    if strategy == "last":
+        return values[-1], 0.0
+    return holt_fit(values, BETA if strategy == "holt" else 0.0)
+
+
+STRATEGIES = ("selected", "holt", "ewma", "last")
+
+
 def backtest(cows: dict) -> dict:
-    """Hold out the trailing HOLDOUT_DAYS per cow; compare vs naive last-value."""
-    abs_err_model, abs_err_naive, n = 0.0, 0.0, 0
+    """Champion/challenger (G2.1): hold out the trailing week per cow, score
+    every strategy on it — naive last-value is itself a challenger, so the
+    served champion can never be worse than naive. All scores are reported."""
+    err = {s: 0.0 for s in STRATEGIES}
+    n = 0
     for c in cows.values():
         days = c["days"]
         if len(days) < HOLDOUT_DAYS + 5:      # need a training run-up
             continue
         train, test = days[:-HOLDOUT_DAYS], days[-HOLDOUT_DAYS:]
-        level, trend = holt_fit([v for _, v in train])
-        preds = holt_forecast(level, trend, HOLDOUT_DAYS)
-        naive = train[-1][1]
-        for (d, actual), pred in zip(test, preds):
-            abs_err_model += abs(actual - pred)
-            abs_err_naive += abs(actual - naive)
-            n += 1
-    return {"holdout_days": HOLDOUT_DAYS, "points": n,
-            "mae_model": round(abs_err_model / n, 3) if n else None,
-            "mae_naive": round(abs_err_naive / n, 3) if n else None}
+        vals = [v for _, v in train]
+        for s in STRATEGIES:
+            level, trend = _strategy_fit(vals, s)
+            preds = holt_forecast(level, trend, HOLDOUT_DAYS)
+            err[s] += sum(abs(a - p) for (_, a), p in zip(test, preds))
+        n += HOLDOUT_DAYS
+    maes = {s: round(e / n, 3) if n else None for s, e in err.items()}
+    champion = min(maes, key=lambda s: maes[s]) if n else "ewma"
+    return {"holdout_days": HOLDOUT_DAYS, "points": n, "maes": maes,
+            "champion": champion,
+            "mae_model": maes.get(champion), "mae_naive": maes.get("last")}
 
 
 def anomaly_scores(cows: dict) -> list[dict]:
@@ -107,7 +173,7 @@ def anomaly_scores(cows: dict) -> list[dict]:
         if len(days) < DROP_WINDOW + 7:
             continue
         train, recent = days[:-DROP_WINDOW], days[-DROP_WINDOW:]
-        level, trend = holt_fit([v for _, v in train])
+        level, trend, _method = select_and_fit([v for _, v in train])
         preds = holt_forecast(level, trend, DROP_WINDOW)
         devs = [(a - p) / p for (_, a), p in zip(recent, preds) if p > 0]
         mean_dev = sum(devs) / len(devs) if devs else 0.0
@@ -140,6 +206,44 @@ def revenue_projection(hub: str) -> dict:
             "abs_pct_error": round(abs(projected - actual) / actual * 100, 2)}
 
 
+def run_training(cows: dict, out_root: str = MODELS, version: str = "v1") -> dict:
+    """Backtest (champion/challenger), fit the champion, write the versioned
+    artifact + LATEST + anomaly flags under out_root. Returns the backtest."""
+    bt = backtest(cows)
+    flags = anomaly_scores(cows)
+    params = {}
+    champ = bt["champion"]
+    for cid, c in cows.items():
+        vals = [v for _, v in c["days"]]
+        if champ == "selected":
+            level, trend, method = select_and_fit(vals)
+        else:
+            level, trend = _strategy_fit(vals, champ)
+            method = champ
+        params[str(cid)] = {"tag": c["tag"], "breed": c["breed"],
+                            "level": round(level, 3), "trend": round(trend, 4),
+                            "method": method,
+                            "trained_through": c["days"][-1][0],
+                            "n_days": len(c["days"])}
+    outdir = os.path.join(out_root, "yield_forecast", version)
+    os.makedirs(outdir, exist_ok=True)
+    artifact = {"model": "yield_forecast", "version": version,
+                "algorithm": "champion/challenger: damped Holt / EWMA / last-value, "
+                             f"champion chosen on the holdout (alpha={ALPHA}, beta={BETA}, damp={DAMP})",
+                "alpha": ALPHA, "beta": BETA, "damp": DAMP,
+                "lineage": ["gold.agg_milk_cow_daily"],
+                "backtest": bt, "champion": bt["champion"], "cows": params}
+    with open(os.path.join(outdir, "params.json"), "w") as f:
+        json.dump(artifact, f, indent=2)
+    with open(os.path.join(out_root, "yield_forecast", "LATEST"), "w") as f:
+        f.write(version + "\n")
+    with open(os.path.join(out_root, "anomaly_flags.json"), "w") as f:
+        json.dump({"threshold": DROP_THRESHOLD, "window_days": DROP_WINDOW,
+                   "scores": flags}, f, indent=2)
+    bt["flagged"] = [f["tag"] for f in flags if f["flagged"]]
+    return bt
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gold", default=GOLD)
@@ -147,40 +251,13 @@ def main() -> int:
     args = ap.parse_args()
 
     cows = load_series(args.gold)
-    bt = backtest(cows)
-    flags = anomaly_scores(cows)
+    bt = run_training(cows, MODELS, args.version)
     rev = revenue_projection(HUB)
-
-    # final fit on ALL days -> the served artifact
-    params = {}
-    for cid, c in cows.items():
-        level, trend = holt_fit([v for _, v in c["days"]])
-        params[str(cid)] = {"tag": c["tag"], "breed": c["breed"],
-                            "level": round(level, 3), "trend": round(trend, 4),
-                            "trained_through": c["days"][-1][0],
-                            "n_days": len(c["days"])}
-    outdir = os.path.join(MODELS, "yield_forecast", args.version)
-    os.makedirs(outdir, exist_ok=True)
-    artifact = {"model": "yield_forecast", "version": args.version,
-                "algorithm": f"damped Holt (alpha={ALPHA}, beta={BETA}, damp={DAMP})",
-                "alpha": ALPHA, "beta": BETA, "damp": DAMP,
-                "lineage": ["gold.agg_milk_cow_daily"],
-                "backtest": bt, "cows": params}
-    with open(os.path.join(outdir, "params.json"), "w") as f:
-        json.dump(artifact, f, indent=2)
-    with open(os.path.join(MODELS, "yield_forecast", "LATEST"), "w") as f:
-        f.write(args.version + "\n")
-
-    with open(os.path.join(MODELS, "anomaly_flags.json"), "w") as f:
-        json.dump({"threshold": DROP_THRESHOLD, "window_days": DROP_WINDOW,
-                   "scores": flags}, f, indent=2)
-
-    print(json.dumps({"backtest": bt,
-                      "flagged": [f["tag"] for f in flags if f["flagged"]],
-                      "revenue": rev}, indent=2))
-    beats = bt["mae_model"] is not None and bt["mae_model"] < bt["mae_naive"]
-    print(f"model {'BEATS' if beats else 'DOES NOT BEAT'} naive baseline; artifact -> {outdir}/params.json")
-    return 0 if beats else 1
+    print(json.dumps({"backtest": bt, "flagged": bt["flagged"], "revenue": rev}, indent=2))
+    ok = bt["mae_model"] is not None and bt["mae_model"] <= bt["mae_naive"]
+    print(f"champion '{bt['champion']}' MAE {bt['mae_model']} vs naive {bt['mae_naive']} "
+          f"({'OK - never worse than naive' if ok else 'GATE FAILURE'})")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

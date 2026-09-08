@@ -1,49 +1,14 @@
 {
   "slug": "barnboard",
-  "generated_at": "2026-09-08T06:18:05Z",
+  "generated_at": "2026-09-08T06:21:54Z",
   "stages": [
-    "analyst",
     "designer",
+    "analyst",
     "architect",
     "engineer"
   ],
   "lineage": {
     "edges": [
-      {
-        "output": "report.q1",
-        "from": [
-          "metric.cow_days_recorded"
-        ],
-        "logic": "count over gold; additive"
-      },
-      {
-        "output": "report.q2",
-        "from": [
-          "metric.avg_daily_yield_per_cow"
-        ],
-        "logic": "derived over gold; additive"
-      },
-      {
-        "output": "report.q3",
-        "from": [
-          "metric.yield_by_breed"
-        ],
-        "logic": "derived over gold; additive"
-      },
-      {
-        "output": "report.q4",
-        "from": [
-          "metric.milk_revenue"
-        ],
-        "logic": "derived over gold; additive"
-      },
-      {
-        "output": "report.q5",
-        "from": [
-          "metric.price_per_litre"
-        ],
-        "logic": "derived over gold; additive"
-      },
       {
         "output": "metric.avg_daily_yield_per_cow",
         "from": [
@@ -148,6 +113,20 @@
           "gold.agg_milk_cow_daily"
         ],
         "logic": "derived (derived) v1"
+      },
+      {
+        "output": "report.q1",
+        "from": [
+          "metric.avg_daily_yield_per_cow"
+        ],
+        "logic": "derived over gold; additive"
+      },
+      {
+        "output": "report.q2",
+        "from": [
+          "metric.price_per_litre"
+        ],
+        "logic": "derived over gold; additive"
       },
       {
         "output": "bronze.cows",
@@ -288,23 +267,20 @@
       "metric.yield_by_breed",
       "report.q1",
       "report.q2",
-      "report.q3",
-      "report.q4",
-      "report.q5",
       "silver.breedings",
       "silver.cows",
       "silver.milk_logs",
       "silver.sales",
       "silver.treatments"
     ],
-    "edge_count": 35
+    "edge_count": 32
   },
   "pii": {
     "columns": [
       {
         "column": "cows.name",
         "class": "name",
-        "first_stage": "analyst",
+        "first_stage": "designer",
         "disposition": "flagged \u2014 carried forward"
       }
     ],
@@ -312,14 +288,14 @@
   },
   "contracts": [
     {
-      "stage": "analyst",
-      "name": "barnboard.reports@1",
+      "stage": "designer",
+      "name": "barnboard.semantic@1",
       "honored": true,
       "violations": []
     },
     {
-      "stage": "designer",
-      "name": "barnboard.semantic@1",
+      "stage": "analyst",
+      "name": "barnboard.reports@1",
       "honored": true,
       "violations": []
     },
@@ -339,13 +315,13 @@
   "all_contracts_honored": true,
   "quality": {
     "by_stage": {
-      "analyst": {
-        "pass": 5,
+      "designer": {
+        "pass": 15,
         "warn": 0,
         "fail": 0
       },
-      "designer": {
-        "pass": 15,
+      "analyst": {
+        "pass": 2,
         "warn": 0,
         "fail": 0
       },
@@ -361,7 +337,7 @@
       }
     },
     "totals": {
-      "pass": 44,
+      "pass": 41,
       "warn": 2,
       "fail": 0
     },

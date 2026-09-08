@@ -1,41 +1,6 @@
 {
   "edges": [
     {
-      "output": "report.q1",
-      "from": [
-        "metric.cow_days_recorded"
-      ],
-      "logic": "count over gold; additive"
-    },
-    {
-      "output": "report.q2",
-      "from": [
-        "metric.avg_daily_yield_per_cow"
-      ],
-      "logic": "derived over gold; additive"
-    },
-    {
-      "output": "report.q3",
-      "from": [
-        "metric.yield_by_breed"
-      ],
-      "logic": "derived over gold; additive"
-    },
-    {
-      "output": "report.q4",
-      "from": [
-        "metric.milk_revenue"
-      ],
-      "logic": "derived over gold; additive"
-    },
-    {
-      "output": "report.q5",
-      "from": [
-        "metric.price_per_litre"
-      ],
-      "logic": "derived over gold; additive"
-    },
-    {
       "output": "silver.cows",
       "from": [
         "bronze.cows"
@@ -209,6 +174,20 @@
         "gold.agg_milk_cow_daily"
       ],
       "logic": "derived (derived) v1"
+    },
+    {
+      "output": "report.q1",
+      "from": [
+        "metric.avg_daily_yield_per_cow"
+      ],
+      "logic": "derived over gold; additive"
+    },
+    {
+      "output": "report.q2",
+      "from": [
+        "metric.price_per_litre"
+      ],
+      "logic": "derived over gold; additive"
     },
     {
       "output": "bronze.cows",

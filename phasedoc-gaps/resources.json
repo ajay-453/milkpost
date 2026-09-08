@@ -1,0 +1,31 @@
+{
+  "services": [
+    { "name": "Gap arc cockpit (this window)", "url": "http://127.0.0.1:6793", "manager": "pm2: phasedoc-gaps", "note": "third process of the ONE cockpit codebase (phasedoc/cockpit.py), parameterized by env" },
+    { "name": "Barnboard app (live)", "url": "http://127.0.0.1:8321", "manager": "pm2: barnboard", "note": "the product the gaps are being closed around" },
+    { "name": "Hosted twin v2", "url": "https://barnboard-app-v2.vercel.app", "manager": "Vercel: barnboard-app-v2", "note": "G0.1/G0.2/G2.3 land here" },
+    { "name": "Data arc cockpit", "url": "http://127.0.0.1:6791", "manager": "pm2: phasedoc-dataarc", "note": "previous arc (25/27)" },
+    { "name": "Betadocs", "url": "http://127.0.0.1:6790 · http://127.0.0.1:6792", "manager": "pm2: betadoc-*", "note": "G3.2 puts TLS in front of these" }
+  ],
+  "documents": [
+    { "name": "Gap analysis (the scoring)", "path": "phasedoc-gaps/gap-analysis.md" },
+    { "name": "Plan of record", "path": "phasedoc-gaps/plan-of-record.md" },
+    { "name": "Architecture", "path": "phasedoc-gaps/architecture.md" },
+    { "name": "Buildplan mirror (generated)", "path": "phasedoc-gaps/buildplan.md" },
+    { "name": "Technical reference", "path": "docs/technical-reference.html" },
+    { "name": "CS concepts", "path": "docs/concepts.html" }
+  ],
+  "code": [
+    { "name": "Plan script (this arc)", "path": "phasedoc-gaps/plan.py" },
+    { "name": "Cockpit (shared, one codebase)", "path": "phasedoc/cockpit.py" },
+    { "name": "App code", "path": "aina-out/barnboard/app/app/" },
+    { "name": "Tools (backup, trainer, registry)", "path": "tools/" }
+  ],
+  "ports": {
+    "8321": "Barnboard app",
+    "6789": "phasedoc cockpit — v1 arc (day 1)",
+    "6790": "betadoc — Barnboard v1 (day 1)",
+    "6791": "phasedoc cockpit — data arc (day 2)",
+    "6792": "betadoc — Data Platform (day 2)",
+    "6793": "phasedoc cockpit — THIS gap arc (day 3); next surface takes 6794"
+  }
+}

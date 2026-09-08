@@ -1,0 +1,7 @@
+{
+  "G0": "Four small, high-payoff fixes: make the hosted twin's API token stable so machines can actually use the advertised contracts, add the Secure flag to session cookies over HTTPS, teach the forecast panel Telugu, and write the published-PIN policy down as a decision.",
+  "G1": "The platform learns to survive: reboot persistence (one-time pm2 startup, then a rehearsed resurrect drill), nightly database backups with a rehearsed restore, CI running the 23-test suite and the model baseline gate on every push, and a check that catches ports missing from the registry.",
+  "G2": "The data stops decaying: the pipeline-and-retrain chain runs nightly so new milk reaches the forecast automatically, the governed metrics become an API that returns values with receipts, and the hosted demo retrains on its own seeded herd so its forecast starts tomorrow, not last week.",
+  "G3": "Claims become verified facts: the Docker image actually built and served (blocked on this host until Docker exists — tracked honestly), TLS in front of the LAN-exposed lanes, and the accepted serverless trade-offs recorded in the technical reference with a revisit trigger.",
+  "G4": "The backlog, tracked but deliberately unscheduled: milk-price outlook, lactation-curve priors (only if they beat the current model on a real backtest), heat-detection rules, narrated demo videos, and the multi-farm co-op design. Acceptance tests are written now so scope stays honest later."
+}

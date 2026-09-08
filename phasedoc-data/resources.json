@@ -3,8 +3,8 @@
     { "name": "Barnboard app (live)", "url": "http://127.0.0.1:8321", "manager": "pm2: barnboard", "note": "the product this data arc feeds and serves inference back into" },
     { "name": "Data arc cockpit (this window)", "url": "http://127.0.0.1:6791", "manager": "pm2: phasedoc-dataarc", "note": "second process of the ONE cockpit codebase (phasedoc/cockpit.py), parameterized by env" },
     { "name": "Barnboard v1 cockpit (archive)", "url": "http://127.0.0.1:6789", "manager": "pm2: phasedoc-barnboard", "note": "previous arc, archived in place" },
-    { "name": "Barnboard betadoc (public face)", "url": "http://127.0.0.1:6790", "manager": "pm2: betadoc-barnboard", "note": "client-facing site + PIN-gated app proxy; owns 6790 permanently" },
-    { "name": "Data Platform betadoc (public face of THIS arc)", "url": "http://127.0.0.1:6792", "manager": "pm2: betadoc-dataplatform", "note": "same server codebase as 6790, parameterized by env (site dir, PIN, cookie)" }
+    { "name": "Barnboard betadoc (public face)", "url": "https://127.0.0.1:6790", "manager": "pm2: betadoc-barnboard", "note": "client-facing site + PIN-gated app proxy; owns 6790 permanently" },
+    { "name": "Data Platform betadoc (public face of THIS arc)", "url": "https://127.0.0.1:6790", "manager": "pm2: betadoc-dataplatform", "note": "same server codebase as 6790, parameterized by env (site dir, PIN, cookie)" }
   ],
   "documents": [
     { "name": "Plan of record", "path": "phasedoc-data/plan-of-record.md" },

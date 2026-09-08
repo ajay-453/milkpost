@@ -12,7 +12,7 @@ module.exports = {
       interpreter: "python3",
       cwd: __dirname,
       env: {
-        BETADOC_PORT: "6792",            // next in the 6789+ range (6791 = data-arc phasedoc)
+        BETADOC_PORT: "6790",            // THE betadoc port, fixed (2026-09-09 decision)
         BETADOC_BIND: "0.0.0.0",
         BETADOC_PIN: "4276",             // demo access PIN — share with the client
         BETADOC_SITE: path.join(__dirname, "site"),

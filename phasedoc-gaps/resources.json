@@ -4,7 +4,7 @@
     { "name": "Barnboard app (live)", "url": "http://127.0.0.1:8321", "manager": "pm2: barnboard", "note": "the product the gaps are being closed around" },
     { "name": "Hosted twin v2", "url": "https://barnboard-app-v2.vercel.app", "manager": "Vercel: barnboard-app-v2", "note": "G0.1/G0.2/G2.3 land here" },
     { "name": "Data arc cockpit", "url": "http://127.0.0.1:6791", "manager": "pm2: phasedoc-dataarc", "note": "previous arc (25/27)" },
-    { "name": "Betadocs", "url": "http://127.0.0.1:6790 · http://127.0.0.1:6792", "manager": "pm2: betadoc-*", "note": "G3.2 puts TLS in front of these" }
+    { "name": "Betadocs", "url": "https://127.0.0.1:6790 · https://127.0.0.1:6790", "manager": "pm2: betadoc-*", "note": "G3.2 puts TLS in front of these" }
   ],
   "documents": [
     { "name": "Gap analysis (the scoring)", "path": "phasedoc-gaps/gap-analysis.md" },

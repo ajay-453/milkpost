@@ -147,6 +147,15 @@ footer{max-width:1040px;margin:0 auto;padding:30px 24px;color:var(--mut);font-si
       versioned JSON API with a schema endpoint any consumer can program against.
       Export, re-import, back up — the round-trip is tested, and the whole database
       is one portable file.</p></div>
+    <div class="card"><h3>🔔 Alerts that earn trust</h3>
+      <p class="mut">Withholding (DO-NOT-TANK), yield-drop early warning, <em>and</em> likely-heat
+      detection — a cow on her 21-day cycle showing the tell-tale one-day milk dip gets
+      flagged in time to breed her. Every alert needs two signals to agree, so quiet
+      mornings stay quiet.</p></div>
+    <div class="card"><h3>📊 A price outlook, honestly built</h3>
+      <p class="mut">Next year's ₹/L estimate on the dashboard: 35 years of India's official
+      milk price index give the direction, your own collection records give the level.
+      Backtested before it was allowed on screen.</p></div>
     <div class="card"><h3>🌍 Benchmarks that fit your herd</h3>
       <p class="mut">Cited benchmark yields for the breeds Indian farms actually
       keep — Gir, Sahiwal, Red Sindhi, Murrah buffalo, HF and Jersey crosses —
@@ -244,17 +253,29 @@ footer{max-width:1040px;margin:0 auto;padding:30px 24px;color:var(--mut);font-si
         <td>23-test suite over contracts, models, auth and rate-limiting — all passing</td>
         <td class="st ok">Built</td></tr>
     <tr><td>Runs on bare metal, supervised</td>
-        <td>PM2-managed processes, state saved; reboot persistence needs a one-time host command</td>
-        <td class="st part">Partial</td></tr>
+        <td>PM2 + systemd boot unit; kill-and-resurrect drill passes — all six services survive a power cycle</td>
+        <td class="st ok">Built</td></tr>
     <tr><td>Container deployment</td>
-        <td>Dockerfile ready and committed; unverified — the demo host has no Docker</td>
-        <td class="st plan">Roadmap</td></tr>
-    <tr><td>Milk-price forecasting from market data</td>
-        <td>Sources researched and verified (USDA API et al.); not yet wired in</td>
-        <td class="st plan">Roadmap</td></tr>
+        <td>Docker image builds and serves — login and dashboard verified running inside the container</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Milk-price outlook from market data</td>
+        <td>FAOSTAT India milk price index (35 years) gives the direction, your own sales give the level — a dashboard tile shows next year's ₹/L estimate, backtested (drift beats naive, 4.6% vs 6.9% error)</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Heat (estrus) detection</td>
+        <td>21-day cycle + one-day milk-dip rules flag "likely heat" on the dashboard; zero false positives by construction (both signals must agree)</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Governed metrics API</td>
+        <td>Every governed metric served with its receipt — definition, owner, version, lineage, and the exact SQL (<code>/api/v1/metrics</code>)</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Operations that run themselves</td>
+        <td>Nightly database backups (14-day retention, restore rehearsed) · nightly pipeline + model retraining · CI on every code change</td>
+        <td class="st ok">Built</td></tr>
+    <tr><td>Encrypted access on the farm network</td>
+        <td>HTTPS on the shared lanes with secure cookies (self-signed until a domain brings a public certificate)</td>
+        <td class="st ok">Built</td></tr>
     <tr><td>Multi-farm / co-op analytics</td>
-        <td>Design direction only</td>
-        <td class="st plan">Roadmap</td></tr>
+        <td>Design drafted, deliberately parked by owner decision</td>
+        <td class="st plan">Parked</td></tr>
   </table>
   </div>
 </section>
@@ -263,10 +284,10 @@ footer{max-width:1040px;margin:0 auto;padding:30px 24px;color:var(--mut);font-si
 <section id="roadmap">
   <h2>Roadmap</h2>
   <ol class="steps">
-    <li><strong>Verify the container path</strong> — build and run the existing Docker image on a Docker-capable host; publish the compose file.</li>
-    <li><strong>Deeper history, better models</strong> — as real multi-month data accumulates, add lactation-curve priors seeded from the breed benchmarks and re-baseline the forecasts.</li>
-    <li><strong>Market prices</strong> — wire the verified USDA price series (and Indian sources as they're validated) into a price outlook next to the revenue projection.</li>
-    <li><strong>Co-op view</strong> — the same governed metrics rolled up across farms, with each farm's data staying its own.</li>
+    <li><strong>The lactation curve takes over on its own</strong> — a curve-based forecaster already competes in every nightly retraining contest (it has beaten the trend model on a multi-month backtest); it ships automatically the night it wins outright on your real data.</li>
+    <li><strong>Narrated demo video</strong> — the hero walkthrough gains a voiceover.</li>
+    <li><strong>A public certificate</strong> — when a domain arrives, the self-signed HTTPS on the farm network upgrades to a browser-trusted one.</li>
+    <li><strong>Co-op view</strong> — parked by decision; the design is written and waiting.</li>
   </ol>
 </section>
 

@@ -97,10 +97,15 @@ and pull data out programmatically.</p>
   <li><strong>Glance at the dashboard.</strong> Two charts side by side: the last 14 days
   <em>actual</em>, and the next 7 days <em>forecast</em> (dashed bars, labeled with the model
   version). The forecast is recomputed from your own records — no cloud involved.</li>
+  <li><strong>Glance at the tiles.</strong> Beside today's totals: a <em>price outlook</em> tile
+  (next year's ₹/L, built from India's official price index and your own sales) sits next to
+  this month's revenue.</li>
   <li><strong>Check the flags.</strong> If a cow has run well below her own forecast for
   3 straight days, she's flagged. In the seeded herd that's cow #102 — her drop
   pattern is planted so you can see the alert working. Half-logged days (AM entered,
-  PM missing) are ignored by the model, so a busy evening never fakes an alarm.</li>
+  PM missing) are ignored by the model, so a busy evening never fakes an alarm.
+  A <em>likely heat</em> alert works the same two-signal way: cow #110's 21-day cycle plus
+  her one-day dip flag her in time to breed.</li>
   <li><strong>Evening.</strong> Log PM litres; record a milk collection on the Sales page and
   the month's revenue updates — with a projected month-end figure behind it.</li>
   <li><strong>Any time.</strong> Pull any table as CSV from the app, or hit the JSON API
@@ -128,12 +133,16 @@ and the exact SQL.</p>
 <h3 id="models">The models</h3>
 <div class="tablewrap"><table>
   <tr><th>Model</th><th>Method</th><th>Evaluated</th></tr>
-  <tr><td>7-day yield forecast</td><td>Per-cow damped level+trend on complete cow-days; standard-library Python, versioned JSON parameters</td>
-      <td>Held-out week: MAE 1.25 L vs naive 1.33 L — beats baseline</td></tr>
-  <tr><td>Drop detection</td><td>Mean deviation of the last 3 complete days vs the cow's own forecast; flag at −20%</td>
+  <tr><td>7-day yield forecast</td><td>Champion/challenger: every night five strategies (trend, smoothing, last-value, per-cow selected, and a lactation curve for cows with 90+ days of history) compete on a held-out week; the winner is served. The served model can never be worse than the naive baseline, because naive is itself a candidate.</td>
+      <td>Current holdout MAEs: champion 1.12 L · lactation curve 1.22 (beat the trend model's 1.28 on a multi-month backtest) · all recorded in models/eval.md</td></tr>
+  <tr><td>Drop detection</td><td>Mean deviation of the last 3 complete days vs the cow's own forecast; flag at −20%; half-logged days excluded</td>
       <td>Catches the seeded decliner; zero false positives across the stable herd</td></tr>
+  <tr><td>Heat (estrus) detection</td><td>Rules, no ML: a cow whose insemination failed is watched on the 21-day cycle; flagged only when the cycle window AND a one-day milk dip (≤92% of her own mean) agree</td>
+      <td>Seeded heat event flagged exactly once; zero false positives by construction</td></tr>
   <tr><td>Revenue projection</td><td>Month-to-date rate extrapolated to month-end</td>
       <td>8.1% absolute error with the final week hidden</td></tr>
+  <tr><td>Price outlook</td><td>FAOSTAT India milk price index (1991–2025) drift-forecast for direction × the farm's own volume-weighted ₹/L for level</td>
+      <td>Walk-forward: drift 4.6% error vs naive 6.9% over the held-out years</td></tr>
 </table></div>
 <p class="mut">Honest caveat: these figures come from three weeks of synthetic demo
 data. The methods are deliberately simple and auditable; expect the margins to
@@ -156,6 +165,10 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://&lt;demo-host&gt;/api/v1/cow
       <td>The versioned data contract: every exportable table with column names, types, and keys — program against this, not guesswork.</td></tr>
   <tr><td><code>GET /api/v1/{table}.json</code></td>
       <td>Full rows for <code>cows</code>, <code>milk_logs</code>, <code>treatments</code>, <code>breedings</code>, <code>sales</code> in an envelope: <code>{schema_version, table, row_count, rows}</code>. Anything else → 404 (whitelist).</td></tr>
+  <tr><td><code>GET /api/v1/metrics</code></td>
+      <td>Every governed metric: id, label, version, owner, unit, aggregation class, breakdown dimensions.</td></tr>
+  <tr><td><code>GET /api/v1/metrics/{id}?by=dim</code></td>
+      <td>The metric's value <em>with its receipt</em> — definition, owner, version, lineage, and the exact SQL. <code>?by=breed</code> style breakdowns for declared dimensions. Unknown id → 404, undeclared dimension → 422.</td></tr>
   <tr><td><code>GET /api/v1/predict/yield/{cow_id}?days=7</code></td>
       <td>The cow's forecast: date + litres per day, with the serving model version. Unknown cow → 404. <code>days</code> caps at 30.</td></tr>
   <tr><td><code>GET /export/{table}.csv</code></td>
@@ -188,11 +201,13 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://&lt;demo-host&gt;/api/v1/cow
 
 <h2 id="deploy">Running it yourself</h2>
 <p>Requirements: Python 3.12 and four pinned packages for the app; the data and model
-layer is standard-library only. One process manager command supervises the app, and
-the same codebase runs on a laptop, a farm PC, or a small VPS — copy the database
-file and start. A container image exists in the repository but is marked
-<em>roadmap</em> until it has been built and verified on a Docker host (see the
-<a href="/#matrix">feature matrix</a> — we don't mark things done that haven't run).</p>
+layer is standard-library only. Three verified ways to run the same codebase:
+bare metal under PM2 with a systemd boot unit (survives power cycles — drilled, not
+assumed), a Docker container (image builds and serves; login and dashboard verified
+inside it), and the serverless demo twin. Operations run themselves: nightly database
+backups with a rehearsed restore, nightly pipeline-and-retrain so forecasts follow the
+milk, and CI on every code change. See the <a href="/#matrix">feature matrix</a> —
+everything marked Built has actually been run.</p>
 
 <p class="mut" style="margin-top:44px;border-top:1px solid var(--bd);padding-top:16px">
 Barnboard Data Platform · beta · questions? Come back through the <a href="/demo">demo</a> and poke the real thing.</p>

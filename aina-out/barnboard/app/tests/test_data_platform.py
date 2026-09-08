@@ -60,6 +60,15 @@ def test_api_bearer_header(client):
     assert r.status_code == 200
 
 
+def test_feed_token_env_override(client, monkeypatch):
+    # G0.1: FEED_TOKEN env must win over the per-install settings token, so
+    # serverless instances (each with a private /tmp DB) agree on one token.
+    monkeypatch.setenv("FEED_TOKEN", "stable-env-token")
+    assert client.get("/api/v1/cows.json?token=stable-env-token").status_code == 200
+    # and the old settings token stops working while the env override is active
+    assert client.get(f"/api/v1/cows.json?token={FEED_TOKEN}").status_code == 401
+
+
 def test_api_rejects_non_whitelisted(client):
     r = client.get(f"/api/v1/users.json?token={FEED_TOKEN}")
     assert r.status_code == 404

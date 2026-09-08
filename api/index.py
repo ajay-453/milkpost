@@ -36,6 +36,9 @@ os.environ.setdefault("BARNBOARD_MODELS", os.path.join(ROOT, "models"))
 # that — the signing key comes from the SESSION_SECRET env var (set in the
 # Vercel project); the derived fallback only covers local rehearsal.
 os.environ.setdefault("STATELESS_SESSIONS", "1")
+if os.environ.get("VERCEL"):
+    # HTTPS is guaranteed on Vercel: mark the app session cookie Secure (G0.2)
+    os.environ.setdefault("SECURE_COOKIES", "1")
 os.environ.setdefault("SESSION_SECRET", hashlib.sha256(
     f"bb-v2-session-fallback:{os.environ.get('BETADOC_PIN', '4276')}".encode()).hexdigest())
 
@@ -124,6 +127,11 @@ async def app(scope, receive, send):
         return await barnboard(scope, receive, send)
     path = scope["path"]
     has_pin = _valid(_cookie(scope))
+
+    if path.startswith("/api/v1/") or path == "/healthz":
+        # Machine consumers can't hold a PIN cookie. The app's own middleware
+        # enforces session-or-feed-token auth and answers JSON 401 (G0.1).
+        return await barnboard(scope, receive, send)
 
     if path == "/" and not has_pin:
         return await _site_file(send, "index.html")

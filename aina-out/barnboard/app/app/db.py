@@ -137,6 +137,13 @@ def get_setting(con: sqlite3.Connection, key: str) -> str | None:
     return row["value"] if row else None
 
 
+def feed_token(con: sqlite3.Connection) -> str:
+    """The calendar/API secret. A FEED_TOKEN env var overrides the per-install
+    settings value so serverless instances (each with a private /tmp database
+    and therefore a different random token) all agree on one stable token."""
+    return os.environ.get("FEED_TOKEN") or get_setting(con, "feed_token") or ""
+
+
 def set_setting(con: sqlite3.Connection, key: str, value: str) -> None:
     con.execute("INSERT INTO settings (key, value) VALUES (?, ?) "
                 "ON CONFLICT (key) DO UPDATE SET value = excluded.value", (key, value))

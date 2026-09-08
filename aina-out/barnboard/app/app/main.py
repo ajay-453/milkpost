@@ -174,7 +174,7 @@ async def require_login(request: Request, call_next):
             request.headers.get("authorization", "").removeprefix("Bearer ").strip()
         with db.get_db() as con:
             user = db.session_user(con, request.cookies.get(SESSION_COOKIE))
-            expected = db.get_setting(con, "feed_token") or ""
+            expected = db.feed_token(con)
         if user or (tok and expected and secrets.compare_digest(tok, expected)):
             return await call_next(request)
         return Response(json.dumps({"error": "unauthorized"}), status_code=401,
@@ -231,7 +231,7 @@ def ctx(request: Request, active: str, **extra):
     with db.get_db() as con:
         cows = con.execute(
             "SELECT id, tag, name FROM cows WHERE status != 'sold' ORDER BY tag").fetchall()
-        feed_token = db.get_setting(con, "feed_token") or ""
+        feed_token = db.feed_token(con)
     palette = [{"label": f"{n['label']}", "href": n["href"], "kind": "page"} for n in NAV]
     palette += [{"label": f"#{c['tag']} {c['name']}".strip(), "href": f"/cows#cow-{c['id']}",
                  "kind": "cow"} for c in cows]
@@ -1157,7 +1157,7 @@ def calendar_feed_redirect():
     """Legacy/browser entry point (login-protected by middleware): bounce to
     the secret-token URL, which is what actually goes into a calendar app."""
     with db.get_db() as con:
-        token = db.get_setting(con, "feed_token") or ""
+        token = db.feed_token(con)
     return RedirectResponse(f"/calendar/{token}.ics", status_code=303)
 
 
@@ -1167,7 +1167,7 @@ def calendar_feed(token: str):
     Zero notification infrastructure — the calendar app does the reminding.
     Public by secret token, because calendar apps cannot log in."""
     with db.get_db() as con:
-        expected = db.get_setting(con, "feed_token") or ""
+        expected = db.feed_token(con)
     if not expected or not secrets.compare_digest(token, expected):
         return PlainTextResponse("not found", status_code=404)
     today = date.today()

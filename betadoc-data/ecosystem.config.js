@@ -19,6 +19,8 @@ module.exports = {
         BETADOC_SECRET_FILE: path.join(__dirname, ".betadoc-secret"),
         BETADOC_COOKIE: "bdd_demo",      // distinct: same-host ports share a cookie jar
         APP_UPSTREAM: "http://127.0.0.1:8321",
+        BETADOC_TLS_CERT: "/home/oc/velocity/hub/.secrets/betadoc-cert.pem",
+        BETADOC_TLS_KEY: "/home/oc/velocity/hub/.secrets/betadoc-key.pem",
       },
       autorestart: true,
       max_restarts: 10,

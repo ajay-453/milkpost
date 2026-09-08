@@ -74,7 +74,56 @@ def _ensure_models() -> None:
     except Exception:
         pass
 
-PIN = os.environ.get("BETADOC_PIN", "4276")
+PIN = os.environ.get("BETADOC_PIN", "8437")   # rotated 2026-09-09 (request-based access)
+# Demo-access requests (mirrors betadoc_server.py): email in, PIN out — by
+# SMTP when configured, on screen otherwise. On Vercel the lead log goes to
+# stdout (visible in function logs) plus ephemeral /tmp.
+SMTP_HOST = os.environ.get("SMTP_HOST", "")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_PASS = os.environ.get("SMTP_PASS", "")
+SMTP_FROM = os.environ.get("SMTP_FROM", SMTP_USER)
+OWNER_EMAIL = os.environ.get("OWNER_EMAIL", "")
+
+
+def _log_request(email: str, delivered: str) -> None:
+    import json as _json
+    from datetime import datetime, timezone
+    line = _json.dumps({"ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "email": email, "delivered": delivered})
+    print(f"DEMO-REQUEST {line}", flush=True)          # durable in Vercel logs
+    try:
+        with open("/tmp/demo-requests.jsonl", "a") as f:
+            f.write(line + "\n")
+    except OSError:
+        pass
+
+
+def _send_pin_email(to_addr: str) -> bool:
+    if not (SMTP_HOST and SMTP_USER and SMTP_PASS):
+        return False
+    import smtplib
+    from email.message import EmailMessage
+    try:
+        msg = EmailMessage()
+        msg["Subject"] = "Your Barnboard demo access PIN"
+        msg["From"] = SMTP_FROM
+        msg["To"] = to_addr
+        if OWNER_EMAIL:
+            msg["Bcc"] = OWNER_EMAIL
+        msg.set_content(
+            "Thanks for your interest in Barnboard!\n\n"
+            f"Your demo access PIN: {PIN}\n\n"
+            "Enter it at the /demo page, then sign in with the demo account\n"
+            "shown in the documentation. Everything in the demo is synthetic\n"
+            "data - explore freely.\n")
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as s:
+            s.starttls()
+            s.login(SMTP_USER, SMTP_PASS)
+            s.send_message(msg)
+        return True
+    except Exception:
+        return False
 # The PIN is the credential; the cookie secret only has to be stable across
 # cold starts, so deriving it from the PIN is fine for a demo gate.
 SECRET = os.environ.get("BETADOC_SECRET",
@@ -102,8 +151,24 @@ a{{color:var(--acc)}}.back{{margin-top:18px;font-size:13px}}</style></head><body
 <p>Enter the access PIN you were given to open the live application.</p>
 <input name="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="8" autofocus placeholder="&#183;&#183;&#183;&#183;">
 <button type="submit">Open the demo</button>{err}
+<div class="back">No PIN yet? <a href="/demo/request"><strong>Request access</strong></a></div>
 <div class="back"><a href="/">&larr; back to the overview</a></div>
 </form></body></html>"""
+
+REQUEST_PAGE = GATE_PAGE.split("<form", 1)[0] + """<form class="card" method="post" action="/demo/request">
+<div style="font-size:34px">&#9993;&#65039;</div><h1>Request demo access</h1>
+<p>Leave your email and we'll send you the access PIN for the live demo.</p>
+<input name="email" type="email" required autofocus placeholder="you@example.com"
+  style="letter-spacing:normal;font-size:16px;text-align:left">
+<button type="submit">Send me the PIN</button>{err}
+<div class="back"><a href="/demo">I already have a PIN</a></div>
+</form></body></html>"""
+
+GRANTED_PAGE = GATE_PAGE.split("<form", 1)[0] + """<div class="card">
+<div style="font-size:34px">&#9989;</div><h1>{title}</h1>
+<p>{message}</p>
+<div class="back"><a href="/demo"><strong>Enter the demo &rarr;</strong></a></div>
+</div></body></html>"""
 
 
 def _token() -> str:
@@ -232,6 +297,35 @@ async def app(scope, receive, send):
             return await _redirect(send, "/login", [(b"set-cookie", cookie.encode())])
         page = GATE_PAGE.format(err='<div class="err">Wrong PIN — try again.</div>')
         return await _send(send, 401, page.encode(), "text/html; charset=utf-8")
+    if path == "/demo/request" and scope["method"] == "GET":
+        return await _send(send, 200, REQUEST_PAGE.format(err="").encode(),
+                           "text/html; charset=utf-8")
+    if path == "/demo/request" and scope["method"] == "POST":
+        import re as _re
+        body = b""
+        while True:
+            msg = await receive()
+            body += msg.get("body", b"")
+            if not msg.get("more_body"):
+                break
+        email = ""
+        for pair in body.decode(errors="replace").split("&"):
+            k, _, v = pair.partition("=")
+            if k == "email":
+                email = urllib.parse.unquote_plus(v).strip()
+        if not _re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]{2,}", email):
+            page = REQUEST_PAGE.format(err='<div class="err">That doesn\'t look like an email address.</div>')
+            return await _send(send, 422, page.encode(), "text/html; charset=utf-8")
+        if _send_pin_email(email):
+            _log_request(email, "email")
+            page = GRANTED_PAGE.format(title="Check your inbox",
+                message=f"We've sent the access PIN to <strong>{email}</strong>. It can take a minute to arrive.")
+        else:
+            _log_request(email, "screen")
+            page = GRANTED_PAGE.format(title="You're in",
+                message=f"Thanks, <strong>{email}</strong>! Your access PIN is "
+                        f"<strong style='font-size:22px;letter-spacing:.2em'>{PIN}</strong>")
+        return await _send(send, 200, page.encode(), "text/html; charset=utf-8")
     if path == "/demo/exit":
         cookie = f"{COOKIE}=; Path=/; Max-Age=0"
         return await _redirect(send, "/", [(b"set-cookie", cookie.encode())])

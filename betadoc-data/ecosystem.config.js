@@ -14,7 +14,12 @@ module.exports = {
       env: {
         BETADOC_PORT: "6790",            // THE betadoc port, fixed (2026-09-09 decision)
         BETADOC_BIND: "0.0.0.0",
-        BETADOC_PIN: "4276",             // demo access PIN — share with the client
+        BETADOC_PIN: "8437",             // rotated 2026-09-09: delivered via /demo/request only
+        BETADOC_REQUESTS: path.join(__dirname, ".demo-requests.jsonl"),
+        OWNER_EMAIL: "ajaycse777@gmail.com",   // gets a copy of each PIN email (when SMTP is on)
+        // To enable real email delivery, set: SMTP_HOST, SMTP_PORT, SMTP_USER,
+        // SMTP_PASS (e.g. a Gmail app password), SMTP_FROM. Until then the PIN
+        // is revealed on screen after the email is captured.
         BETADOC_SITE: path.join(__dirname, "site"),
         BETADOC_SECRET_FILE: path.join(__dirname, ".betadoc-secret"),
         BETADOC_COOKIE: "bdd_demo",      // distinct: same-host ports share a cookie jar

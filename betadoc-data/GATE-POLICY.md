@@ -22,3 +22,11 @@ LAN-only. No real farm data sits behind any published PIN.
 
 **Revisit trigger:** the moment any non-synthetic data reaches a gated lane,
 this policy is void — rotate immediately and unpublish.
+
+## Update 2026-09-09 — request-based access
+
+The PIN is no longer published. Visitors request access at `/demo/request`
+with their email; every request is appended to `.demo-requests.jsonl` (the
+lead log, gitignored). Delivery: by email when SMTP_* env is configured
+(owner gets a copy via OWNER_EMAIL), otherwise revealed on screen after the
+email is captured. PIN rotated 4276 → 8437 as part of this change.

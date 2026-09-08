@@ -1055,9 +1055,16 @@ def api_table(table: str):
 
 import sqlite3 as _sqlite3
 
+def _hub_root() -> Path:
+    """The repo root when running from the checkout; falls back to the app's
+    own base dir in shallow layouts (e.g. a container at /app) where the
+    data-platform artifacts simply aren't present."""
+    p = Path(__file__).resolve().parents
+    return p[4] if len(p) > 4 else BASE_DIR
+
+
 RUN_DIR = os.environ.get(
-    "BARNBOARD_RUNDIR",
-    str(Path(__file__).resolve().parents[4] / "data-team-out" / "barnboard"))
+    "BARNBOARD_RUNDIR", str(_hub_root() / "data-team-out" / "barnboard"))
 
 
 def _metric_defs() -> dict[str, dict]:
@@ -1143,8 +1150,7 @@ def api_metric(metric_id: str, by: str = ""):
 # tools/train_models.py); LATEST names the served version. Both are read per
 # request, so bumping LATEST hot-reloads with zero code changes.
 
-MODELS_DIR = os.environ.get(
-    "BARNBOARD_MODELS", str(Path(__file__).resolve().parents[4] / "models"))
+MODELS_DIR = os.environ.get("BARNBOARD_MODELS", str(_hub_root() / "models"))
 
 
 def _load_yield_model() -> dict | None:

@@ -1,0 +1,7 @@
+.venv
+.pm2
+tests
+barnboard.db
+backup-*.db
+__pycache__
+*.pyc

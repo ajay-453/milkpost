@@ -62,12 +62,12 @@
     <div class="card">
       <div class="card__head">
         <div class="card__title">{{ t('Alerts') }}</div>
-        <span class="badge {% if withholds or drops %}badge--warning{% else %}badge--success{% endif %}">
-          {{ (withholds|length) + (calvings|length) + (drops|length) }} {{ t('active') }}
+        <span class="badge {% if withholds or drops or heats %}badge--warning{% else %}badge--success{% endif %}">
+          {{ (withholds|length) + (calvings|length) + (drops|length) + (heats|length) }} {{ t('active') }}
         </span>
       </div>
       <div class="card__body">
-        {% if not withholds and not calvings and not drops %}
+        {% if not withholds and not calvings and not drops and not heats %}
           <div class="empty"><div class="empty__icon">🌤️</div>{{ t('All quiet in the barn — no alerts.') }}</div>
         {% endif %}
         {% for w in withholds %}
@@ -81,6 +81,12 @@
           <div class="alert-item">
             <span class="badge badge--warning">{{ t('yield drop') }}</span>
             <div><strong>#{{ d.tag }} {{ d.name }}</strong> {{ t('gave') }} {{ d.latest }} L ({{ t('avg') }} {{ d.avg }} L · -{{ d.pct }}%)<br><span class="faint">{{ t('early sign of mastitis or lameness — check her') }}</span></div>
+          </div>
+        {% endfor %}
+        {% for h in heats %}
+          <div class="alert-item">
+            <span class="badge badge--accent">{{ t('likely heat') }}</span>
+            <div><strong>#{{ h.tag }} {{ h.name }}</strong> {{ t('cycle-day milk dip') }} -{{ h.dip_pct }}% ({{ h.heat_day }})<br><span class="faint">{{ t('inseminate now or watch next window') }} ~{{ h.next_expected }}</span></div>
           </div>
         {% endfor %}
         {% for c in calvings %}

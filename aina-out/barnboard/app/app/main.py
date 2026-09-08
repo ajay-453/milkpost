@@ -686,12 +686,33 @@ def dashboard(request: Request):
         withholds = db.active_withholdings(con, today)
         calvings = db.upcoming_calvings(con, today, 30)
         drops = db.yield_drop_alerts(con, today)
+        heats = db.heat_watch(con, today)
         month_start = today.replace(day=1)
         rev = con.execute(
             "SELECT COALESCE(SUM(litres * price_per_litre), 0) v FROM sales WHERE collected_on >= ?",
             (db.iso(month_start),)).fetchone()["v"]
     delta = today_total - yday_total
     t = i18n.make_t(i18n.get_lang(request))
+    # G4.1: market-referenced price outlook — FAOSTAT India milk PPI gives the
+    # direction (yoy factor), the farm's own volume-weighted ₹/L gives the level.
+    outlook_tile = None
+    try:
+        po = json.loads((_hub_root() / "data" / "reference" /
+                         "price_outlook.json").read_text())
+        with db.get_db() as con:
+            r = con.execute("SELECT SUM(litres*price_per_litre)/SUM(litres) v "
+                            "FROM sales").fetchone()
+        if r and r["v"]:
+            est = r["v"] * po["yoy_factor"]
+            outlook_tile = {
+                "label": "Milk price outlook",
+                "value": f"{CURRENCY}{est:.1f}/L",
+                "delta": f"{po['index_next_year']} {t('est')} · "
+                         f"{t('your avg')} {CURRENCY}{r['v']:.1f} × "
+                         f"FAOSTAT PPI {po['yoy_factor']:.3f}",
+                "dir": "up" if po["yoy_factor"] >= 1 else "down"}
+    except (OSError, json.JSONDecodeError, KeyError):
+        pass
     stats = [
         {"label": "Milk today", "value": f"{today_total:.1f} L",
          "delta": f"{delta:+.1f} L {t('vs yesterday')}", "dir": "up" if delta >= 0 else "down"},
@@ -703,11 +724,13 @@ def dashboard(request: Request):
         {"label": "Revenue this month", "value": f"{CURRENCY}{inr_format(rev)}",
          "delta": t("from collections"), "dir": "up"},
     ]
+    if outlook_tile:
+        stats.append(outlook_tile)
     empty_herd = herd_n == 0
     forecast = _herd_forecast()
     return templates.TemplateResponse(request, "pages/dashboard.html", ctx(
         request, "dashboard", stats=stats, withholds=withholds, calvings=calvings,
-        drops=drops, trend_svg=_svg_trend(days), empty_herd=empty_herd,
+        drops=drops, heats=heats, trend_svg=_svg_trend(days), empty_herd=empty_herd,
         forecast=forecast,
         forecast_svg=_svg_forecast(forecast["days"]) if forecast else ""))
 

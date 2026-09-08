@@ -130,12 +130,71 @@ def holt_forecast(level: float, trend: float, horizon: int) -> list[float]:
     return out
 
 
+WOOD_MIN_DAYS = 90  # G4.2: the lactation curve may only compete (and thus
+                    # ever ship) once a cow has multi-month history — the
+                    # acceptance requires beating Holt on a real backtest first.
+
+
+def wood_fit(values: list[float]) -> tuple[float, float, float]:
+    """Wood's lactation curve y(t) = a * t^b * exp(-c t), fitted by
+    log-linearisation (ln y = ln a + b ln t - c t) via 3x3 normal equations."""
+    import math
+    xs = [(1.0, math.log(t), -float(t)) for t in range(1, len(values) + 1)]
+    ys = [math.log(max(v, 0.1)) for v in values]
+    # build normal equations A beta = rhs
+    A = [[sum(x[i] * x[j] for x in xs) for j in range(3)] for i in range(3)]
+    rhs = [sum(x[i] * y for x, y in zip(xs, ys)) for i in range(3)]
+    # gaussian elimination
+    for col in range(3):
+        piv = max(range(col, 3), key=lambda r: abs(A[r][col]))
+        A[col], A[piv] = A[piv], A[col]
+        rhs[col], rhs[piv] = rhs[piv], rhs[col]
+        for r in range(col + 1, 3):
+            f = A[r][col] / A[col][col]
+            for c2 in range(col, 3):
+                A[r][c2] -= f * A[col][c2]
+            rhs[r] -= f * rhs[col]
+    beta = [0.0, 0.0, 0.0]
+    for r in (2, 1, 0):
+        beta[r] = (rhs[r] - sum(A[r][c2] * beta[c2] for c2 in range(r + 1, 3))) / A[r][r]
+    ln_a, b, c = beta
+    return math.exp(ln_a), b, c
+
+
+def wood_forecast(params: tuple[float, float, float], start_t: int, horizon: int) -> list[float]:
+    import math
+    a, b, c = params
+    return [max(0.0, a * (start_t + h) ** b * math.exp(-c * (start_t + h)))
+            for h in range(1, horizon + 1)]
+
+
+def _wood_as_level_trend(values: list[float], horizon: int = HOLDOUT_DAYS):
+    """Approximate Wood's projected path in the served level/trend contract."""
+    w = wood_forecast(wood_fit(values), len(values), horizon)
+    cums = []
+    cum = 0.0
+    for h in range(1, horizon + 1):
+        cum += DAMP ** h
+        cums.append(cum)
+    trend = (w[-1] - w[0]) / (cums[-1] - cums[0]) if horizon > 1 else 0.0
+    level = w[0] - cums[0] * trend
+    return level, trend
+
+
 def _strategy_fit(values: list[float], strategy: str):
     if strategy == "selected":
         return select_and_fit(values)[:2]
     if strategy == "last":
         return values[-1], 0.0
+    if strategy == "wood":
+        return _wood_as_level_trend(values)
     return holt_fit(values, BETA if strategy == "holt" else 0.0)
+
+
+def strategies_for(cows: dict) -> tuple[str, ...]:
+    base = ("selected", "holt", "ewma", "last")
+    longest = max((len(c["days"]) for c in cows.values()), default=0)
+    return base + ("wood",) if longest >= WOOD_MIN_DAYS else base
 
 
 STRATEGIES = ("selected", "holt", "ewma", "last")
@@ -145,7 +204,8 @@ def backtest(cows: dict) -> dict:
     """Champion/challenger (G2.1): hold out the trailing week per cow, score
     every strategy on it — naive last-value is itself a challenger, so the
     served champion can never be worse than naive. All scores are reported."""
-    err = {s: 0.0 for s in STRATEGIES}
+    strategies = strategies_for(cows)
+    err = {s: 0.0 for s in strategies}
     n = 0
     for c in cows.values():
         days = c["days"]
@@ -153,7 +213,7 @@ def backtest(cows: dict) -> dict:
             continue
         train, test = days[:-HOLDOUT_DAYS], days[-HOLDOUT_DAYS:]
         vals = [v for _, v in train]
-        for s in STRATEGIES:
+        for s in strategies:
             level, trend = _strategy_fit(vals, s)
             preds = holt_forecast(level, trend, HOLDOUT_DAYS)
             err[s] += sum(abs(a - p) for (_, a), p in zip(test, preds))

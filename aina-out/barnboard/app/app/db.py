@@ -482,6 +482,58 @@ def upcoming_calvings(con: sqlite3.Connection, today: date, within_days: int = 3
     return out
 
 
+HEAT_CYCLE_DAYS = 21
+HEAT_WINDOW = 1          # ± days around the expected return
+HEAT_DIP = 0.92          # day total <= 92% of her own recent mean = dip
+HEAT_LOOKBACK = 3        # only surface heats detected in the last few days
+
+
+def heat_watch(con: sqlite3.Connection, today: date) -> list[dict]:
+    """Rules-based estrus (heat) return detection (G4.3).
+
+    Literature-validated shape, no ML: a cow whose latest insemination FAILED
+    returns to heat on a ~21-day cycle, and the heat day shows a one-day milk
+    dip. Flag only when BOTH agree — a projected cycle day (±1) AND a dip
+    (<=92% of her own prior mean) — so stable cows can never false-positive.
+    """
+    alerts = []
+    rows = con.execute(
+        """SELECT b.cow_id, c.tag, c.name, MAX(b.inseminated_on) AS anchor
+           FROM breedings b JOIN cows c ON c.id = b.cow_id
+           WHERE c.status = 'milking'
+             AND b.outcome = 'failed'
+             AND NOT EXISTS (SELECT 1 FROM breedings b2 WHERE b2.cow_id = b.cow_id
+                             AND b2.inseminated_on > b.inseminated_on
+                             AND b2.outcome IN ('open','confirmed'))
+           GROUP BY b.cow_id""").fetchall()
+    for r in rows:
+        anchor = date.fromisoformat(r["anchor"])
+        daily = con.execute(
+            "SELECT log_date, SUM(litres) AS total, COUNT(*) AS n FROM milk_logs "
+            "WHERE cow_id = ? GROUP BY log_date ORDER BY log_date", (r["cow_id"],)).fetchall()
+        totals = {d["log_date"]: d["total"] for d in daily if d["n"] >= 2}
+        for back in range(HEAT_LOOKBACK):
+            day = today - timedelta(days=back)
+            cycles = (day - anchor).days
+            if cycles <= 0 or cycles % HEAT_CYCLE_DAYS > HEAT_WINDOW \
+                    and cycles % HEAT_CYCLE_DAYS < HEAT_CYCLE_DAYS - HEAT_WINDOW:
+                continue
+            d_iso = iso(day)
+            if d_iso not in totals:
+                continue
+            prior = [t for d, t in totals.items() if d < d_iso][-5:]
+            if len(prior) < 4:
+                continue
+            mean = sum(prior) / len(prior)
+            if mean > 0 and totals[d_iso] <= mean * HEAT_DIP:
+                alerts.append({"cow_id": r["cow_id"], "tag": r["tag"], "name": r["name"],
+                               "heat_day": d_iso, "cycle": round(cycles / HEAT_CYCLE_DAYS),
+                               "dip_pct": round(100 * (1 - totals[d_iso] / mean)),
+                               "next_expected": iso(day + timedelta(days=HEAT_CYCLE_DAYS))})
+                break
+    return alerts
+
+
 # ── Demo seed ──────────────────────────────────────────────────────────────
 
 _SEED_COWS = [

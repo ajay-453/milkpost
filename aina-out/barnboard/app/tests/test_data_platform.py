@@ -172,3 +172,24 @@ def test_incomplete_cow_days_excluded(tmp_path):
 def test_revenue_projection_within_target():
     rev = train_models.revenue_projection(str(HUB))
     assert "abs_pct_error" in rev and rev["abs_pct_error"] < 15
+
+
+# ── G4.2: Wood's lactation-curve challenger (eligibility-gated) ────────────
+
+def test_wood_fit_recovers_curve():
+    import math
+    a, b, c = 18.0, 0.25, 0.004
+    series = [a * t**b * math.exp(-c*t) * (1 + 0.02*((t*7) % 5 - 2)/2)
+              for t in range(1, 121)]
+    fa, fb, fc = train_models.wood_fit(series)
+    preds = train_models.wood_forecast((fa, fb, fc), 120, 7)
+    actual = [a * t**b * math.exp(-c*t) for t in range(121, 128)]
+    mae = sum(abs(x-y) for x, y in zip(preds, actual)) / 7
+    assert mae < 0.5, mae
+
+
+def test_wood_gated_below_90_days():
+    cows = {1: {"days": [(f"d{i}", 20.0) for i in range(30)]}}
+    assert "wood" not in train_models.strategies_for(cows)
+    cows = {1: {"days": [(f"d{i}", 20.0) for i in range(120)]}}
+    assert "wood" in train_models.strategies_for(cows)

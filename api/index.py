@@ -152,6 +152,41 @@ async def _site_file(send, name: str):
         await _send(send, 404, b"not found", "text/plain")
 
 
+_ASSET_MIME = {".webm": "video/webm", ".mp4": "video/mp4", ".svg": "image/svg+xml",
+               ".png": "image/png", ".jpg": "image/jpeg"}
+
+
+async def _site_asset(scope, send, name: str):
+    """Site assets with byte-range support (G4.4) so the hero video streams
+    (206) instead of downloading whole. `name` is basename-flattened upstream."""
+    path = os.path.join(SITE, "assets", name)
+    ext = os.path.splitext(name)[1]
+    ctype = _ASSET_MIME.get(ext, "application/octet-stream")
+    try:
+        with open(path, "rb") as f:
+            data = f.read()
+    except OSError:
+        return await _send(send, 404, b"not found", "text/plain")
+    rng = ""
+    for hname, hval in scope.get("headers", []):
+        if hname == b"range":
+            rng = hval.decode(errors="replace")
+    if rng.startswith("bytes=") and ext in (".webm", ".mp4"):
+        try:
+            start_s, _, end_s = rng[6:].split(",")[0].partition("-")
+            start = int(start_s) if start_s else 0
+            end = min(int(end_s) if end_s else len(data) - 1, len(data) - 1)
+            if 0 <= start <= end:
+                chunk = data[start:end + 1]
+                return await _send(send, 206, chunk, ctype, [
+                    (b"content-range", f"bytes {start}-{end}/{len(data)}".encode()),
+                    (b"accept-ranges", b"bytes")])
+        except ValueError:
+            pass
+    extra = [(b"accept-ranges", b"bytes")] if ext in (".webm", ".mp4") else []
+    await _send(send, 200, data, ctype, extra)
+
+
 async def app(scope, receive, send):
     if scope["type"] != "http":
         return await barnboard(scope, receive, send)
@@ -170,6 +205,8 @@ async def app(scope, receive, send):
         return await _site_file(send, "index.html")
     if path == "/documentation.html":
         return await _site_file(send, "documentation.html")
+    if path.startswith("/assets/"):
+        return await _site_asset(scope, send, os.path.basename(path))
 
     if path == "/demo" and scope["method"] == "GET":
         if has_pin:

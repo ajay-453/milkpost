@@ -1,0 +1,28 @@
+{
+ "source": "FAOSTAT India, 'Milk, Total' Producer Price Index (2014-16=100), bulk download, CC BY 4.0",
+ "note": "India reports no absolute milk prices to FAOSTAT after 1994; the index gives direction, the farm's own \u20b9/L gives level.",
+ "index_last_year": 2025,
+ "index_last": 158.44,
+ "index_next_year": 2026,
+ "index_estimate": 162.59,
+ "yoy_factor": 1.0262,
+ "eval": {
+  "holdout_years": 5,
+  "points": 5,
+  "mape": {
+   "drift": 4.57,
+   "naive": 6.94
+  },
+  "champion": "drift"
+ },
+ "index_tail": {
+  "2018": 109.77,
+  "2019": 118.14,
+  "2020": 110.17,
+  "2021": 127.39,
+  "2022": 135.96,
+  "2023": 138.94,
+  "2024": 148.69,
+  "2025": 158.44
+ }
+}

@@ -1,4 +1,12 @@
 {
+  "faostat_producer_prices": {
+    "bytes": 11683910,
+    "file": "faostat-producer-prices.zip",
+    "inventory": "#5",
+    "license": "CC BY 4.0 (FAO caveat: no commercial-promotion use)",
+    "sha256": "0eaff92014d4af5fc2f477dbd436a792bfed1a408645e9ed18d8e45ab14fdc6b",
+    "url": "https://bulks-faostat.fao.org/production/Prices_E_All_Data_(Normalized).zip"
+  },
   "ketosis_risk_cows": {
     "bytes": 12950313,
     "file": "ketosis-risk-german-cows.xlsx",

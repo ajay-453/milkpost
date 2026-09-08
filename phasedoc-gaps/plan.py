@@ -81,8 +81,6 @@ TASKS = [
      "21-day-cycle + deviation rules flag seeded heat events with zero false positives on stable cows", "backlog", "open"),
     ("G4.4", "G4", "Narrated demo videos for both betadoc heroes (gap #17)",
      "hero videos stream (byte-range 206) on :6790, :6792 and the hosted twin", "backlog", "open"),
-    ("G4.5", "G4", "Multi-farm / co-op analytics design (gap #20)",
-     "a design doc covers auth partitioning, per-farm data isolation, and governed rollups; reviewed before any code", "backlog", "open"),
 ]
 
 SCHEMA = """

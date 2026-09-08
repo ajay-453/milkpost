@@ -53,14 +53,14 @@ buildplan in this directory.
 | 17 | **Demo video in betadoc heroes** (both betadocs shipped without one; the skill prescribes it). | Recording + narration + ffmpeg pipeline; polish, not function. |
 | 18 | **Serverless rate limiting is per-instance** (each lambda has its own window) and **stateless sessions can't be revoked** before expiry. | Both are accepted trade-offs for a demo twin; fixing properly needs shared state (KV/DB) — revisit only if the twin ever holds real data. |
 | 19 | **Known perf cliffs**: N+1 in `yield_drop_alerts`, no-cache dashboard. | Correct at 12 cows; the batch rewrite is documented in concepts.html §18 for when a large herd arrives. |
-| 20 | **Multi-farm / co-op analytics.** | The strategic horizon; needs auth model, data partitioning, and rollup design. |
+| 20 | **Multi-farm / co-op analytics.** | ~~The strategic horizon~~ **Descoped 2026-09-08 by owner decision** — removed from the arc; the design draft is parked at `docs/coop-design.md` for whenever it returns. |
 
 ## Sorted priority → arc mapping
 
 Q1 (#1–6) → **G0 Contract & security quick wins** + **G1 Continuity**.
 Q2 (#7–10) → **G2 Freshness & reach** + **G3 Platform proof**.
 Q3 (#11–13) → folded into G0/G1 where they touch the same files.
-Q4 (#14–20) → **G4 Backlog**, honestly open, no dates.
+Q4 (#14–19) → **G4 Backlog**, honestly open, no dates. (#20 descoped 2026-09-08.)
 
 Tracking: `phasedoc-gaps/` (this arc), cockpit on **port 6793**, one leaf per
 gap with a runnable acceptance test. Ticks only after the test runs.

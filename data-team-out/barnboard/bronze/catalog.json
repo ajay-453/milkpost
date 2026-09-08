@@ -103,28 +103,28 @@
         "breed",
         "status"
       ],
-      "freshness": "2026-09-08T11:51:54",
+      "freshness": "2026-09-08T14:40:15",
       "owner": "unassigned"
     },
     {
       "table": "bronze.milk_logs",
       "source_file": "milk_logs.csv",
       "kind": "tabular",
-      "rows": 512,
+      "rows": 2270,
       "columns": [
         {
           "name": "id",
           "type": "integer",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 512,
+          "distinct": 2270,
           "samples": [
             "1",
             "2",
             "3"
           ],
           "min": 1.0,
-          "max": 512.0
+          "max": 2270.0
         },
         {
           "name": "cow_id",
@@ -145,7 +145,7 @@
           "type": "date",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 26,
+          "distinct": 126,
           "samples": [
             "2026-08-13",
             "2026-08-13",
@@ -169,14 +169,14 @@
           "type": "real",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 77,
+          "distinct": 100,
           "samples": [
             "14.6",
             "12.4",
             "11.8"
           ],
-          "min": 7.0,
-          "max": 15.3
+          "min": 6.2,
+          "max": 17.5
         }
       ],
       "candidate_keys": [
@@ -185,7 +185,7 @@
       "dimensions": [
         "session"
       ],
-      "freshness": "2026-09-08T11:51:54",
+      "freshness": "2026-09-08T14:40:15",
       "owner": "unassigned"
     },
     {
@@ -276,37 +276,39 @@
         "notes"
       ],
       "dimensions": [],
-      "freshness": "2026-09-08T11:51:54",
+      "freshness": "2026-09-08T14:40:15",
       "owner": "unassigned"
     },
     {
       "table": "bronze.breedings",
       "source_file": "breedings.csv",
       "kind": "tabular",
-      "rows": 2,
+      "rows": 3,
       "columns": [
         {
           "name": "id",
           "type": "integer",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 2,
+          "distinct": 3,
           "samples": [
             "1",
-            "2"
+            "2",
+            "3"
           ],
           "min": 1.0,
-          "max": 2.0
+          "max": 3.0
         },
         {
           "name": "cow_id",
           "type": "integer",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 2,
+          "distinct": 3,
           "samples": [
             "11",
-            "6"
+            "6",
+            "10"
           ],
           "min": 6.0,
           "max": 11.0
@@ -316,10 +318,11 @@
           "type": "date",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 2,
+          "distinct": 3,
           "samples": [
             "2025-12-06",
-            "2026-07-25"
+            "2026-07-25",
+            "2026-08-17"
           ]
         },
         {
@@ -327,10 +330,11 @@
           "type": "date",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 2,
+          "distinct": 3,
           "samples": [
             "2026-09-15",
-            "2027-05-04"
+            "2027-05-04",
+            "2027-05-27"
           ]
         },
         {
@@ -338,16 +342,17 @@
           "type": "text",
           "nulls": 0,
           "null_pct": 0.0,
-          "distinct": 2,
+          "distinct": 3,
           "samples": [
             "confirmed",
-            "open"
+            "open",
+            "failed"
           ]
         },
         {
           "name": "calf_cow_id",
           "type": "text",
-          "nulls": 2,
+          "nulls": 3,
           "null_pct": 1.0,
           "distinct": 0,
           "samples": []
@@ -356,9 +361,11 @@
           "name": "notes",
           "type": "text",
           "nulls": 2,
-          "null_pct": 1.0,
-          "distinct": 0,
-          "samples": []
+          "null_pct": 0.6667,
+          "distinct": 1,
+          "samples": [
+            "seeded: heat-return demo (G4.3)"
+          ]
         }
       ],
       "candidate_keys": [
@@ -369,7 +376,7 @@
         "outcome"
       ],
       "dimensions": [],
-      "freshness": "2026-09-08T11:51:54",
+      "freshness": "2026-09-08T14:40:15",
       "owner": "unassigned"
     },
     {
@@ -450,7 +457,7 @@
         "collected_on"
       ],
       "dimensions": [],
-      "freshness": "2026-09-08T11:51:54",
+      "freshness": "2026-09-08T14:40:15",
       "owner": "unassigned"
     }
   ],

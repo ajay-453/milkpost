@@ -1,5 +1,17 @@
 # Model evaluation report (D4.4; updated for G2.1)
 
+> **2026-09-08 later update — Wood's lactation curve (G4.2).** The demo herd
+> gained a deterministic 100-day synthetic backstory (tools/seed_history.py,
+> Wood-shaped, anchored to each cow's observed level) so the multi-month gate
+> could actually run. Result on the 126-day backtest: **wood 1.217 beats holt
+> 1.279** — the G4.2 ship criterion is met, and wood now competes in every
+> nightly retrain (per-cow selection includes it for cows with ≥90 days).
+> Current overall champion is still `last` (1.120) on the smooth recent tail;
+> wood ships automatically whenever it wins outright. Numbers are from
+> synthetic data by construction — the same contest re-runs nightly as real
+> history accumulates.
+
+
 > **2026-09-08 update — champion/challenger.** With the series extended through
 > 2026-09-07, the original damped Holt stopped beating naive on the holdout
 > (the new synthetic tail is extremely smooth, so last-value is near-optimal

@@ -1,14 +1,28 @@
 {
   "slug": "barnboard",
-  "generated_at": "2026-09-08T06:21:54Z",
+  "generated_at": "2026-09-08T09:10:15Z",
   "stages": [
-    "designer",
     "analyst",
+    "designer",
     "architect",
     "engineer"
   ],
   "lineage": {
     "edges": [
+      {
+        "output": "report.q1",
+        "from": [
+          "metric.avg_daily_yield_per_cow"
+        ],
+        "logic": "derived over gold; additive"
+      },
+      {
+        "output": "report.q2",
+        "from": [
+          "metric.price_per_litre"
+        ],
+        "logic": "derived over gold; additive"
+      },
       {
         "output": "metric.avg_daily_yield_per_cow",
         "from": [
@@ -113,20 +127,6 @@
           "gold.agg_milk_cow_daily"
         ],
         "logic": "derived (derived) v1"
-      },
-      {
-        "output": "report.q1",
-        "from": [
-          "metric.avg_daily_yield_per_cow"
-        ],
-        "logic": "derived over gold; additive"
-      },
-      {
-        "output": "report.q2",
-        "from": [
-          "metric.price_per_litre"
-        ],
-        "logic": "derived over gold; additive"
       },
       {
         "output": "bronze.cows",
@@ -280,7 +280,7 @@
       {
         "column": "cows.name",
         "class": "name",
-        "first_stage": "designer",
+        "first_stage": "analyst",
         "disposition": "flagged \u2014 carried forward"
       }
     ],
@@ -288,14 +288,14 @@
   },
   "contracts": [
     {
-      "stage": "designer",
-      "name": "barnboard.semantic@1",
+      "stage": "analyst",
+      "name": "barnboard.reports@1",
       "honored": true,
       "violations": []
     },
     {
-      "stage": "analyst",
-      "name": "barnboard.reports@1",
+      "stage": "designer",
+      "name": "barnboard.semantic@1",
       "honored": true,
       "violations": []
     },
@@ -315,13 +315,13 @@
   "all_contracts_honored": true,
   "quality": {
     "by_stage": {
-      "designer": {
-        "pass": 15,
+      "analyst": {
+        "pass": 2,
         "warn": 0,
         "fail": 0
       },
-      "analyst": {
-        "pass": 2,
+      "designer": {
+        "pass": 15,
         "warn": 0,
         "fail": 0
       },
@@ -343,7 +343,7 @@
     },
     "reconciliation": [
       "gold.agg_cows_daily.tag matches raw fact (\u03a3=1278.0)",
-      "gold.agg_milk_logs_daily.litres matches raw fact (\u03a3=6026.7)",
+      "gold.agg_milk_logs_daily.litres matches raw fact (\u03a3=26354.0)",
       "gold.agg_treatments_daily.withhold_days matches raw fact (\u03a3=5.0)",
       "gold.agg_sales_daily.litres matches raw fact (\u03a3=4642.9)",
       "gold.agg_sales_daily.price_per_litre matches raw fact (\u03a3=422.38)"

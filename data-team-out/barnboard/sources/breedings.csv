@@ -1,3 +1,4 @@
 id,cow_id,inseminated_on,due_date,outcome,calf_cow_id,notes
 1,11,2025-12-06,2026-09-15,confirmed,,
 2,6,2026-07-25,2027-05-04,open,,
+3,10,2026-08-17,2027-05-27,failed,,seeded: heat-return demo (G4.3)

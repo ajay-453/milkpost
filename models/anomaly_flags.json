@@ -10,17 +10,17 @@
       "flagged": false
     },
     {
-      "cow_id": 7,
-      "tag": 107,
-      "breed": "Red Sindhi",
-      "mean_deviation": -0.012,
+      "cow_id": 10,
+      "tag": 110,
+      "breed": "Gir",
+      "mean_deviation": -0.032,
       "flagged": false
     },
     {
-      "cow_id": 1,
-      "tag": 101,
-      "breed": "HF cross",
-      "mean_deviation": -0.005,
+      "cow_id": 7,
+      "tag": 107,
+      "breed": "Red Sindhi",
+      "mean_deviation": -0.009,
       "flagged": false
     },
     {
@@ -52,17 +52,17 @@
       "flagged": false
     },
     {
+      "cow_id": 1,
+      "tag": 101,
+      "breed": "HF cross",
+      "mean_deviation": 0.009,
+      "flagged": false
+    },
+    {
       "cow_id": 3,
       "tag": 103,
       "breed": "Sahiwal",
       "mean_deviation": 0.01,
-      "flagged": false
-    },
-    {
-      "cow_id": 10,
-      "tag": 110,
-      "breed": "Gir",
-      "mean_deviation": 0.017,
       "flagged": false
     },
     {

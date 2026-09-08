@@ -87,8 +87,8 @@
   {
    "stage": "architect",
    "status": "ok",
-   "started_at": "2026-09-08T06:21:54Z",
-   "ended_at": "2026-09-08T06:21:54Z",
+   "started_at": "2026-09-08T09:10:15Z",
+   "ended_at": "2026-09-08T09:10:15Z",
    "engine": {
     "role": "architect",
     "model": "local",
@@ -107,7 +107,7 @@
     "bronze": "bronze",
     "catalog": "bronze/catalog.json",
     "bronze_db": "bronze/bronze.db",
-    "bronze_db_hash": "sha256:79d00075083e21c4"
+    "bronze_db_hash": "sha256:f3d60db277787155"
    },
    "governance": {
     "lineage": [
@@ -178,7 +178,7 @@
      {
       "check": "milk_logs row_count > 0",
       "result": "pass",
-      "detail": "512 rows"
+      "detail": "2270 rows"
      },
      {
       "check": "milk_logs columns <50% null",
@@ -208,7 +208,7 @@
      {
       "check": "breedings row_count > 0",
       "result": "pass",
-      "detail": "2 rows"
+      "detail": "3 rows"
      },
      {
       "check": "breedings columns <50% null",
@@ -238,15 +238,15 @@
     ]
    },
    "receipts": [
-    "landed 5 table(s), 538 rows into bronze.db"
+    "landed 5 table(s), 2297 rows into bronze.db"
    ],
    "notes": "5 tables; 1 PII column(s) flagged"
   },
   {
    "stage": "engineer",
    "status": "ok",
-   "started_at": "2026-09-08T06:21:54Z",
-   "ended_at": "2026-09-08T06:21:54Z",
+   "started_at": "2026-09-08T09:10:15Z",
+   "ended_at": "2026-09-08T09:10:15Z",
    "engine": {
     "role": "engineer",
     "model": "local",
@@ -259,8 +259,8 @@
     "silver": "silver",
     "gold": "gold",
     "lineage": "lineage/engineer.json",
-    "silver_db_hash": "sha256:cc2c1626a503e693",
-    "gold_db_hash": "sha256:35e561252e34d1a0"
+    "silver_db_hash": "sha256:32fc5a65bd644610",
+    "gold_db_hash": "sha256:13e0b49139a5f7ce"
    },
    "governance": {
     "lineage": [
@@ -356,7 +356,7 @@
      {
       "check": "silver.milk_logs dedupe",
       "result": "pass",
-      "detail": "512->512 rows (0 dropped)"
+      "detail": "2270->2270 rows (0 dropped)"
      },
      {
       "check": "silver.treatments dedupe",
@@ -366,7 +366,7 @@
      {
       "check": "silver.breedings dedupe",
       "result": "pass",
-      "detail": "2->2 rows (0 dropped)"
+      "detail": "3->3 rows (0 dropped)"
      },
      {
       "check": "silver.sales dedupe",
@@ -381,7 +381,7 @@
      {
       "check": "gold.agg_milk_logs_daily reconciles litres",
       "result": "pass",
-      "detail": "silver \u03a3=6026.7 gold \u03a3=6026.7"
+      "detail": "silver \u03a3=26354.0 gold \u03a3=26354.0"
      },
      {
       "check": "gold.agg_treatments_daily reconciles withhold_days",
@@ -391,7 +391,7 @@
      {
       "check": "gold.dim_breedings conformed",
       "result": "pass",
-      "detail": "2 rows; PII dropped: none"
+      "detail": "3 rows; PII dropped: none"
      },
      {
       "check": "gold.agg_sales_daily reconciles litres",
@@ -407,7 +407,7 @@
    },
    "receipts": [
     "gold.agg_cows_daily.tag matches raw fact (\u03a3=1278.0)",
-    "gold.agg_milk_logs_daily.litres matches raw fact (\u03a3=6026.7)",
+    "gold.agg_milk_logs_daily.litres matches raw fact (\u03a3=26354.0)",
     "gold.agg_treatments_daily.withhold_days matches raw fact (\u03a3=5.0)",
     "gold.agg_sales_daily.litres matches raw fact (\u03a3=4642.9)",
     "gold.agg_sales_daily.price_per_litre matches raw fact (\u03a3=422.38)",
@@ -418,8 +418,8 @@
   {
    "stage": "designer",
    "status": "ok",
-   "started_at": "2026-09-08T06:21:54Z",
-   "ended_at": "2026-09-08T06:21:54Z",
+   "started_at": "2026-09-08T09:10:15Z",
+   "ended_at": "2026-09-08T09:10:15Z",
    "engine": {
     "role": "designer",
     "model": "local",
@@ -644,6 +644,6 @@
    "issues": []
   },
   "pii_columns": 1,
-  "generated_at": "2026-09-08T06:21:54Z"
+  "generated_at": "2026-09-08T09:10:15Z"
  }
 }

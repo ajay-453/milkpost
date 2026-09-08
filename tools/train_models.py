@@ -106,12 +106,17 @@ def select_and_fit(values: list[float]) -> tuple[float, float, str]:
     def _fit(vals: list[float], method: str) -> tuple[float, float]:
         if method == "last":                 # naive last-value as a real candidate
             return vals[-1], 0.0
+        if method == "wood":                 # lactation curve (G4.2), history-gated
+            return _wood_as_level_trend(vals)
         return holt_fit(vals, BETA if method == "holt" else 0.0)
 
     if len(values) > VAL_DAYS + 4:
         fit_part, val_part = values[:-VAL_DAYS], values[-VAL_DAYS:]
+        candidates = ["holt", "ewma", "last"]
+        if len(values) >= WOOD_MIN_DAYS:
+            candidates.append("wood")
         scores = {}
-        for name in ("holt", "ewma", "last"):
+        for name in candidates:
             lv, tr = _fit(fit_part, name)
             preds = holt_forecast(lv, tr, VAL_DAYS)
             scores[name] = sum(abs(a - p) for a, p in zip(val_part, preds))

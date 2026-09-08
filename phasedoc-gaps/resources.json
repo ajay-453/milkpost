@@ -2,9 +2,9 @@
   "services": [
     {
       "name": "Gap arc cockpit (this window)",
-      "url": "http://127.0.0.1:6793",
+      "url": "http://127.0.0.1:6792",
       "manager": "pm2: phasedoc-gaps",
-      "note": "third process of the ONE cockpit codebase (phasedoc/cockpit.py), parameterized by env"
+      "note": "cockpit codebase shared; moved from 6793 on 2026-09-09"
     },
     {
       "name": "Barnboard app (live)",

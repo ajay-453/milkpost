@@ -104,7 +104,8 @@ def _resend_send(to_addr: str, subject: str, text: str) -> bool:
             data=_json.dumps({"from": RESEND_FROM, "to": [to_addr],
                               "subject": subject, "text": text}).encode(),
             headers={"Authorization": f"Bearer {RESEND_API_KEY}",
-                     "Content-Type": "application/json"})
+                     "Content-Type": "application/json",
+                     "User-Agent": "barnboard/1.0 (+https://mydairyfarm.online)"})
         with urllib.request.urlopen(req, timeout=15) as r:
             return 200 <= r.status < 300
     except Exception:

@@ -19,6 +19,7 @@ module.exports = {
         BETADOC_REQUESTS: path.join(__dirname, ".demo-requests.jsonl"),
         OWNER_EMAIL: "ajaycse777@gmail.com",
         BETADOC_APP_TOKEN_FILE: "/home/oc/velocity/hub/.secrets/local-feed-token.txt",
+        RESEND_FROM: "Barnboard <hello@mydairyfarm.online>",
         RESEND_KEY_FILE: "/home/oc/velocity/hub/.secrets/resend-key.txt",  // create this file to enable email   // gets a copy of each PIN email (when SMTP is on)
         // To enable real email delivery, set: SMTP_HOST, SMTP_PORT, SMTP_USER,
         // SMTP_PASS (e.g. a Gmail app password), SMTP_FROM. Until then the PIN

@@ -128,6 +128,11 @@ def _migrate_users(con: sqlite3.Connection) -> None:
         con.execute("ALTER TABLE users ADD COLUMN security_answer_hash TEXT")
         con.execute("ALTER TABLE users ADD COLUMN reset_fails INTEGER NOT NULL DEFAULT 0")
         con.execute("ALTER TABLE users ADD COLUMN reset_lock TEXT")
+    if "is_temp" not in cols:
+        # v1.7: request-based demo guests — temporary credentials that self-
+        # destruct after logouts_left logouts (the visitor re-requests access).
+        con.execute("ALTER TABLE users ADD COLUMN is_temp INTEGER NOT NULL DEFAULT 0")
+        con.execute("ALTER TABLE users ADD COLUMN logouts_left INTEGER")
 
 
 # ── Settings ───────────────────────────────────────────────────────────────
@@ -189,6 +194,39 @@ def create_user(con: sqlite3.Connection, username: str, password: str,
         (username, hash_password(password), datetime.now().isoformat(timespec="seconds"),
          role, 1 if approved else 0))
     return cur.lastrowid
+
+
+_TEMP_WORDS = ("milk", "calf", "barn", "gir", "moo", "hay", "churn", "ghee")
+
+
+def create_temp_user(con: sqlite3.Connection, logouts: int = 2) -> tuple[str, str]:
+    """A disposable demo login (helper role). Dies after `logouts` logouts —
+    the visitor requests access again. Returns (username, password)."""
+    while True:
+        username = "guest-" + secrets.token_hex(2)
+        if not con.execute("SELECT 1 FROM users WHERE username = ?", (username,)).fetchone():
+            break
+    password = (f"{secrets.choice(_TEMP_WORDS)}-{secrets.randbelow(9000) + 1000}"
+                f"-{secrets.choice(_TEMP_WORDS)}")
+    con.execute(
+        "INSERT INTO users (username, password_hash, created_at, role, approved, "
+        "is_temp, logouts_left) VALUES (?,?,?,?,1,1,?)",
+        (username, hash_password(password),
+         datetime.now().isoformat(timespec="seconds"), "helper", logouts))
+    return username, password
+
+
+def burn_temp_logout(con: sqlite3.Connection, user_row) -> None:
+    """Called on logout: a temp guest loses one life; at zero the account and
+    its sessions are deleted — the credentials simply stop existing."""
+    if not user_row or not user_row["is_temp"]:
+        return
+    left = (user_row["logouts_left"] or 1) - 1
+    if left <= 0:
+        con.execute("DELETE FROM sessions WHERE user_id = ?", (user_row["id"],))
+        con.execute("DELETE FROM users WHERE id = ?", (user_row["id"],))
+    else:
+        con.execute("UPDATE users SET logouts_left = ? WHERE id = ?", (left, user_row["id"]))
 
 
 def authenticate(con: sqlite3.Connection, username: str, password: str) -> sqlite3.Row | None:

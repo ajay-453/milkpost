@@ -193,3 +193,27 @@ def test_wood_gated_below_90_days():
     assert "wood" not in train_models.strategies_for(cows)
     cows = {1: {"days": [(f"d{i}", 20.0) for i in range(120)]}}
     assert "wood" in train_models.strategies_for(cows)
+
+
+# ── Demo guest credentials: issued by request, burned after 2 logouts ──────
+
+def test_temp_credentials_burn_after_two_logouts(client):
+    r = client.post(f"/api/v1/demo-credentials?token={FEED_TOKEN}")
+    assert r.status_code == 200
+    creds = r.json()
+    u, p = creds["username"], creds["password"]
+    assert u.startswith("guest-") and creds["logouts_allowed"] == 2
+
+    def login():
+        return client.post("/login", data={"username": u, "password": p},
+                           follow_redirects=False)
+    def logout():
+        return client.post("/logout", follow_redirects=False)
+
+    assert login().status_code == 303      # 1st login works
+    assert logout().status_code == 303     # 1st logout — one life left
+    assert login().status_code == 303      # 2nd login works
+    assert logout().status_code == 303     # 2nd logout — account burned
+    assert login().status_code == 401      # credentials no longer exist
+    with db.get_db() as con:
+        assert con.execute("SELECT 1 FROM users WHERE username = ?", (u,)).fetchone() is None

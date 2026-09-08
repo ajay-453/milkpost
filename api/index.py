@@ -99,7 +99,7 @@ def _log_request(email: str, delivered: str) -> None:
         pass
 
 
-def _send_pin_email(to_addr: str) -> bool:
+def _send_pin_email(to_addr: str, creds: dict | None = None) -> bool:
     if not (SMTP_HOST and SMTP_USER and SMTP_PASS):
         return False
     import smtplib
@@ -111,12 +111,18 @@ def _send_pin_email(to_addr: str) -> bool:
         msg["To"] = to_addr
         if OWNER_EMAIL:
             msg["Bcc"] = OWNER_EMAIL
+        creds_txt = ""
+        if creds:
+            creds_txt = (f"Your personal demo login:\n"
+                         f"  username: {creds['username']}\n"
+                         f"  password: {creds['password']}\n\n"
+                         "It works until you sign out twice - after that,\n"
+                         "just request access again.\n\n")
         msg.set_content(
             "Thanks for your interest in Barnboard!\n\n"
-            f"Your demo access PIN: {PIN}\n\n"
-            "Enter it at the /demo page, then sign in with the demo account\n"
-            "shown in the documentation. Everything in the demo is synthetic\n"
-            "data - explore freely.\n")
+            f"Your demo access PIN: {PIN}\n\n" + creds_txt +
+            "Enter the PIN at the /demo page, then sign in. Everything in\n"
+            "the demo is synthetic data - explore freely.\n")
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as s:
             s.starttls()
             s.login(SMTP_USER, SMTP_PASS)
@@ -316,15 +322,29 @@ async def app(scope, receive, send):
         if not _re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]{2,}", email):
             page = REQUEST_PAGE.format(err='<div class="err">That doesn\'t look like an email address.</div>')
             return await _send(send, 422, page.encode(), "text/html; charset=utf-8")
-        if _send_pin_email(email):
+        creds = None
+        try:
+            _ensure_seed()
+            from app import db as _appdb
+            with _appdb.get_db() as _con:
+                _u, _pw = _appdb.create_temp_user(_con)
+                creds = {"username": _u, "password": _pw}
+        except Exception:
+            pass
+        if _send_pin_email(email, creds):
             _log_request(email, "email")
             page = GRANTED_PAGE.format(title="Check your inbox",
-                message=f"We've sent the access PIN to <strong>{email}</strong>. It can take a minute to arrive.")
+                message=f"We've sent the access PIN and your personal demo login to <strong>{email}</strong>. It can take a minute to arrive.")
         else:
             _log_request(email, "screen")
+            cred_html = ""
+            if creds:
+                cred_html = (f"<br><br>Your personal demo login (valid until you sign out twice):<br>"
+                             f"username <strong>{creds['username']}</strong> &middot; "
+                             f"password <strong>{creds['password']}</strong>")
             page = GRANTED_PAGE.format(title="You're in",
                 message=f"Thanks, <strong>{email}</strong>! Your access PIN is "
-                        f"<strong style='font-size:22px;letter-spacing:.2em'>{PIN}</strong>")
+                        f"<strong style='font-size:22px;letter-spacing:.2em'>{PIN}</strong>" + cred_html)
         return await _send(send, 200, page.encode(), "text/html; charset=utf-8")
     if path == "/demo/exit":
         cookie = f"{COOKIE}=; Path=/; Max-Age=0"

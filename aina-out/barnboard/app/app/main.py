@@ -442,7 +442,9 @@ def forgot_reset(request: Request, username: str = Form(...), answer: str = Form
 @app.post("/logout")
 def logout(request: Request):
     with db.get_db() as con:
+        user = db.session_user(con, request.cookies.get(SESSION_COOKIE))
         db.delete_session(con, request.cookies.get(SESSION_COOKIE))
+        db.burn_temp_logout(con, user)   # demo guests: 2nd logout burns the account
     resp = RedirectResponse("/login", status_code=303)
     resp.delete_cookie(SESSION_COOKIE)
     return resp
@@ -1067,6 +1069,18 @@ def api_table(table: str):
         rows = [dict(r) for r in con.execute(f"SELECT * FROM {table}").fetchall()]
     return _json({"schema_version": DATA_SCHEMA_VERSION, "table": table,
                   "row_count": len(rows), "rows": rows})
+
+
+# ── Demo guest credentials (request-based access) ──────────────────────────
+# Called by the betadoc gate (feed-token auth via middleware) when a visitor
+# requests demo access: issues a disposable login that self-destructs after
+# two logouts. Never listed in /team pages beyond its short life.
+
+@app.post("/api/v1/demo-credentials")
+def api_demo_credentials():
+    with db.get_db() as con:
+        username, password = db.create_temp_user(con)
+    return _json({"username": username, "password": password, "logouts_allowed": 2})
 
 
 # ── Governed metrics API (G2.2) ─────────────────────────────────────────────

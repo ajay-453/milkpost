@@ -112,7 +112,7 @@ def _toast(html: str, message: str, status_code: int = 200) -> HTMLResponse:
 # feed (calendar apps cannot log in; the token IS the credential).
 
 SESSION_COOKIE = "bb_session"
-_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset", "/sw.js"}
+_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset"}
 
 # Secure cookies when served over TLS (set SECURE_COOKIES=1 behind HTTPS/a TLS proxy).
 SECURE_COOKIES = os.environ.get("SECURE_COOKIES", "0") == "1"
@@ -1013,15 +1013,6 @@ def create_sale(request: Request, collected_on: str = Form(...), litres: str = F
     html = templates.get_template("partials/sale_row.html").render(
         {"request": request, "s": s, "currency": CURRENCY, "t": _t_for(request)})
     return _toast(html, f"Collection saved - Rs {inr_format(li * price, 2)}")
-
-
-# ── PWA: service worker must be served from the root for scope "/" ─────────
-
-@app.get("/sw.js", include_in_schema=False)
-def service_worker():
-    from fastapi.responses import FileResponse
-    return FileResponse(BASE_DIR / "static" / "sw.js", media_type="text/javascript",
-                        headers={"Cache-Control": "no-cache"})
 
 
 # ── CSV export ─────────────────────────────────────────────────────────────

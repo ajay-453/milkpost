@@ -14,7 +14,8 @@ module.exports = {
       env: {
         BETADOC_PORT: "6790",            // THE betadoc port, fixed (2026-09-09 decision)
         BETADOC_BIND: "0.0.0.0",
-        BETADOC_PIN: "8437",             // rotated 2026-09-09: delivered via /demo/request only
+        BETADOC_PIN: "8437",
+        BETADOC_SHOW_PIN: "0",  // email-first flow: PIN is granted at /demo/request             // rotated 2026-09-09: delivered via /demo/request only
         BETADOC_REQUESTS: path.join(__dirname, ".demo-requests.jsonl"),
         OWNER_EMAIL: "ajaycse777@gmail.com",
         BETADOC_APP_TOKEN_FILE: "/home/oc/velocity/hub/.secrets/local-feed-token.txt",

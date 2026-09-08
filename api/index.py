@@ -221,7 +221,7 @@ a{{color:var(--acc)}}.back{{margin-top:18px;font-size:13px}}</style></head><body
 # PIN visible on the gate until an email channel (Resend/SMTP) is configured;
 # auto-hides once RESEND_API_KEY or SMTP_* env exists. Override: BETADOC_SHOW_PIN.
 _EMAIL_READY = bool(RESEND_API_KEY or (SMTP_HOST and SMTP_USER and SMTP_PASS))
-_SHOW = os.environ.get("BETADOC_SHOW_PIN", "auto")
+_SHOW = os.environ.get("BETADOC_SHOW_PIN", "0")  # email-first: PIN granted at /demo/request
 if _SHOW == "1" or (_SHOW == "auto" and not _EMAIL_READY):
     GATE_PAGE = GATE_PAGE.replace(
         '<input name="pin"',

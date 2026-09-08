@@ -19,6 +19,7 @@ import os
 import sys
 import time
 import urllib.parse
+import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP_DIR = os.path.join(ROOT, "aina-out", "barnboard", "app")
@@ -84,6 +85,62 @@ SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
 SMTP_FROM = os.environ.get("SMTP_FROM", SMTP_USER)
 OWNER_EMAIL = os.environ.get("OWNER_EMAIL", "")
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+RESEND_FROM = os.environ.get("RESEND_FROM", "Barnboard <onboarding@resend.dev>")
+
+
+def _resend_send(to_addr: str, subject: str, text: str) -> bool:
+    """Send via the Resend HTTP API (no SDK — one urllib call). Note: until a
+    sending domain is verified in Resend, the free tier delivers only to the
+    account owner's own address — requester delivery then falls back to the
+    on-screen reveal while owner notifications still work."""
+    if not RESEND_API_KEY:
+        return False
+    import json as _json
+    try:
+        req = urllib.request.Request(
+            "https://api.resend.com/emails", method="POST",
+            data=_json.dumps({"from": RESEND_FROM, "to": [to_addr],
+                              "subject": subject, "text": text}).encode(),
+            headers={"Authorization": f"Bearer {RESEND_API_KEY}",
+                     "Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            return 200 <= r.status < 300
+    except Exception:
+        return False
+
+
+def _pin_email_text(creds) -> str:
+    creds_txt = ""
+    if creds:
+        creds_txt = (f"Your personal demo login:\n"
+                     f"  username: {creds['username']}\n"
+                     f"  password: {creds['password']}\n\n"
+                     "It works until you sign out twice - after that,\n"
+                     "just request access again.\n\n")
+    return ("Thanks for your interest in Barnboard!\n\n"
+            f"Your demo access PIN: {PIN}\n\n" + creds_txt +
+            "Enter the PIN at the /demo page, then sign in. Everything in\n"
+            "the demo is synthetic data - explore freely.\n")
+
+
+def _deliver_pin(email: str, creds) -> str:
+    """Preferred: Resend -> SMTP -> on-screen. Owner always gets a lead
+    notification when any email channel exists. Returns the delivery mode."""
+    text = _pin_email_text(creds)
+    delivered = "screen"
+    if _resend_send(email, "Your Barnboard demo access PIN", text):
+        delivered = "resend"
+    elif _send_pin_email(email, creds):
+        delivered = "smtp"
+    if OWNER_EMAIL:
+        _resend_send(OWNER_EMAIL, "Barnboard demo request",
+                     f"New demo access request from: {email}\n"
+                     f"Delivered via: {delivered}\n"
+                     + (f"Issued login: {creds['username']}\n" if creds else ""))
+    return delivered
+
 
 
 def _log_request(email: str, delivered: str) -> None:
@@ -331,12 +388,13 @@ async def app(scope, receive, send):
                 creds = {"username": _u, "password": _pw}
         except Exception:
             pass
-        if _send_pin_email(email, creds):
-            _log_request(email, "email")
+        mode = _deliver_pin(email, creds)
+        if mode in ("resend", "smtp"):
+            _log_request(email, mode)
             page = GRANTED_PAGE.format(title="Check your inbox",
                 message=f"We've sent the access PIN and your personal demo login to <strong>{email}</strong>. It can take a minute to arrive.")
         else:
-            _log_request(email, "screen")
+            _log_request(email, mode)
             cred_html = ""
             if creds:
                 cred_html = (f"<br><br>Your personal demo login (valid until you sign out twice):<br>"

@@ -30,3 +30,11 @@ with their email; every request is appended to `.demo-requests.jsonl` (the
 lead log, gitignored). Delivery: by email when SMTP_* env is configured
 (owner gets a copy via OWNER_EMAIL), otherwise revealed on screen after the
 email is captured. PIN rotated 4276 → 8437 as part of this change.
+
+## Update 2026-09-09 (later) — interim PIN on the gate
+
+Until an email channel is configured (Resend key or SMTP), the gate page
+itself displays the access PIN so visitors are never locked out; the request
+form still captures leads. The moment RESEND_API_KEY / SMTP_* env exists and
+the process restarts, the PIN disappears from the gate automatically
+(override with BETADOC_SHOW_PIN=1/0).

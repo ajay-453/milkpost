@@ -218,6 +218,17 @@ a{{color:var(--acc)}}.back{{margin-top:18px;font-size:13px}}</style></head><body
 <div class="back"><a href="/">&larr; back to the overview</a></div>
 </form></body></html>"""
 
+# PIN visible on the gate until an email channel (Resend/SMTP) is configured;
+# auto-hides once RESEND_API_KEY or SMTP_* env exists. Override: BETADOC_SHOW_PIN.
+_EMAIL_READY = bool(RESEND_API_KEY or (SMTP_HOST and SMTP_USER and SMTP_PASS))
+_SHOW = os.environ.get("BETADOC_SHOW_PIN", "auto")
+if _SHOW == "1" or (_SHOW == "auto" and not _EMAIL_READY):
+    GATE_PAGE = GATE_PAGE.replace(
+        '<input name="pin"',
+        '<p style="margin:-6px 0 14px;font-size:15px">Access PIN: '
+        f'<strong style="font-size:20px;letter-spacing:.2em">{PIN}</strong></p>'
+        '<input name="pin"', 1)
+
 REQUEST_PAGE = GATE_PAGE.split("<form", 1)[0] + """<form class="card" method="post" action="/demo/request">
 <div style="font-size:34px">&#9993;&#65039;</div><h1>Request demo access</h1>
 <p>Leave your email and we'll send you the access PIN for the live demo.</p>

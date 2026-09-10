@@ -17,7 +17,10 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_PATH = os.environ.get("DB_PATH", str(BASE_DIR / "barnboard.db"))
+# On serverless hosts the bundle is read-only — default to /tmp there.
+_DEFAULT_DB = "/tmp/milkpost.db" if os.environ.get("VERCEL") \
+    else str(BASE_DIR / "barnboard.db")
+DB_PATH = os.environ.get("DB_PATH", _DEFAULT_DB)
 
 GESTATION_DAYS = 283          # bovine average; user can override the due date
 DRY_OFF_BEFORE_DUE = 60       # planned dry-off = due_date - 60 days

@@ -112,7 +112,7 @@ def _toast(html: str, message: str, status_code: int = 200) -> HTMLResponse:
 # feed (calendar apps cannot log in; the token IS the credential).
 
 SESSION_COOKIE = "bb_session"
-_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset", "/welcome"}
+_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset", "/welcome", "/demo"}
 
 # Secure cookies when served over TLS (set SECURE_COOKIES=1 behind HTTPS/a TLS proxy).
 SECURE_COOKIES = os.environ.get("SECURE_COOKIES", "0") == "1"
@@ -254,8 +254,10 @@ def ctx(request: Request, active: str, **extra):
 
 def _auth_ctx(request: Request, **extra):
     lang = i18n.get_lang(request)
+    demo = os.environ.get("DEMO_LOGIN", "")
     return {"request": request, "app_name": APP_NAME, "app_tagline": APP_TAGLINE,
-            "lang": lang, "t": i18n.make_t(lang), **extra}
+            "lang": lang, "t": i18n.make_t(lang),
+            "demo_hint": demo.replace(":", " / ") if ":" in demo else "", **extra}
 
 
 @app.get("/lang/{code}")
@@ -674,6 +676,26 @@ def _svg_trend(days: list[dict], width: int = 640, height: int = 140) -> str:
         f'fill="var(--text-faint)">today</text>')
     parts.append("</svg>")
     return "".join(parts)
+
+
+@app.get("/demo")
+def demo_login():
+    """One-click demo: sign in as the seeded demo owner (active only when the
+    host sets DEMO_LOGIN, i.e. on the public demo deployment)."""
+    demo = os.environ.get("DEMO_LOGIN", "")
+    if ":" not in demo:
+        return RedirectResponse("/welcome", status_code=303)
+    _ensure_seed()
+    username = demo.split(":", 1)[0].strip()
+    with db.get_db() as con:
+        user = con.execute("SELECT id FROM users WHERE username = ?",
+                           (username,)).fetchone()
+        if not user:
+            return RedirectResponse("/login", status_code=303)
+        token = db.create_session(con, user["id"])
+    resp = RedirectResponse("/", status_code=303)
+    _set_session_cookie(resp, token)
+    return resp
 
 
 @app.get("/welcome", response_class=HTMLResponse)

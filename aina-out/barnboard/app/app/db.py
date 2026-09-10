@@ -1,4 +1,4 @@
-"""Barnboard data layer — stdlib sqlite3, no ORM.
+"""MilkPost data layer — stdlib sqlite3, no ORM.
 
 One SQLite file holds the whole farm. Schema is created at boot with
 CREATE TABLE IF NOT EXISTS (additive migrations are enough for V1).

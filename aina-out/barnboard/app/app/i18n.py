@@ -1,4 +1,4 @@
-"""Barnboard i18n — English (default) + simple Telugu (సులభమైన తెలుగు).
+"""MilkPost i18n — English (default) + simple Telugu (సులభమైన తెలుగు).
 
 Deliberately tiny: a dict keyed by the English string, a `make_t` factory the
 templates call as t("..."). Unknown keys fall back to English, so a missing
@@ -202,7 +202,7 @@ TE: dict[str, str] = {
     "Make owner": "యజమానిగా మార్చు",
     "Make helper": "సహాయకుడిగా మార్చు",
     "account(s) waiting for approval": "ఖాతా(లు) ఆమోదం కోసం వేచి ఉన్నాయి",
-    "new signups cannot use Barnboard until you approve them below.":
+    "new signups cannot use MilkPost until you approve them below.":
         "మీరు కింద ఆమోదించే వరకు కొత్త ఖాతాలు వాడలేరు.",
     "calf in herd": "దూడ మందలో ఉంది",
     # ── password reset ──

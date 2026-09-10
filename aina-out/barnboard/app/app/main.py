@@ -1,4 +1,4 @@
-"""Barnboard — a small dairy farm's daily command center.
+"""MilkPost — a small dairy farm's daily command center.
 
 FastAPI + Jinja2 + HTMX on the AiNa golden starter shell. Server-rendered,
 no build step, SQLite in one file. The three rules of this codebase:
@@ -26,7 +26,7 @@ from fastapi.templating import Jinja2Templates
 
 from . import db, i18n
 
-APP_NAME = os.environ.get("APP_NAME", "Barnboard")
+APP_NAME = os.environ.get("APP_NAME", "MilkPost")
 APP_TAGLINE = os.environ.get("APP_TAGLINE", "Your dairy farm's daily command center.")
 CURRENCY = os.environ.get("CURRENCY", "₹")  # ₹ — override for other markets
 
@@ -1326,7 +1326,7 @@ def calendar_feed(token: str):
                     f"Dry off: #{b['tag']} {b['name']}".strip(),
                     f"Planned dry-off {db.DRY_OFF_BEFORE_DUE} days before {b['due_date']}."))
     body = "\r\n".join([
-        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Barnboard//EN",
+        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//MilkPost//EN",
         "CALSCALE:GREGORIAN", f"X-WR-CALNAME:{APP_NAME} reminders",
         *events, "END:VCALENDAR", ""])
     return Response(body, media_type="text/calendar",

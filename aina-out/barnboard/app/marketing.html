@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Barnboard — Dairy Farm Management, Self-Hosted</title>
+<title>MilkPost — Dairy Farm Management, Self-Hosted</title>
 <meta name="description" content="Log milk in seconds, get warned before treated milk reaches the tank, and see calvings coming on your own phone calendar. Self-hosted and free.">
-<meta property="og:title" content="Barnboard — Dairy Farm Management, Self-Hosted">
+<meta property="og:title" content="MilkPost — Dairy Farm Management, Self-Hosted">
 <meta property="og:description" content="The pocket notebook is retired. Herd, milk, health, breeding and sales on one screen you own.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="./og-image.png">
@@ -18,7 +18,7 @@
 
 <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-stone-200">
   <div class="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
-    <a href="#hero" class="font-extrabold text-green-800 text-lg">🐄 Barnboard</a>
+    <a href="#hero" class="font-extrabold text-green-800 text-lg">🐄 MilkPost</a>
     <div class="flex gap-4 text-sm font-semibold text-stone-600">
       <a href="#features" class="hover:text-green-700">Features</a>
       <a href="#faq" class="hover:text-green-700">FAQ</a>
@@ -31,7 +31,7 @@
 <section id="hero" class="bg-gradient-to-b from-green-900 to-green-700 text-white">
   <div class="max-w-5xl mx-auto px-4 py-20 text-center">
     <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">Retire the pocket notebook.</h1>
-    <h2 class="mt-4 text-lg sm:text-xl text-green-100">Barnboard runs your dairy farm's day — milk, herd, health, breeding and sales — on one screen you own.</h2>
+    <h2 class="mt-4 text-lg sm:text-xl text-green-100">MilkPost runs your dairy farm's day — milk, herd, health, breeding and sales — on one screen you own.</h2>
     <ul class="mt-8 grid sm:grid-cols-3 gap-4 text-left text-sm">
       <li class="bg-white/10 rounded-xl p-4"><strong>⛔ Never tank treated milk.</strong> Withholding alerts you can't miss, computed from the vet's dates.</li>
       <li class="bg-white/10 rounded-xl p-4"><strong>⚡ Log a cow in seconds.</strong> One tap, one number, no page reloads — faster than the notebook.</li>
@@ -46,7 +46,7 @@
   <h2 class="text-3xl font-extrabold text-center">Low complexity. High stakes covered.</h2>
   <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
     <div class="bg-white rounded-2xl border border-stone-200 p-5"><div class="text-2xl">🥛</div><h3 class="font-bold mt-2">Fast milk logging</h3><p class="text-sm text-stone-600 mt-1">AM/PM per-cow entry built for wet gloves and barn signal. Session totals update live.</p></div>
-    <div class="bg-white rounded-2xl border border-stone-200 p-5"><div class="text-2xl">⛔</div><h3 class="font-bold mt-2">Withholding alerts</h3><p class="text-sm text-stone-600 mt-1">Record a treatment once — Barnboard shouts DO NOT TANK until the clear-date passes. One saved tanker pays for years.</p></div>
+    <div class="bg-white rounded-2xl border border-stone-200 p-5"><div class="text-2xl">⛔</div><h3 class="font-bold mt-2">Withholding alerts</h3><p class="text-sm text-stone-600 mt-1">Record a treatment once — MilkPost shouts DO NOT TANK until the clear-date passes. One saved tanker pays for years.</p></div>
     <div class="bg-white rounded-2xl border border-stone-200 p-5"><div class="text-2xl">📉</div><h3 class="font-bold mt-2">Yield-drop detection</h3><p class="text-sm text-stone-600 mt-1">A cow 20% below her own weekly average is flagged — often the first sign of mastitis.</p></div>
     <div class="bg-white rounded-2xl border border-stone-200 p-5"><div class="text-2xl">🐮</div><h3 class="font-bold mt-2">Herd register</h3><p class="text-sm text-stone-600 mt-1">Tags, breeds, status from calf to dry — the spine every record hangs on.</p></div>
     <div class="bg-white rounded-2xl border border-stone-200 p-5"><div class="text-2xl">🍼</div><h3 class="font-bold mt-2">Calving countdowns</h3><p class="text-sm text-stone-600 mt-1">Inseminations auto-compute due dates. Marking "calved" adds the calf to the herd in one step.</p></div>
@@ -60,9 +60,9 @@
   <div class="max-w-3xl mx-auto px-4 py-16">
     <h2 class="text-3xl font-extrabold text-center">Questions farmers ask</h2>
     <div class="mt-8 space-y-3">
-      <details class="bg-stone-50 rounded-xl p-4 border border-stone-200"><summary class="font-bold cursor-pointer">Do I need internet in the barn?</summary><p class="mt-2 text-sm text-stone-600">Barnboard runs on your own server or a €4/month VPS. Pages are tiny and server-rendered, so they load even on weak barn signal.</p></details>
+      <details class="bg-stone-50 rounded-xl p-4 border border-stone-200"><summary class="font-bold cursor-pointer">Do I need internet in the barn?</summary><p class="mt-2 text-sm text-stone-600">MilkPost runs on your own server or a €4/month VPS. Pages are tiny and server-rendered, so they load even on weak barn signal.</p></details>
       <details class="bg-stone-50 rounded-xl p-4 border border-stone-200"><summary class="font-bold cursor-pointer">Where does my data live?</summary><p class="mt-2 text-sm text-stone-600">On your machine, in one SQLite file. Nothing is sent anywhere. Backup = copy the file. Every table exports to CSV.</p></details>
-      <details class="bg-stone-50 rounded-xl p-4 border border-stone-200"><summary class="font-bold cursor-pointer">Does it know my drug withholding rules?</summary><p class="mt-2 text-sm text-stone-600">You enter the withholding days from the drug label or your vet — Barnboard computes the clear-date and alerts until it passes. It deliberately doesn't guess rules that vary by country and product.</p></details>
+      <details class="bg-stone-50 rounded-xl p-4 border border-stone-200"><summary class="font-bold cursor-pointer">Does it know my drug withholding rules?</summary><p class="mt-2 text-sm text-stone-600">You enter the withholding days from the drug label or your vet — MilkPost computes the clear-date and alerts until it passes. It deliberately doesn't guess rules that vary by country and product.</p></details>
       <details class="bg-stone-50 rounded-xl p-4 border border-stone-200"><summary class="font-bold cursor-pointer">Is there a login?</summary><p class="mt-2 text-sm text-stone-600">Not yet — V1 is single-farm and should run on your LAN or behind a VPN like Tailscale. Accounts are the first item on the roadmap.</p></details>
     </div>
   </div>
@@ -71,17 +71,17 @@
 <section id="social" class="max-w-5xl mx-auto px-4 py-16">
   <h2 class="text-3xl font-extrabold text-center">Copy-paste social posts</h2>
   <div class="mt-8 grid sm:grid-cols-3 gap-5 text-sm">
-    <div class="bg-white rounded-2xl border border-stone-200 p-5"><span class="text-xs font-bold uppercase text-green-700">X / Twitter</span><p class="mt-2">The most expensive thing on a dairy farm is a forgotten date. Barnboard remembers the withholding clear-date, the calving, the dry-off — and puts them on your phone calendar. Self-hosted, one SQLite file. 🐄</p></div>
-    <div class="bg-white rounded-2xl border border-stone-200 p-5"><span class="text-xs font-bold uppercase text-green-700">Facebook (farming groups)</span><p class="mt-2">Still tracking your herd in a pocket notebook? We built Barnboard so logging a cow's milk takes one tap and one number — and so milk from a treated cow never reaches the tank by accident. Runs on your own computer, your data stays yours.</p></div>
-    <div class="bg-white rounded-2xl border border-stone-200 p-5"><span class="text-xs font-bold uppercase text-green-700">LinkedIn</span><p class="mt-2">Small dairy farms lose four figures to one contaminated tanker. Barnboard is a self-hosted farm dashboard whose whole job is preventing that call: withholding alerts, yield-drop detection, calving countdowns. FastAPI + HTMX + SQLite — deliberately boring tech that works in a barn.</p></div>
+    <div class="bg-white rounded-2xl border border-stone-200 p-5"><span class="text-xs font-bold uppercase text-green-700">X / Twitter</span><p class="mt-2">The most expensive thing on a dairy farm is a forgotten date. MilkPost remembers the withholding clear-date, the calving, the dry-off — and puts them on your phone calendar. Self-hosted, one SQLite file. 🐄</p></div>
+    <div class="bg-white rounded-2xl border border-stone-200 p-5"><span class="text-xs font-bold uppercase text-green-700">Facebook (farming groups)</span><p class="mt-2">Still tracking your herd in a pocket notebook? We built MilkPost so logging a cow's milk takes one tap and one number — and so milk from a treated cow never reaches the tank by accident. Runs on your own computer, your data stays yours.</p></div>
+    <div class="bg-white rounded-2xl border border-stone-200 p-5"><span class="text-xs font-bold uppercase text-green-700">LinkedIn</span><p class="mt-2">Small dairy farms lose four figures to one contaminated tanker. MilkPost is a self-hosted farm dashboard whose whole job is preventing that call: withholding alerts, yield-drop detection, calving countdowns. FastAPI + HTMX + SQLite — deliberately boring tech that works in a barn.</p></div>
   </div>
 </section>
 
 <footer id="footer" class="bg-green-950 text-green-200">
   <div class="max-w-5xl mx-auto px-4 py-10 text-center text-sm">
-    <p class="font-extrabold text-white text-lg">🐄 Barnboard</p>
+    <p class="font-extrabold text-white text-lg">🐄 MilkPost</p>
     <p class="mt-1">Your dairy farm's daily command center.</p>
-    <p class="mt-4 text-green-400">© 2026 Barnboard · self-hosted &amp; proud of it</p>
+    <p class="mt-4 text-green-400">© 2026 MilkPost · self-hosted &amp; proud of it</p>
   </div>
 </footer>
 

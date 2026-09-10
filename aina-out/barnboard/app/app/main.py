@@ -20,7 +20,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -112,7 +112,7 @@ def _toast(html: str, message: str, status_code: int = 200) -> HTMLResponse:
 # feed (calendar apps cannot log in; the token IS the credential).
 
 SESSION_COOKIE = "bb_session"
-_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset"}
+_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset", "/welcome"}
 
 # Secure cookies when served over TLS (set SECURE_COOKIES=1 behind HTTPS/a TLS proxy).
 SECURE_COOKIES = os.environ.get("SECURE_COOKIES", "0") == "1"
@@ -184,6 +184,8 @@ async def require_login(request: Request, call_next):
     if not user:
         if request.headers.get("HX-Request"):
             return Response(status_code=401, headers={"HX-Redirect": "/login"})
+        if request.url.path == "/":
+            return RedirectResponse("/welcome", status_code=303)
         return RedirectResponse("/login", status_code=303)
     request.state.user = user
     return await call_next(request)
@@ -672,6 +674,12 @@ def _svg_trend(days: list[dict], width: int = 640, height: int = 140) -> str:
         f'fill="var(--text-faint)">today</text>')
     parts.append("</svg>")
     return "".join(parts)
+
+
+@app.get("/welcome", response_class=HTMLResponse)
+def welcome():
+    """Public landing page (marketing.html); the app itself stays gated."""
+    return FileResponse(BASE_DIR / "marketing.html", media_type="text/html")
 
 
 # ── Dashboard ──────────────────────────────────────────────────────────────

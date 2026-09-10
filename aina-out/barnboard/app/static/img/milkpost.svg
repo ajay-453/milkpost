@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="MilkPost">
+  <!-- MilkPost mark: milk drop inside a postmark ring -->
+  <circle cx="60" cy="60" r="56" fill="#2f7d4f"/>
+  <circle cx="60" cy="60" r="56" fill="url(#bg)" opacity=".25"/>
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#7fc99b"/>
+      <stop offset="100%" stop-color="#1d5c38"/>
+    </radialGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="78%" stop-color="#f4f9f5"/>
+      <stop offset="100%" stop-color="#dcebe0"/>
+    </linearGradient>
+  </defs>
+  <!-- postmark ring -->
+  <circle cx="60" cy="60" r="47" fill="none" stroke="#eaf5ec" stroke-width="2.6"
+          stroke-dasharray="1.5 7.5" stroke-linecap="round" opacity=".9"/>
+  <!-- main drop -->
+  <path d="M60 22 C 60 22, 38 52, 38 68 C 38 81, 48 90, 60 90 C 72 90, 82 81, 82 68
+           C 82 52, 60 22, 60 22 Z" fill="url(#drop)"/>
+  <!-- inner shading -->
+  <path d="M60 84 C 52 84, 45 78, 44 70 C 47 76, 53 80, 60 80 C 67 80, 73 76, 76 70
+           C 75 78, 68 84, 60 84 Z" fill="#c9dfd0" opacity=".8"/>
+  <!-- highlight -->
+  <path d="M52 48 C 55 42, 58 38, 58 38 C 56 46, 55 52, 54 58 C 53 63, 49 64, 48 60
+           C 47 56, 50 52, 52 48 Z" fill="#ffffff" opacity=".95"/>
+  <!-- satellite droplets -->
+  <path d="M84 40 C 84 40, 78 47, 78 51 C 78 54.4, 80.6 57, 84 57 C 87.4 57, 90 54.4, 90 51
+           C 90 47, 84 40, 84 40 Z" fill="#f2f8f3" opacity=".9"/>
+  <path d="M35 36 C 35 36, 31 41, 31 44 C 31 46.4, 32.8 48, 35 48 C 37.2 48, 39 46.4, 39 44
+           C 39 41, 35 36, 35 36 Z" fill="#f2f8f3" opacity=".75"/>
+</svg>

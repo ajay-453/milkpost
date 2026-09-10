@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="MilkPost buffalo">
+  <!-- MilkPost mark: Murrah buffalo head, signature curled horns -->
+  <circle cx="60" cy="60" r="58" fill="#eef7ee"/>
+  <circle cx="60" cy="60" r="58" fill="none" stroke="#cfe6cf" stroke-width="2"/>
+  <!-- horns: tight Murrah curls, attached at the crown -->
+  <path d="M48 42 C 36 40, 27 33, 27 24 C 27 16, 36 13, 41 18 C 45 22, 43 28, 38 28"
+        fill="none" stroke="#8a8078" stroke-width="8.5" stroke-linecap="round"/>
+  <path d="M72 42 C 84 40, 93 33, 93 24 C 93 16, 84 13, 79 18 C 75 22, 77 28, 82 28"
+        fill="none" stroke="#8a8078" stroke-width="8.5" stroke-linecap="round"/>
+  <path d="M48 41 C 38 39, 31 33, 31 25" fill="none" stroke="#a99e94"
+        stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M72 41 C 82 39, 89 33, 89 25" fill="none" stroke="#a99e94"
+        stroke-width="3.4" stroke-linecap="round"/>
+  <!-- ears -->
+  <ellipse cx="30" cy="52" rx="10" ry="6" transform="rotate(-24 30 52)" fill="#33302f"/>
+  <ellipse cx="90" cy="52" rx="10" ry="6" transform="rotate(24 90 52)" fill="#33302f"/>
+  <ellipse cx="31" cy="52" rx="6" ry="3.4" transform="rotate(-24 31 52)" fill="#4d4643"/>
+  <ellipse cx="89" cy="52" rx="6" ry="3.4" transform="rotate(24 89 52)" fill="#4d4643"/>
+  <!-- head -->
+  <path d="M60 34 C 76 34, 84 46, 83 60 C 82 72, 76 80, 72 86 C 68 92, 66 98, 60 98
+           C 54 98, 52 92, 48 86 C 44 80, 38 72, 37 60 C 36 46, 44 34, 60 34 Z"
+        fill="#3a3634"/>
+  <!-- forehead sheen -->
+  <path d="M60 38 C 70 38, 76 46, 76 54 C 70 50, 50 50, 44 54 C 44 46, 50 38, 60 38 Z"
+        fill="#4a4542"/>
+  <!-- muzzle -->
+  <path d="M60 74 C 70 74, 75 80, 74 87 C 73 94, 67 97, 60 97 C 53 97, 47 94, 46 87
+           C 45 80, 50 74, 60 74 Z" fill="#57504c"/>
+  <!-- nostrils -->
+  <ellipse cx="53" cy="86" rx="2.6" ry="3.4" transform="rotate(-14 53 86)" fill="#26221f"/>
+  <ellipse cx="67" cy="86" rx="2.6" ry="3.4" transform="rotate(14 67 86)" fill="#26221f"/>
+  <!-- eyes -->
+  <circle cx="48" cy="60" r="3.4" fill="#15120f"/>
+  <circle cx="72" cy="60" r="3.4" fill="#15120f"/>
+  <circle cx="49.2" cy="58.8" r="1.1" fill="#e8e2da"/>
+  <circle cx="73.2" cy="58.8" r="1.1" fill="#e8e2da"/>
+  <!-- blaze -->
+  <path d="M60 66 C 62 68, 62 72, 60 74 C 58 72, 58 68, 60 66 Z" fill="#5a534e"/>
+</svg>

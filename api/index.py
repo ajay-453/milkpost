@@ -87,7 +87,7 @@ SMTP_FROM = os.environ.get("SMTP_FROM", SMTP_USER)
 OWNER_EMAIL = os.environ.get("OWNER_EMAIL", "")
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
-RESEND_FROM = os.environ.get("RESEND_FROM", "Barnboard <onboarding@resend.dev>")
+RESEND_FROM = os.environ.get("RESEND_FROM", "MilkPost <onboarding@resend.dev>")
 
 
 def _resend_send(to_addr: str, subject: str, text: str) -> bool:
@@ -120,7 +120,7 @@ def _pin_email_text(creds) -> str:
                      f"  password: {creds['password']}\n\n"
                      "It works until you sign out twice - after that,\n"
                      "just request access again.\n\n")
-    return ("Thanks for your interest in Barnboard!\n\n"
+    return ("Thanks for your interest in MilkPost!\n\n"
             f"Your demo access PIN: {PIN}\n\n" + creds_txt +
             "Enter the PIN at the /demo page, then sign in. Everything in\n"
             "the demo is synthetic data - explore freely.\n")
@@ -131,12 +131,12 @@ def _deliver_pin(email: str, creds) -> str:
     notification when any email channel exists. Returns the delivery mode."""
     text = _pin_email_text(creds)
     delivered = "screen"
-    if _resend_send(email, "Your Barnboard demo access PIN", text):
+    if _resend_send(email, "Your MilkPost demo access PIN", text):
         delivered = "resend"
     elif _send_pin_email(email, creds):
         delivered = "smtp"
     if OWNER_EMAIL:
-        _resend_send(OWNER_EMAIL, "Barnboard demo request",
+        _resend_send(OWNER_EMAIL, "MilkPost demo request",
                      f"New demo access request from: {email}\n"
                      f"Delivered via: {delivered}\n"
                      + (f"Issued login: {creds['username']}\n" if creds else ""))
@@ -164,7 +164,7 @@ def _send_pin_email(to_addr: str, creds: dict | None = None) -> bool:
     from email.message import EmailMessage
     try:
         msg = EmailMessage()
-        msg["Subject"] = "Your Barnboard demo access PIN"
+        msg["Subject"] = "Your MilkPost demo access PIN"
         msg["From"] = SMTP_FROM
         msg["To"] = to_addr
         if OWNER_EMAIL:
@@ -177,7 +177,7 @@ def _send_pin_email(to_addr: str, creds: dict | None = None) -> bool:
                          "It works until you sign out twice - after that,\n"
                          "just request access again.\n\n")
         msg.set_content(
-            "Thanks for your interest in Barnboard!\n\n"
+            "Thanks for your interest in MilkPost!\n\n"
             f"Your demo access PIN: {PIN}\n\n" + creds_txt +
             "Enter the PIN at the /demo page, then sign in. Everything in\n"
             "the demo is synthetic data - explore freely.\n")
@@ -197,7 +197,7 @@ TTL = 14 * 86400
 
 GATE_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Barnboard — demo access</title>
+<title>MilkPost — demo access</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext x='1' y='13' font-size='13'%3E%F0%9F%93%88%3C/text%3E%3C/svg%3E">
 <style>:root{{--bg:#f8f7f4;--fg:#1c1917;--mut:#6b6560;--card:#fff;--bd:#e7e5e4;--acc:#15803d}}
 @media (prefers-color-scheme:dark){{:root{{--bg:#0f110f;--fg:#f5f5f4;--mut:#a8a29e;--card:#191c19;--bd:#2b2f2b;--acc:#2fb463}}}}

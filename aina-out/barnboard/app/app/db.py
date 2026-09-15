@@ -11,6 +11,7 @@ import hashlib
 import hmac
 import os
 import random
+import re
 import secrets
 import sqlite3
 from datetime import date, datetime, timedelta
@@ -202,15 +203,31 @@ def create_user(con: sqlite3.Connection, username: str, password: str,
 _TEMP_WORDS = ("milk", "calf", "barn", "gir", "moo", "hay", "churn", "ghee")
 
 
+def _temp_password_for(con: sqlite3.Connection, username: str,
+                       day_offset: int = 0) -> str:
+    """Deterministic guest password: HMAC(stateless secret, username + day).
+    On serverless every instance has its own /tmp DB, so a guest minted while
+    handling /demo/request must be verifiable — and re-creatable — on
+    whichever instance the login later lands on (the same trick that makes
+    sessions stateless). Passwords stay valid the issue day plus the next;
+    authenticate() checks both."""
+    day = (datetime.now() - timedelta(days=day_offset)).strftime("%Y%m%d")
+    digest = hmac.new(_stateless_secret(con).encode(),
+                      f"temp-cred:{username}:{day}".encode(),
+                      hashlib.sha256).hexdigest()
+    return (f"{_TEMP_WORDS[int(digest[:4], 16) % len(_TEMP_WORDS)]}"
+            f"-{int(digest[4:8], 16) % 9000 + 1000}"
+            f"-{_TEMP_WORDS[int(digest[8:12], 16) % len(_TEMP_WORDS)]}")
+
+
 def create_temp_user(con: sqlite3.Connection, logouts: int = 2) -> tuple[str, str]:
-    """A disposable demo login (helper role). Dies after `logouts` logouts —
-    the visitor requests access again. Returns (username, password)."""
+    """A disposable demo login (helper role). Dies after `logouts` logouts or
+    ~2 days — the visitor requests access again. Returns (username, password)."""
     while True:
         username = "guest-" + secrets.token_hex(2)
         if not con.execute("SELECT 1 FROM users WHERE username = ?", (username,)).fetchone():
             break
-    password = (f"{secrets.choice(_TEMP_WORDS)}-{secrets.randbelow(9000) + 1000}"
-                f"-{secrets.choice(_TEMP_WORDS)}")
+    password = _temp_password_for(con, username)
     con.execute(
         "INSERT INTO users (username, password_hash, created_at, role, approved, "
         "is_temp, logouts_left) VALUES (?,?,?,?,1,1,?)",
@@ -220,22 +237,37 @@ def create_temp_user(con: sqlite3.Connection, logouts: int = 2) -> tuple[str, st
 
 
 def burn_temp_logout(con: sqlite3.Connection, user_row) -> None:
-    """Called on logout: a temp guest loses one life; at zero the account and
-    its sessions are deleted — the credentials simply stop existing."""
+    """Called on logout: a temp guest loses one life; at zero its sessions are
+    dropped and the row stays as a tombstone (logouts_left <= 0) — kept, not
+    deleted, so authenticate() won't lazily re-create the account from the
+    still-valid derived password."""
     if not user_row or not user_row["is_temp"]:
         return
     left = (user_row["logouts_left"] or 1) - 1
     if left <= 0:
         con.execute("DELETE FROM sessions WHERE user_id = ?", (user_row["id"],))
-        con.execute("DELETE FROM users WHERE id = ?", (user_row["id"],))
-    else:
-        con.execute("UPDATE users SET logouts_left = ? WHERE id = ?", (left, user_row["id"]))
+    con.execute("UPDATE users SET logouts_left = ? WHERE id = ?", (left, user_row["id"]))
 
 
 def authenticate(con: sqlite3.Connection, username: str, password: str) -> sqlite3.Row | None:
     user = con.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
     if user and verify_password(password, user["password_hash"]):
+        if user["is_temp"] and (user["logouts_left"] or 0) <= 0:
+            return None  # burned guest (tombstone) — credentials are dead
         return user
+    if user is None and re.fullmatch(r"guest-[0-9a-f]{4}", username):
+        # Guest minted by another serverless instance (its row lives in that
+        # instance's /tmp DB): verify the derived password for today or
+        # yesterday and materialize the account here.
+        for off in (0, 1):
+            if hmac.compare_digest(password, _temp_password_for(con, username, off)):
+                con.execute(
+                    "INSERT INTO users (username, password_hash, created_at, role, "
+                    "approved, is_temp, logouts_left) VALUES (?,?,?,?,1,1,?)",
+                    (username, hash_password(password),
+                     datetime.now().isoformat(timespec="seconds"), "helper", 2))
+                return con.execute("SELECT * FROM users WHERE username = ?",
+                                   (username,)).fetchone()
     return None
 
 

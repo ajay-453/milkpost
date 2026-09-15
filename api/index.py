@@ -118,8 +118,8 @@ def _pin_email_text(creds) -> str:
         creds_txt = (f"Your personal demo login:\n"
                      f"  username: {creds['username']}\n"
                      f"  password: {creds['password']}\n\n"
-                     "It works until you sign out twice - after that,\n"
-                     "just request access again.\n\n")
+                     "It works for 2 days or until you sign out twice -\n"
+                     "after that, just request access again.\n\n")
     return ("Thanks for your interest in MilkPost!\n\n"
             f"Your demo access PIN: {PIN}\n\n" + creds_txt +
             "Enter the PIN at the /demo page, then sign in. Everything in\n"
@@ -174,8 +174,8 @@ def _send_pin_email(to_addr: str, creds: dict | None = None) -> bool:
             creds_txt = (f"Your personal demo login:\n"
                          f"  username: {creds['username']}\n"
                          f"  password: {creds['password']}\n\n"
-                         "It works until you sign out twice - after that,\n"
-                         "just request access again.\n\n")
+                         "It works for 2 days or until you sign out twice -\n"
+                         "after that, just request access again.\n\n")
         msg.set_content(
             "Thanks for your interest in MilkPost!\n\n"
             f"Your demo access PIN: {PIN}\n\n" + creds_txt +

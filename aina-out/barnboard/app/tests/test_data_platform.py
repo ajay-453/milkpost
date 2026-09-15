@@ -216,4 +216,8 @@ def test_temp_credentials_burn_after_two_logouts(client):
     assert logout().status_code == 303     # 2nd logout — account burned
     assert login().status_code == 401      # credentials no longer exist
     with db.get_db() as con:
-        assert con.execute("SELECT 1 FROM users WHERE username = ?", (u,)).fetchone() is None
+        # Burned guests stay as a tombstone row (logouts_left <= 0) so the
+        # derived password can't lazily re-create the account (serverless).
+        row = con.execute("SELECT logouts_left FROM users WHERE username = ?",
+                          (u,)).fetchone()
+        assert row is not None and row["logouts_left"] <= 0

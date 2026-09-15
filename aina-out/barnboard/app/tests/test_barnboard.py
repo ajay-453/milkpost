@@ -65,6 +65,23 @@ def test_security_answer_normalized(client):
 
 # ── endpoints (auth gate + rate limiting) ────────────────────────────────────
 
+def test_temp_guest_login_survives_instance_loss(client):
+    # Serverless: the guest row is minted in one instance's /tmp DB, but the
+    # login may land on another. The derived password must authenticate and
+    # lazily re-create the account (db.authenticate); junk must not.
+    from app import db
+    with db.get_db() as con:
+        u, p = db.create_temp_user(con)
+        con.execute("DELETE FROM users WHERE username = ?", (u,))
+    with db.get_db() as con:
+        assert db.authenticate(con, u, "milk-0000-moo") is None
+        user = db.authenticate(con, u, p)
+        assert user is not None and user["is_temp"] == 1 and user["approved"] == 1
+    r = client.post("/login", data={"username": u, "password": p}, follow_redirects=False)
+    assert r.status_code == 303 and r.headers["location"] == "/"
+    client.cookies.clear()  # leave the shared client anonymous again
+
+
 def test_protected_route_redirects_when_anon(client):
     # Anonymous root lands on the public marketing page (cea9fca); protected
     # non-public paths still bounce to /login.

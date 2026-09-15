@@ -257,9 +257,10 @@ def _auth_ctx(request: Request, **extra):
     demo = os.environ.get("DEMO_LOGIN", "")
     return {"request": request, "app_name": APP_NAME, "app_tagline": APP_TAGLINE,
             "lang": lang, "t": i18n.make_t(lang),
-            "demo_hint": demo.replace(":", " / ") if ":" in demo else "",
             # DEMO_LOGIN set ⇒ this is a demo deployment ⇒ the gate wrapper in
             # front of us serves /demo/request (PIN + temp creds by email).
+            # The account's credentials are never displayed — access is
+            # granted per-request through that email flow.
             "demo_request": bool(demo), **extra}
 
 

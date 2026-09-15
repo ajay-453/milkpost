@@ -16,7 +16,9 @@ data-team-out/barnboard/visuals
 data-team-out/barnboard/governance
 data-team-out/barnboard/lineage
 data-team-sources
-data
+data/reference/*.zip
+data/reference/*.xlsx
+data/reference/*.csv
 betadoc/.pm2
 betadoc/site/assets
 phasedoc

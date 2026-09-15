@@ -222,6 +222,8 @@ TE: dict[str, str] = {
     # ── self-service recovery ──
     "Forgot password": "పాస్‌వర్డ్ మర్చిపోయారా",
     "Forgot your password?": "పాస్‌వర్డ్ మర్చిపోయారా?",
+    "Need demo access?": "డెమో యాక్సెస్ కావాలా?",
+    "Get the PIN and a login by email": "ఇమెయిల్ ద్వారా PIN మరియు లాగిన్ పొందండి",
     "Enter your username to start.": "మొదలుపెట్టడానికి మీ యూజర్ పేరు ఇవ్వండి.",
     "Continue": "కొనసాగించు",
     "Back to sign in": "లాగిన్‌కు తిరిగి వెళ్ళండి",

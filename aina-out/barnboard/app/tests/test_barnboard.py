@@ -66,7 +66,11 @@ def test_security_answer_normalized(client):
 # ── endpoints (auth gate + rate limiting) ────────────────────────────────────
 
 def test_protected_route_redirects_when_anon(client):
+    # Anonymous root lands on the public marketing page (cea9fca); protected
+    # non-public paths still bounce to /login.
     r = client.get("/", follow_redirects=False)
+    assert r.status_code == 303 and r.headers["location"] == "/welcome"
+    r = client.get("/cows", follow_redirects=False)
     assert r.status_code == 303 and r.headers["location"] == "/login"
 
 

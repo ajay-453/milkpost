@@ -43,6 +43,11 @@
         <p class="muted" style="font-size:13px; text-align:center; margin-top:6px">
           <a href="/forgot">{{ t('Forgot your password?') }}</a>
         </p>
+        {% if demo_request %}
+        <p class="muted" style="font-size:13px; text-align:center; margin-top:6px">
+          {{ t('Need demo access?') }} <a href="/demo/request"><strong>{{ t('Get the PIN and a login by email') }}</strong></a>
+        </p>
+        {% endif %}
         <p class="faint" style="font-size:12px; text-align:center; margin-top:8px">
           {{ t('Signed in for 30 days on this device.') }}
           {% if demo_hint %}<br><span class="muted">{{ t('Demo login') }}: <strong>{{ demo_hint }}</strong></span>{% endif %}

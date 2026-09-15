@@ -215,9 +215,15 @@ a{{color:var(--acc)}}.back{{margin-top:18px;font-size:13px}}</style></head><body
 <p>Enter the access PIN you were given to open the live application.</p>
 <input name="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="8" autofocus placeholder="&#183;&#183;&#183;&#183;">
 <button type="submit">Open the demo</button>{err}
-<div class="back">No PIN yet? <a href="/demo/request"><strong>Request access</strong></a></div>
+<div class="back">No PIN yet? <a href="/demo/request"><strong>Request access</strong></a></div>{extra}
 <div class="back"><a href="/">&larr; back to the overview</a></div>
 </form></body></html>"""
+
+# Shown on the gate when the visitor already holds a valid PIN cookie: the
+# gate stays the front door (Request access must stay reachable — email-first
+# flow), but returning visitors get a one-click path into the app.
+GATE_HAS_PIN = ('<div class="back" style="margin-top:10px">Already unlocked on this device — '
+                '<a href="/login"><strong>continue to sign in</strong></a></div>')
 
 # PIN visible on the gate until an email channel (Resend/SMTP) is configured;
 # auto-hides once RESEND_API_KEY or SMTP_* env exists. Override: BETADOC_SHOW_PIN.
@@ -349,9 +355,11 @@ async def app(scope, receive, send):
         return await _site_asset(scope, send, os.path.basename(path))
 
     if path == "/demo" and scope["method"] == "GET":
-        if has_pin:
-            return await _redirect(send, "/login")
-        return await _send(send, 200, GATE_PAGE.format(err="").encode(),
+        # Always show the access page — never skip to /login: the Request-
+        # access flow (PIN + temp credentials by email) must stay reachable
+        # even for visitors whose PIN cookie is still valid.
+        extra = GATE_HAS_PIN if has_pin else ""
+        return await _send(send, 200, GATE_PAGE.format(err="", extra=extra).encode(),
                            "text/html; charset=utf-8")
     if path == "/demo" and scope["method"] == "POST":
         body = b""
@@ -370,7 +378,7 @@ async def app(scope, receive, send):
             cookie = (f"{COOKIE}={_token()}; Path=/; HttpOnly; SameSite=Lax; "
                       f"Max-Age={TTL}{secure}")
             return await _redirect(send, "/login", [(b"set-cookie", cookie.encode())])
-        page = GATE_PAGE.format(err='<div class="err">Wrong PIN — try again.</div>')
+        page = GATE_PAGE.format(err='<div class="err">Wrong PIN — try again.</div>', extra="")
         return await _send(send, 401, page.encode(), "text/html; charset=utf-8")
     if path == "/demo/request" and scope["method"] == "GET":
         return await _send(send, 200, REQUEST_PAGE.format(err="").encode(),

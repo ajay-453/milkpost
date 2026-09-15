@@ -211,7 +211,7 @@ button{{width:100%;margin-top:14px;padding:12px;font-size:15px;font-weight:600;b
 background:var(--acc);color:#fff;cursor:pointer}}.err{{color:#dc2626;font-size:14px;margin-top:10px}}
 a{{color:var(--acc)}}.back{{margin-top:18px;font-size:13px}}</style></head><body>
 <form class="card" method="post" action="/demo">
-<div style="font-size:34px">&#128200;</div><h1>Data Platform live demo</h1>
+<div style="font-size:34px">&#128003;</div><h1>MilkPost live demo</h1>
 <p>Enter the access PIN you were given to open the live application.</p>
 <input name="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="8" autofocus placeholder="&#183;&#183;&#183;&#183;">
 <button type="submit">Open the demo</button>{err}

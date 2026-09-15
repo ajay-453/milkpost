@@ -87,7 +87,7 @@ SMTP_FROM = os.environ.get("SMTP_FROM", SMTP_USER)
 OWNER_EMAIL = os.environ.get("OWNER_EMAIL", "")
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
-RESEND_FROM = os.environ.get("RESEND_FROM", "MilkPost <onboarding@resend.dev>")
+RESEND_FROM = os.environ.get("RESEND_FROM", "MilkPost <hello@milkpost.ajaykongala.online>")
 
 
 def _resend_send(to_addr: str, subject: str, text: str) -> bool:
@@ -105,7 +105,7 @@ def _resend_send(to_addr: str, subject: str, text: str) -> bool:
                               "subject": subject, "text": text}).encode(),
             headers={"Authorization": f"Bearer {RESEND_API_KEY}",
                      "Content-Type": "application/json",
-                     "User-Agent": "barnboard/1.0 (+https://mydairyfarm.online)"})
+                     "User-Agent": "milkpost/1.0 (+https://milkpost.ajaykongala.online)"})
         with urllib.request.urlopen(req, timeout=15) as r:
             return 200 <= r.status < 300
     except Exception:

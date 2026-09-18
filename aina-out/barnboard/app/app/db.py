@@ -255,6 +255,21 @@ def authenticate(con: sqlite3.Connection, username: str, password: str) -> sqlit
         if user["is_temp"] and (user["logouts_left"] or 0) <= 0:
             return None  # burned guest (tombstone) — credentials are dead
         return user
+    if user is None and re.fullmatch(r"guest-\d{6}-[0-9a-f]{4}", username):
+        # OC Apps shared guest login (one login for every app): guest-YYMMDD-xxxx with a
+        # password derived from the username and the shared secret; valid the issue day + 2.
+        pw = _oc_guest_password(con, username)
+        try:
+            issued = datetime.strptime(username.split("-")[1], "%y%m%d")
+        except ValueError:
+            issued = None
+        if issued and (datetime.now() - issued).days <= 3 and hmac.compare_digest(password, pw):
+            con.execute(
+                "INSERT INTO users (username, password_hash, created_at, role, "
+                "approved, is_temp, logouts_left) VALUES (?,?,?,?,1,1,?)",
+                (username, hash_password(password),
+                 datetime.now().isoformat(timespec="seconds"), "helper", 2))
+            return con.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
     if user is None and re.fullmatch(r"guest-[0-9a-f]{4}", username):
         # Guest minted by another serverless instance (its row lives in that
         # instance's /tmp DB): verify the derived password for today or
@@ -269,6 +284,13 @@ def authenticate(con: sqlite3.Connection, username: str, password: str) -> sqlit
                 return con.execute("SELECT * FROM users WHERE username = ?",
                                    (username,)).fetchone()
     return None
+
+
+def _oc_guest_password(con: sqlite3.Connection, username: str) -> str:
+    """Same derivation as Tallyard/Abhyas (auth._guest_password) so one login works everywhere."""
+    import base64
+    raw = hmac.new(_stateless_secret(con).encode(), f"guest:{username}".encode(), hashlib.sha256).digest()
+    return base64.b32encode(raw).decode().lower().rstrip("=")[:10]
 
 
 def _stateless_secret(con: sqlite3.Connection) -> str:

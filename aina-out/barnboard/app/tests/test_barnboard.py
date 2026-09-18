@@ -112,3 +112,20 @@ def test_good_login_sets_secure_aware_cookie(client):
                     headers=hdr, follow_redirects=False)
     assert r.status_code == 303
     assert "bb_session=" in r.headers.get("set-cookie", "")
+
+
+def test_oc_apps_shared_guest_login(client):
+    """One login for every OC app: guest-YYMMDD-xxxx with the Tallyard/Abhyas derivation."""
+    import base64, hashlib, hmac, time
+    from app import db as _db
+    username = f"guest-{time.strftime('%y%m%d')}-abcd"
+    with _db.get_db() as con:
+        secret = _db._stateless_secret(con)
+    raw = hmac.new(secret.encode(), f"guest:{username}".encode(), hashlib.sha256).digest()
+    password = base64.b32encode(raw).decode().lower().rstrip("=")[:10]
+    with _db.get_db() as con:
+        assert _db.authenticate(con, username, password) is not None       # materialised on first use
+        assert _db.authenticate(con, username, "wrong-password") is None
+        assert _db.authenticate(con, "guest-000101-abcd", password) is None  # expired issue date
+    r = client.post("/login", data={"username": username, "password": password}, follow_redirects=False)
+    assert r.status_code in (302, 303)

@@ -75,7 +75,7 @@ def _ensure_models() -> None:
     except Exception:
         pass
 
-PIN = os.environ.get("BETADOC_PIN", "8437")   # rotated 2026-09-09 (request-based access)
+PIN = os.environ.get("OC_ACCESS_PIN") or os.environ.get("BETADOC_PIN", "8437")   # one PIN for every OC app (OC_ACCESS_PIN on every project)
 # Demo-access requests (mirrors betadoc_server.py): email in, PIN out — by
 # SMTP when configured, on screen otherwise. On Vercel the lead log goes to
 # stdout (visible in function logs) plus ephemeral /tmp.
@@ -190,9 +190,10 @@ def _send_pin_email(to_addr: str, creds: dict | None = None) -> bool:
         return False
 # The PIN is the credential; the cookie secret only has to be stable across
 # cold starts, so deriving it from the PIN is fine for a demo gate.
-SECRET = os.environ.get("BETADOC_SECRET",
+SECRET = os.environ.get("OC_ACCESS_SECRET") or os.environ.get("BETADOC_SECRET",
                         hashlib.sha256(f"bb-v2:{PIN}".encode()).hexdigest())
-COOKIE = "bdd_demo"
+COOKIE = "oc_access"          # shared with the hub and every other app: one PIN unlocks all
+COOKIE_DOMAIN = os.environ.get("OC_ACCESS_DOMAIN", ".ajaykongala.online")
 TTL = 14 * 86400
 
 GATE_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -212,10 +213,10 @@ background:var(--acc);color:#fff;cursor:pointer}}.err{{color:#dc2626;font-size:1
 a{{color:var(--acc)}}.back{{margin-top:18px;font-size:13px}}</style></head><body>
 <form class="card" method="post" action="/demo">
 <div style="width:64px;height:64px;margin:0 auto 4px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="MilkPost"> <!-- MilkPost mark: milk drop inside a postmark ring --> <circle cx="60" cy="60" r="56" fill="#2f7d4f"/> <circle cx="60" cy="60" r="56" fill="url(#bg)" opacity=".25"/> <defs> <radialGradient id="bg" cx="35%" cy="30%" r="80%"> <stop offset="0%" stop-color="#7fc99b"/> <stop offset="100%" stop-color="#1d5c38"/> </radialGradient> <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#ffffff"/> <stop offset="78%" stop-color="#f4f9f5"/> <stop offset="100%" stop-color="#dcebe0"/> </linearGradient> </defs> <!-- postmark ring --> <circle cx="60" cy="60" r="47" fill="none" stroke="#eaf5ec" stroke-width="2.6" stroke-dasharray="1.5 7.5" stroke-linecap="round" opacity=".9"/> <!-- main drop --> <path d="M60 22 C 60 22, 38 52, 38 68 C 38 81, 48 90, 60 90 C 72 90, 82 81, 82 68 C 82 52, 60 22, 60 22 Z" fill="url(#drop)"/> <!-- inner shading --> <path d="M60 84 C 52 84, 45 78, 44 70 C 47 76, 53 80, 60 80 C 67 80, 73 76, 76 70 C 75 78, 68 84, 60 84 Z" fill="#c9dfd0" opacity=".8"/> <!-- highlight --> <path d="M52 48 C 55 42, 58 38, 58 38 C 56 46, 55 52, 54 58 C 53 63, 49 64, 48 60 C 47 56, 50 52, 52 48 Z" fill="#ffffff" opacity=".95"/> <!-- satellite droplets --> <path d="M84 40 C 84 40, 78 47, 78 51 C 78 54.4, 80.6 57, 84 57 C 87.4 57, 90 54.4, 90 51 C 90 47, 84 40, 84 40 Z" fill="#f2f8f3" opacity=".9"/> <path d="M35 36 C 35 36, 31 41, 31 44 C 31 46.4, 32.8 48, 35 48 C 37.2 48, 39 46.4, 39 44 C 39 41, 35 36, 35 36 Z" fill="#f2f8f3" opacity=".75"/> </svg></div><h1>MilkPost live demo</h1>
-<p>Enter the access PIN you were given to open the live application.</p>
+<p>Enter the OC Apps access PIN from your email. One PIN opens every demo; entering it once unlocks all of them on this device.</p>
 <input name="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="8" autofocus placeholder="&#183;&#183;&#183;&#183;">
 <button type="submit">Open the demo</button>{err}
-<div class="back">No PIN yet? <a href="/demo/request"><strong>Request access</strong></a></div>{extra}
+<div class="back">No PIN yet? <a href="https://oc-apps.ajaykongala.online/access"><strong>Request access</strong></a> (one request for all OC apps)</div>{extra}
 <div class="back"><a href="/">&larr; back to the overview</a></div>
 </form></body></html>"""
 
@@ -375,14 +376,14 @@ async def app(scope, receive, send):
                 pin = urllib.parse.unquote_plus(v).strip()
         if hmac.compare_digest(pin, PIN):
             secure = "; Secure" if os.environ.get("VERCEL") else ""
-            cookie = (f"{COOKIE}={_token()}; Path=/; HttpOnly; SameSite=Lax; "
+            dom = f"; Domain={COOKIE_DOMAIN}" if os.environ.get("VERCEL") and COOKIE_DOMAIN else ""
+            cookie = (f"{COOKIE}={_token()}; Path=/{dom}; HttpOnly; SameSite=Lax; "
                       f"Max-Age={TTL}{secure}")
             return await _redirect(send, "/login", [(b"set-cookie", cookie.encode())])
         page = GATE_PAGE.format(err='<div class="err">Wrong PIN — try again.</div>', extra="")
         return await _send(send, 401, page.encode(), "text/html; charset=utf-8")
     if path == "/demo/request" and scope["method"] == "GET":
-        return await _send(send, 200, REQUEST_PAGE.format(err="").encode(),
-                           "text/html; charset=utf-8")
+        return await _redirect(send, "https://oc-apps.ajaykongala.online/access")   # one request for every OC app
     if path == "/demo/request" and scope["method"] == "POST":
         import re as _re
         body = b""
@@ -425,7 +426,8 @@ async def app(scope, receive, send):
                         f"<strong style='font-size:22px;letter-spacing:.2em'>{PIN}</strong>" + cred_html)
         return await _send(send, 200, page.encode(), "text/html; charset=utf-8")
     if path == "/demo/exit":
-        cookie = f"{COOKIE}=; Path=/; Max-Age=0"
+        dom = f"; Domain={COOKIE_DOMAIN}" if os.environ.get("VERCEL") and COOKIE_DOMAIN else ""
+        cookie = f"{COOKIE}=; Path=/{dom}; Max-Age=0"
         return await _redirect(send, "/", [(b"set-cookie", cookie.encode())])
 
     if not has_pin:

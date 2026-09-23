@@ -230,6 +230,18 @@ GATE_HAS_PIN = ('<div class="back" style="margin-top:10px">Already unlocked on t
 # auto-hides once RESEND_API_KEY or SMTP_* env exists. Override: BETADOC_SHOW_PIN.
 _EMAIL_READY = bool(RESEND_API_KEY or (SMTP_HOST and SMTP_USER and SMTP_PASS))
 _SHOW = os.environ.get("BETADOC_SHOW_PIN", "0")  # email-first: PIN granted at /demo/request
+# OC_GATE_OFF=1: /demo grants the PIN cookie by itself and hands the visitor to the app's one-click
+# demo login (DEMO_LOGIN). The gate and login code stay in place; flip the env var to re-enable.
+GATE_OFF = os.environ.get("OC_GATE_OFF", "0") == "1"
+
+
+async def _forward_with_cookie(scope, receive, send, cookie: str):
+    """Forward to the app while adding one Set-Cookie header to its response."""
+    async def send_with_cookie(message):
+        if message["type"] == "http.response.start":
+            message = {**message, "headers": list(message.get("headers", [])) + [(b"set-cookie", cookie.encode())]}
+        await send(message)
+    return await barnboard(scope, receive, send_with_cookie)
 if _SHOW == "1" or (_SHOW == "auto" and not _EMAIL_READY):
     GATE_PAGE = GATE_PAGE.replace(
         '<input name="pin"',
@@ -355,6 +367,11 @@ async def app(scope, receive, send):
     if path.startswith("/assets/"):
         return await _site_asset(scope, send, os.path.basename(path))
 
+    if GATE_OFF and path == "/demo" and scope["method"] == "GET":
+        secure = "; Secure" if os.environ.get("VERCEL") else ""
+        dom = f"; Domain={COOKIE_DOMAIN}" if os.environ.get("VERCEL") and COOKIE_DOMAIN else ""
+        cookie = f"{COOKIE}={_token()}; Path=/{dom}; HttpOnly; SameSite=Lax; Max-Age={TTL}{secure}"
+        return await _forward_with_cookie(scope, receive, send, cookie)   # the app's /demo signs the demo owner in
     if path == "/demo" and scope["method"] == "GET":
         # Always show the access page — never skip to /login: the Request-
         # access flow (PIN + temp credentials by email) must stay reachable

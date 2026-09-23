@@ -1,40 +1,45 @@
-# Keep the upload lean. NOTE: no blanket excludes over dirs the function needs
-# parts of (gitignore-style negation can't re-include under an excluded dir):
-# gold.db + semantic/metrics ship for the metrics API; tools/train_models.py
-# ships for cold-start training (G2.2/G2.3).
-aina-out/barnboard/app/.venv
+aina-out/barnboard/app/barnboard.db
 aina-out/barnboard/app/.pm2
 aina-out/barnboard/app/tests
-aina-out/barnboard/app/barnboard.db
-aina-out/barnboard.zip
+aina-out/barnboard/app/.venv
 aina-out/barnboard/docs
-data-team-out/barnboard/bronze
-data-team-out/barnboard/silver
-data-team-out/barnboard/sources
-data-team-out/barnboard/reports
-data-team-out/barnboard/visuals
-data-team-out/barnboard/governance
-data-team-out/barnboard/lineage
-data-team-sources
-data/reference/*.zip
-data/reference/*.xlsx
-data/reference/*.csv
+aina-out/barnboard.zip
+backups
 betadoc/.pm2
 betadoc/site/assets
+claude-memory
+data/reference/*.csv
+data/reference/*.xlsx
+data/reference/*.zip
+data-team-out/barnboard/bronze
+data-team-out/barnboard/governance
+data-team-out/barnboard/lineage
+data-team-out/barnboard/reports
+data-team-out/barnboard/silver
+data-team-out/barnboard/sources
+data-team-out/barnboard/visuals
+data-team-sources
+docs
+# gold.db + semantic/metrics ship for the metrics API; tools/train_models.py
+# Keep the upload lean. NOTE: no blanket excludes over dirs the function needs
+learn/
+logs
+node_modules
+oc-apps/
+parchi/
+# parts of (gitignore-style negation can't re-include under an excluded dir):
 phasedoc
 phasedoc-data
 phasedoc-gaps
-semantic-metrics
-tools/make_sources.py
-tools/enrich_gold.py
-tools/import_csv.py
-tools/backup_db.py
-tools/fetch_reference.py
-tools/port_registry.py
-tools/check_registry.py
-tools/*.sh
-backups
-logs
 .secrets
-docs
-node_modules
+semantic-metrics
+# ships for cold-start training (G2.2/G2.3).
+tools/backup_db.py
+tools/check_registry.py
+tools/enrich_gold.py
+tools/fetch_reference.py
+tools/import_csv.py
+tools/make_sources.py
+tools/port_registry.py
+tools/*.sh
+vendor/

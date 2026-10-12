@@ -43,7 +43,7 @@ mypy --ignore-missing-imports -p app
 python -m pytest -q --cov=app --cov-report=xml:coverage.xml
 ```
 
-CI (`.github/workflows/milkpost.yml`) runs mypy, then the suite with a 60%
+CI (`.github/workflows/milkpost.yml`) runs mypy, then the suite with a 75%
 coverage floor. It also checks that the committed `coverage.xml` is within one
 point of a fresh run (`check_coverage.py`), so refresh it with the last command
 above whenever tests or code change. Finally it runs `tools/train_models.py`,

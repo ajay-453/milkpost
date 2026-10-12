@@ -198,6 +198,46 @@ async def require_login(request: Request, call_next):
     return await call_next(request)
 
 
+# ── Structured request log (one JSON line per request, stdout only) ─────────
+# Vercel function logs and pm2 logs become searchable by route and status with
+# no external service. Logs the route template, never the raw path: reset
+# links and calendar feeds carry secret tokens in the URL.
+import logging
+import sys
+
+from pythonjsonlogger.json import JsonFormatter
+
+access_log = logging.getLogger("milkpost.access")
+if not access_log.handlers:
+    _handler = logging.StreamHandler(sys.stdout)
+    _handler.setFormatter(JsonFormatter("%(asctime)s %(levelname)s %(message)s",
+                                        rename_fields={"asctime": "ts", "levelname": "level"}))
+    access_log.addHandler(_handler)
+    access_log.setLevel(logging.INFO)
+    access_log.propagate = False
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = _time.perf_counter()
+    request_id = request.headers.get("x-vercel-id") or secrets.token_hex(8)
+    status = 500
+    try:
+        resp = await call_next(request)
+        status = resp.status_code
+        resp.headers["X-Request-Id"] = request_id
+        return resp
+    except Exception:
+        access_log.exception("unhandled error", extra={"request_id": request_id})
+        raise
+    finally:
+        route = getattr(request.scope.get("route"), "path", None)
+        access_log.info("request", extra={
+            "method": request.method, "path": route or request.url.path, "status": status,
+            "duration_ms": round((_time.perf_counter() - start) * 1000, 1),
+            "request_id": request_id})
+
+
 # Inline SVG icons (stroke=currentColor) — no external asset deps.
 _ICONS = {
     "grid": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>',
@@ -658,6 +698,7 @@ def team_remove(request: Request, user_id: int):
         if u["role"] == "owner" and u["approved"] and db.owner_count(con) <= 1:
             return _toast("", "The farm needs at least one owner", 422)
         con.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+        con.execute("DELETE FROM password_resets WHERE user_id = ?", (user_id,))
         con.execute("DELETE FROM users WHERE id = ?", (user_id,))
     return _toast("", f"{u['username']} removed")
 

@@ -24,7 +24,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 def client():
     db.init_db()
     with db.get_db() as con:
-        if not db.has_users(con):
+        if not con.execute("SELECT 1 FROM users WHERE username = 'tester'").fetchone():
             uid = db.create_user(con, "tester", "testpass123", role="owner", approved=True)
             db.set_security(con, uid, "What is your village name?", "kondapur")
     return TestClient(main.app)
@@ -98,6 +98,7 @@ def test_healthz_open(client):
 def test_wrong_password_401_then_rate_limited(client):
     # fresh IP bucket via a unique X-Forwarded-For
     hdr = {"x-forwarded-for": "203.0.113.7"}
+    main._rl_hits.pop("login:203.0.113.7", None)   # a rerun in the same process starts fresh
     codes = [client.post("/login", data={"username": "tester", "password": f"nope{i}"},
                          headers=hdr, follow_redirects=False).status_code for i in range(5)]
     assert codes == [401, 401, 401, 401, 401]
@@ -187,3 +188,30 @@ def test_openapi_documents_json_api(client):
     for path, verb in routes:
         schema = paths[path][verb]["responses"]["200"]["content"]["application/json"]["schema"]
         assert schema.get("$ref"), path
+
+
+# ── structured request log (arc F5.3) ───────────────────────────────────────
+
+def test_request_log_is_json_without_secret_tokens(authed):
+    import json
+    import logging
+    lines = []
+
+    class Grab(logging.Handler):
+        def emit(self, record):
+            lines.append(json.loads(main.access_log.handlers[0].format(record)))
+
+    h = Grab()
+    main.access_log.addHandler(h)
+    try:
+        r = authed.get("/api/v1/cows.json")
+        TestClient(main.app).get("/reset/s3cret-token-abc")
+    finally:
+        main.access_log.removeHandler(h)
+    hit = [ln for ln in lines if ln["path"] == "/api/v1/{table}.json"][0]
+    assert hit["method"] == "GET" and hit["status"] == 200 and hit["level"] == "INFO"
+    assert hit["duration_ms"] >= 0 and hit["request_id"] == r.headers["x-request-id"]
+    assert {"ts", "message"} <= set(hit)
+    reset = [ln for ln in lines if ln["path"].startswith("/reset/")][0]
+    assert reset["path"] == "/reset/{token}" and reset["status"] == 404
+    assert "s3cret" not in json.dumps(lines)

@@ -33,9 +33,9 @@ jobs:
       - name: Type check (mypy)
         working-directory: aina-out/barnboard/app
         run: mypy --ignore-missing-imports -p app
-      - name: Test suite with coverage (floor 60%)
+      - name: Test suite with coverage (floor 75%)
         working-directory: aina-out/barnboard/app
-        run: python -m pytest -q --cov=app --cov-report=term --cov-report=xml:/tmp/fresh.xml --cov-fail-under=60
+        run: python -m pytest -q --cov=app --cov-report=term --cov-report=xml:/tmp/fresh.xml --cov-fail-under=75
       - name: Committed coverage.xml is current
         working-directory: aina-out/barnboard/app
         run: python check_coverage.py coverage.xml /tmp/fresh.xml

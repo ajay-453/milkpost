@@ -14,12 +14,29 @@ import xml.etree.ElementTree as ET
 TOLERANCE = 1.0  # percentage points
 
 
+class ReportError(Exception):
+    pass
+
+
 def line_rate(path: str) -> float:
-    return float(ET.parse(path).getroot().get("line-rate")) * 100
+    try:
+        rate = ET.parse(path).getroot().get("line-rate")
+    except FileNotFoundError:
+        raise ReportError(f"{path}: file not found")
+    except ET.ParseError as e:
+        raise ReportError(f"{path}: not valid XML ({e})")
+    try:
+        return float(rate) * 100
+    except (TypeError, ValueError):
+        raise ReportError(f"{path}: root element has no numeric line-rate")
 
 
 def main(committed: str, fresh: str) -> int:
-    old, new = line_rate(committed), line_rate(fresh)
+    try:
+        old, new = line_rate(committed), line_rate(fresh)
+    except ReportError as e:
+        print(f"coverage check: {e}", file=sys.stderr)
+        return 1
     print(f"coverage.xml: committed {old:.1f}%, fresh run {new:.1f}%")
     if abs(old - new) > TOLERANCE:
         print(f"stale: differs by more than {TOLERANCE:g} point; refresh with\n"

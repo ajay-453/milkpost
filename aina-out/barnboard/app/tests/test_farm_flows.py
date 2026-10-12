@@ -23,7 +23,11 @@ TODAY = date.today()
 @pytest.fixture(scope="module")
 def owner():
     db.init_db()
-    with db.get_db() as con:
+    with db.get_db() as con:   # start clean so the module can run twice in one process
+        mine = "SELECT id FROM cows WHERE tag LIKE 'F4%'"
+        for table in ("milk_logs", "treatments", "breedings"):
+            con.execute(f"DELETE FROM {table} WHERE cow_id IN ({mine})")
+        con.execute("DELETE FROM cows WHERE tag LIKE 'F4%'")
         if not con.execute("SELECT 1 FROM users WHERE username = 'farmer'").fetchone():
             db.create_user(con, "farmer", "farmpass123", role="owner", approved=True)
     c = TestClient(main.app)

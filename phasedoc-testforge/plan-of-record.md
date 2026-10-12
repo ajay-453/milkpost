@@ -143,3 +143,41 @@ of a sentence. CI still fails either way, so the risk is very low. It's real
 and takes five lines, so it gets leaf F4.5. Everything else is on the
 not-fixed lists above. Comparisons: [compare.md](scans/compare.md) (first scan →
 latest), [compare-r1.md](scans/compare-r1.md), [compare-r2.md](scans/compare-r2.md).
+
+## F5 — Score follow-ups
+
+The user asked why Mutation reads 40, Unit Tests 71 and DORA 65. The answers
+come from TestForge's source (github.com/t4tarzan/testforge @ e75665e). Scan
+`(3)` was the same report as `after2` (same 10:06:09Z timestamp), so it raised
+nothing new.
+
+**Unit Tests 71** is the real line coverage, read from `coverage.xml` (71.43%).
+Most of the untested lines are in login, first-run setup, signup and approval,
+password reset and team management, at about 48% of `main.py` before F4 and
+still the largest gap. These are the routes where a bug locks someone out or
+lets the wrong person in, so F5.1 tests them and raises the floor to 75%.
+
+**Mutation 40** isn't a mutation measurement. TestForge computes
+`25 + 100 × (test files ÷ source files)`, capped at 75. It reads assertions only
+from JavaScript test files, and gives +10 only for an npm Stryker dependency. MilkPost
+has 3 test files and about 20 Python source files: 25 + 15 = 40. Splitting the
+tests into more files would raise the number without improving a single test,
+so we won't do that. F5.2 runs a real mutation tool (mutmut injects small bugs
+and checks the tests catch them) on the withholding logic, which decides when
+a treated cow's milk may go to the tank. The real number goes in `scans/`.
+TestForge's figure moves only as a side effect of new test files.
+
+**DORA 65** is a sum of four parts, 25 points each:
+
+| Part | Points | Why |
+| --- | --- | --- |
+| CI + deploy config | 25/25 | GitHub Actions plus `vercel.json` |
+| Tests + type check in CI | 25/25 | pytest + mypy (F4.1) |
+| Observability + structured logging | 0/25 | Neither. Error tracking was declined (F2.4); the app writes no logs of its own |
+| Tests + feature flags | 15/25 | No flag platform; wrong scale for a solo demo |
+
+F5.3 adds structured JSON request logs (`python-json-logger`, written to stdout,
+so Vercel's function logs become searchable by path and status) with no
+external account. This keeps to the F2.4 reasoning and is worth +15. The
+other 20 points need Sentry and a feature-flag service, which stay declined.
+The honest ceiling is 80.

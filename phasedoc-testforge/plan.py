@@ -118,6 +118,12 @@ TASKS = [
     ("F4.5", "F4", "check_coverage.py: clear error on a malformed report",
      "check_coverage.py exits 1 with a one-line message (no traceback) for a missing file, non-XML, and a "
      "root without line-rate; exits 0 on the real coverage.xml; both workflows green", "ci", "open"),
+    # ── F5 Score follow-ups (added 2026-10-12 after the user asked why mutation 40 / unit 71 / DORA 65) ──
+    ('F5', '', 'Score follow-ups — auth tests, real mutation run, structured logs', '', '', 'open'),
+    ('F5.1', 'F5', 'Auth and team flow tests (coverage 71% -> 80%)', 'new tests cover first-run setup, signup -> pending -> owner approve, role change, remove, forgot/reset via recovery question, one-time reset link, logout; pytest --cov-fail-under=75 in both workflows passes with total >= 80%; coverage.xml refreshed; both Actions runs green', 'ci', 'open'),
+    ('F5.2', 'F5', 'Real mutation testing (mutmut) on the withholding core', 'mutmut run over app/db.py; results saved under scans/mutmut-<date>.txt with the real score; every surviving mutant in withhold_clear_date / withheld_cow_ids / active_withholdings is killed by a new test or listed as equivalent with a reason in plan-of-record', 'verify', 'open'),
+    ('F5.3', 'F5', 'Structured JSON request logs (python-json-logger)', 'one JSON log line per request (method, path, status, duration_ms, request id) and JSON tracebacks on errors, to stdout only (no external service); a test asserts the record; requirements.lock regenerated with hashes, pip-audit clean; deployed and a JSON line seen in Vercel logs', 'ops', 'open'),
+    ('F5.4', 'F5', 'Re-mirror and re-scan', 'after the user re-mirrors, a new scan saved under scans/: Unit Tests >= 80, DORA 80 (structured logging detected), no new untriaged findings in compare.md', 'verify', 'open'),
 ]
 
 SCHEMA = """

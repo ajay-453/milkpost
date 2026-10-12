@@ -79,3 +79,52 @@ comparison names every finding still present, each with its triage verdict.
 
 The report's accessibility score of 100 is hollow: the analyzer found 0 HTML
 files and skipped the Jinja templates. It is not evidence either way.
+
+## F3 result (re-scan 2026-10-12, 09:42 UTC)
+
+Report: [scans/after-2026-10-12.md](scans/after-2026-10-12.md). Comparison:
+[scans/compare.md](scans/compare.md). Findings went from 49 to 37. SQL injection
+went from 3 to 0, and known-vulnerable dependencies from 2 to 0 (supply chain
+58 → 100). The README finding is gone (scope 0 → 100) and so is the no-CI
+finding (DORA 30 → 55). Edge cases went 58 → 70, agentic scale 83 → 91.
+
+One security finding remains: **Missing Rate Limiting**, medium, pointed at a
+`package.json` the repo doesn't have. TestForge's rule
+(`checkMissingRateLimit` in `mcp-server/src/analyzers/security-analyzer.ts`)
+fires on any project that has a web-framework dependency but no dependency
+whose name contains `rate-limit` or `ratelimit`. It never looks at code. It
+appeared now because F1.5 put `requirements.txt` in the mirror, so the scanner
+could see fastapi for the first time. MilkPost's `POST /login` already
+has an in-code per-IP window (5 attempts per 60 s). Its per-instance limitation
+on Vercel is the recorded G3.3 trade-off. Adding a package only to satisfy the
+rule would change nothing about the risk. Even `slowapi`, the usual FastAPI
+limiter, doesn't match the name test. F3.1's acceptance asked for
+`security.findings == 0`, so F3.1 stays partial until the user decides whether
+this verdict closes it.
+
+## F4 — Second-scan follow-ups
+
+The re-scan raised three gaps that are real, if small. CI runs tests but no
+type check, and mypy (a static type checker for Python) finds 9 errors in
+`main.py` and `db.py`, mostly `date | None` values passed where a `date` is
+expected. Coverage is 53% (main.py 48%, db.py 56%). The scanner reports 0%
+because the repo doesn't contain a coverage report it can read, so it falls
+back to a guess that doesn't understand pytest. F4 fixes the type errors and
+adds a mypy step, raises coverage to 60% with a CI floor, and commits the
+measured Cobertura report (`coverage.xml`, a standard XML coverage format)
+with a CI guard that fails if it goes stale. A re-mirror and re-scan then
+check all three.
+
+### Deliberately not fixed in round 2
+
+| Finding | Why no task |
+| --- | --- |
+| 42 endpoints without `response_model` | They return HTML or redirects. A Pydantic model doesn't describe them, and `response_model=None` would silence the rule without documenting anything |
+| 17 `int()`/`float()` unchecked | All re-checked on the new line numbers: env defaults, `time.time()`, hex-digest slices, typed `Form(int)`, internal metric config, model math |
+| Missing Rate Limiting / Auth not rate limited | Name-only dependency rule; in-code limiter exists (see F3 result) |
+| Mutation ~36%, Stryker | Analyzer reads only JS assertions |
+| Property-based | Rule detects only fast-check/jsverify imports |
+| Observability ×2 | Declined for now (F2.4) |
+| Feature flags ×2, analytics, CODEOWNERS | Wrong scale for a solo demo |
+| License, visual regression, OWASP coverage, package-lock | JS-only checks or notes about the analyzer |
+| htmx.min.js N+1 ×2, loose equality | Vendored minified library |

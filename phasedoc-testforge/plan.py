@@ -5,7 +5,10 @@ Arc: fix what the testforge.run scan of github.com/ajay-453/milkpost
 (2026-10-12, scans/before-2026-10-12.json) found to be REAL, after triage
 against the code. 2 real security findings (F0), 7 real low-risk gaps mostly
 in how the mirror repo is packaged (F1), small runtime improvements (F2), and
-a re-scan to prove it (F3). The 41 false positives are listed in
+a re-scan to prove it (F3). F4 (added 2026-10-12 after the re-scan,
+scans/after-2026-10-12.md) takes the real items that scan surfaced: a CI
+type-check, coverage to 60%, and the measured figure visible to the scanner.
+The 41 false positives are listed in
 plan-of-record.md and deliberately get no task.
 
 Every leaf carries a runnable acceptance test and is ticked ONLY after that
@@ -94,6 +97,24 @@ TASKS = [
     ("F3.2", "F3", "Before/after comparison written",
      "scans/compare.md lists every dimension score before -> after and names each finding still "
      "present with its triage verdict", "verify", "open"),
+
+    # ── F4 Second-scan follow-ups (added 2026-10-12 from scans/after-2026-10-12.md) ──
+    ("F4", "", "Second-scan follow-ups — type-check, coverage, measured report", "", "", "open"),
+    ("F4.1", "F4", "Type-check step in CI (mypy)",
+     "`mypy --ignore-missing-imports -p app` exits 0 in aina-out/barnboard/app (9 errors today); a mypy step "
+     "in milkpost.yml and ci.yml; both Actions runs green; existing tests pass; if app code changed, "
+     "vercel --prod and live /healthz 200", "ci", "open"),
+    ("F4.2", "F4", "Coverage to 60%",
+     "pytest --cov=app --cov-fail-under=60 passes locally (53% today) and the flag is in both workflows; "
+     "both Actions runs green", "ci", "open"),
+    ("F4.3", "F4", "Measured coverage visible to the scanner",
+     "Cobertura report committed at aina-out/barnboard/app/coverage.xml and mirrored; CI fails when the "
+     "committed line-rate differs from the fresh run by more than 1 point (stale guard, shown failing once "
+     "then passing)", "mirror", "open"),
+    ("F4.4", "F4", "Re-scan and refresh the comparison",
+     "after a re-mirror, a new scan saved under scans/; no 'type-check' finding; Unit Tests reads Measured "
+     ">= 60% from coverage.xml; SQL-injection and known-vulnerable still 0; scans/compare.md regenerated "
+     "with no untriaged rows", "verify", "open"),
 ]
 
 SCHEMA = """

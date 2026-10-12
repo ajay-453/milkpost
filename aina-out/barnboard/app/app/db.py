@@ -99,6 +99,19 @@ CREATE TABLE IF NOT EXISTS password_resets (
 
 COW_STATUSES = ["calf", "heifer", "milking", "dry", "sold"]
 EXPORT_TABLES = ["cows", "milk_logs", "treatments", "breedings", "sales"]
+# One literal query per exportable table: no table name is ever formatted into SQL.
+EXPORT_SELECT = {
+    "cows": "SELECT * FROM cows",
+    "milk_logs": "SELECT * FROM milk_logs",
+    "treatments": "SELECT * FROM treatments",
+    "breedings": "SELECT * FROM breedings",
+    "sales": "SELECT * FROM sales",
+}
+
+
+def table_columns(con: sqlite3.Connection, table: str) -> list:
+    """PRAGMA table_info rows (cid, name, type, notnull, dflt_value, pk), table name bound."""
+    return con.execute("SELECT * FROM pragma_table_info(?)", (table,)).fetchall()
 
 
 def get_db() -> sqlite3.Connection:

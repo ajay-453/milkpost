@@ -1,0 +1,621 @@
+{
+  "repo": "https://github.com/ajay-453/milkpost",
+  "analyzedAt": "2026-10-12T06:38:59.979Z",
+  "codebase": {
+    "totalFiles": 74,
+    "totalLines": 9543,
+    "endpoints": 48,
+    "techStack": [],
+    "dependencies": 0,
+    "languageCoverage": {
+      "nativelyAnalyzedFiles": 16,
+      "unsupportedFiles": 0,
+      "coveragePercent": 100,
+      "unsupportedLanguages": [],
+      "skippedLargeFiles": 0,
+      "analysisTruncated": false
+    }
+  },
+  "security": {
+    "findings": 3,
+    "critical": 0,
+    "high": 3,
+    "medium": 0,
+    "low": 0,
+    "items": [
+      {
+        "severity": "high",
+        "confidence": "high",
+        "title": "SQL Injection",
+        "description": "User-controlled input is built into a SQL string passed to .execute() (request input -> query string). Bound parameters do not sanitize an interpolated query string.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1061,
+        "codeSnippet": "rows = con.execute(f\"SELECT * FROM {table}\").fetchall()  # table from whitelist",
+        "fixSuggestion": "Use bound parameters: execute('... WHERE x = %s', (value,)) or the ORM query builder; never f-string/%/.format user input into SQL.",
+        "category": "SQL Injection"
+      },
+      {
+        "severity": "high",
+        "confidence": "high",
+        "title": "SQL Injection",
+        "description": "User-controlled input is built into a SQL string passed to .execute() (request input -> query string). Bound parameters do not sanitize an interpolated query string.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1068,
+        "codeSnippet": "cols = [c[1] for c in con.execute(f\"PRAGMA table_info({table})\").fetchall()]",
+        "fixSuggestion": "Use bound parameters: execute('... WHERE x = %s', (value,)) or the ORM query builder; never f-string/%/.format user input into SQL.",
+        "category": "SQL Injection"
+      },
+      {
+        "severity": "high",
+        "confidence": "high",
+        "title": "SQL Injection",
+        "description": "User-controlled input is built into a SQL string passed to .execute() (request input -> query string). Bound parameters do not sanitize an interpolated query string.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1103,
+        "codeSnippet": "rows = [dict(r) for r in con.execute(f\"SELECT * FROM {table}\").fetchall()]",
+        "fixSuggestion": "Use bound parameters: execute('... WHERE x = %s', (value,)) or the ORM query builder; never f-string/%/.format user input into SQL.",
+        "category": "SQL Injection"
+      }
+    ]
+  },
+  "unit": {
+    "coverage": 0,
+    "testFiles": 2,
+    "totalTests": 27,
+    "frameworks": [
+      "pytest"
+    ],
+    "findings": 1
+  },
+  "load": {
+    "score": 63,
+    "maxUsers": 1000,
+    "rateLimiting": false,
+    "caching": false,
+    "recommendations": [
+      "Install rate limiting on all API endpoints immediately",
+      "Add Redis caching for frequently accessed data",
+      "Configure database connection pooling",
+      "Enable gzip/brotli compression for API responses",
+      "Set up a /health endpoint with dependency checks",
+      "Configure request timeouts (server + external calls)",
+      "Add request logging with correlation IDs for debugging"
+    ]
+  },
+  "accessibility": {
+    "score": 100,
+    "issues": 0,
+    "imagesWithoutAlt": 0,
+    "formsWithoutLabels": 0,
+    "applicable": false,
+    "totalHtmlFiles": 0
+  },
+  "vision": {
+    "score": 80,
+    "summary": "Product-engineering vision signals look strong: observability + analytics + feature flags wired up.",
+    "findings": [
+      {
+        "severity": "high",
+        "title": "No observability stack detected",
+        "description": "No APM (OpenTelemetry/Datadog/NewRelic/Honeycomb) and no error tracking (Sentry/Rollbar/Bugsnag) dep detected. Without these, you can't correlate user-impacting issues with code changes.",
+        "category": "Observability",
+        "fixSuggestion": "Start with Sentry — fastest path to crash/error visibility. Add OpenTelemetry if you need full tracing. Wire up alerts to a notification channel humans actually read."
+      },
+      {
+        "severity": "medium",
+        "title": "No feature-flag platform",
+        "description": "Feature flags decouple deploy from release: kill-switch on regressions, staged rollouts to a % of users, A/B test cohorts. Releases without them are all-or-nothing.",
+        "category": "Delivery Velocity",
+        "fixSuggestion": "For early-stage: Posthog (free tier, JS-SDK-only). For larger teams: LaunchDarkly / Statsig. Even a homegrown flags table beats no kill-switch."
+      },
+      {
+        "severity": "high",
+        "title": "No product analytics dependency",
+        "description": "No Posthog / Mixpanel / Amplitude / Segment / Heap / Plausible / Fathom dep detected. Without telemetry on feature adoption + user journeys, you can't close the loop between code shipped and value delivered.",
+        "category": "Product Intelligence",
+        "fixSuggestion": "PostHog (open source, generous free tier) is the lowest-friction start. Track 3-5 key events: signup, activation, first-value-moment, retention, churn signal."
+      },
+      {
+        "severity": "low",
+        "title": "No API versioning convention",
+        "description": "No `/v1/`, `/v2/` path-prefixed routes detected (as string literals — not comments). Breaking changes will hit every consumer at once.",
+        "category": "API Maturity",
+        "fixSuggestion": "Adopt URL-based versioning (`/v1/users`). Document the deprecation policy in your README."
+      }
+    ]
+  },
+  "scope": {
+    "coverage": 0,
+    "documentedFeatures": 0,
+    "implementedFeatures": 9,
+    "missingFeatures": [],
+    "findings": [
+      {
+        "severity": "medium",
+        "title": "No README found",
+        "description": "No `README.md` / `README` / `docs/README.md` (case-insensitive) found. Without a top-level README, the project's scope and onboarding are invisible.",
+        "category": "Documentation",
+        "fixSuggestion": "Add a `README.md` to the repo root. At minimum: what the project does (one paragraph), how to run it, and a Features section listing key capabilities."
+      }
+    ]
+  },
+  "stack": {
+    "score": 75,
+    "strengths": [
+      "Testing framework configured (test files detected)"
+    ],
+    "weaknesses": [],
+    "recommendations": [
+      "Maintain test coverage above 70%",
+      "Consider TypeScript migration",
+      "Review dependencies monthly for security updates",
+      "Set up database backup strategy",
+      "Add a runtime validation library at the request boundary"
+    ],
+    "findings": []
+  },
+  "contract": {
+    "score": 96,
+    "totalEndpoints": 48,
+    "documentedEndpoints": 0,
+    "findings": [
+      {
+        "severity": "medium",
+        "title": "48 FastAPI endpoint(s) without response_model",
+        "description": "The response shape isn't declared, so it's missing from the generated OpenAPI and clients can't rely on it. Examples: GET /lang/{code} (aina-out/barnboard/app/app/main.py:268), GET /login (aina-out/barnboard/app/app/main.py:279), POST /login (aina-out/barnboard/app/app/main.py:292), GET /setup (aina-out/barnboard/app/app/main.py:316), POST /setup (aina-out/barnboard/app/app/main.py:340), ….",
+        "fixSuggestion": "Add `response_model=YourSchema` (a Pydantic model) to each route decorator so the response is typed, validated, and self-documented.",
+        "category": "API Contracts"
+      }
+    ]
+  },
+  "visualRegression": {
+    "score": 100,
+    "htmlFiles": 0,
+    "cssFiles": 0,
+    "findings": [
+      {
+        "severity": "low",
+        "title": "No UI files for visual regression",
+        "description": "No HTML/JSX/TSX or CSS files detected. Visual regression testing requires UI components.",
+        "fixSuggestion": "Visual regression tests are applicable to frontend applications with UI components.",
+        "category": "Visual Regression"
+      }
+    ]
+  },
+  "edgeCases": {
+    "score": 58,
+    "potentialCases": 22,
+    "findings": [
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (api/index.py:83)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "api/index.py",
+        "lineNumber": 83,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (api/index.py:269)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "api/index.py",
+        "lineNumber": 269,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (api/index.py:276)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "api/index.py",
+        "lineNumber": 276,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "high",
+        "title": "sql string interpolation (aina-out/barnboard/app/backup.py:33)",
+        "description": "SQL built with string interpolation (f-string / % / .format) in execute() — SQL-injection risk; use bound parameters.",
+        "filePath": "aina-out/barnboard/app/backup.py",
+        "lineNumber": 33,
+        "fixSuggestion": "Never build SQL by string interpolation. Use parameterized queries / bound parameters (`cursor.execute(sql, params)`) or the ORM query builder. F-strings, `%`, and `.format()` in execute() are SQL-injection vectors.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/main.py:127)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 127,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/main.py:128)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 128,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/main.py:44)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 44,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/main.py:1205)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1205,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/main.py:43)",
+        "description": "float(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 43,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/main.py:47)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 47,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/main.py:919)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 919,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "high",
+        "title": "sql string interpolation (aina-out/barnboard/app/app/main.py:1061)",
+        "description": "SQL built with string interpolation (f-string / % / .format) in execute() — SQL-injection risk; use bound parameters.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1061,
+        "fixSuggestion": "Never build SQL by string interpolation. Use parameterized queries / bound parameters (`cursor.execute(sql, params)`) or the ORM query builder. F-strings, `%`, and `.format()` in execute() are SQL-injection vectors.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "high",
+        "title": "sql string interpolation (aina-out/barnboard/app/app/main.py:1068)",
+        "description": "SQL built with string interpolation (f-string / % / .format) in execute() — SQL-injection risk; use bound parameters.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1068,
+        "fixSuggestion": "Never build SQL by string interpolation. Use parameterized queries / bound parameters (`cursor.execute(sql, params)`) or the ORM query builder. F-strings, `%`, and `.format()` in execute() are SQL-injection vectors.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "high",
+        "title": "sql string interpolation (aina-out/barnboard/app/app/main.py:1103)",
+        "description": "SQL built with string interpolation (f-string / % / .format) in execute() — SQL-injection risk; use bound parameters.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1103,
+        "fixSuggestion": "Never build SQL by string interpolation. Use parameterized queries / bound parameters (`cursor.execute(sql, params)`) or the ORM query builder. F-strings, `%`, and `.format()` in execute() are SQL-injection vectors.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "high",
+        "title": "sql string interpolation (aina-out/barnboard/app/app/main.py:1094)",
+        "description": "SQL built with string interpolation (f-string / % / .format) in execute() — SQL-injection risk; use bound parameters.",
+        "filePath": "aina-out/barnboard/app/app/main.py",
+        "lineNumber": 1094,
+        "fixSuggestion": "Never build SQL by string interpolation. Use parameterized queries / bound parameters (`cursor.execute(sql, params)`) or the ORM query builder. F-strings, `%`, and `.format()` in execute() are SQL-injection vectors.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/db.py:304)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/db.py",
+        "lineNumber": 304,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/db.py:439)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/db.py",
+        "lineNumber": 439,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/db.py:490)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/db.py",
+        "lineNumber": 490,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/db.py:218)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/db.py",
+        "lineNumber": 218,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/db.py:219)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/db.py",
+        "lineNumber": 219,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "medium",
+        "title": "int coercion unchecked (aina-out/barnboard/app/app/db.py:220)",
+        "description": "int(x) on non-literal input outside try/except — raises ValueError on bad input.",
+        "filePath": "aina-out/barnboard/app/app/db.py",
+        "lineNumber": 220,
+        "fixSuggestion": "Wrap `int(x)`/`float(x)` on external input in try/except ValueError, or validate first (Pydantic / explicit check). Bad input raises ValueError and crashes the request.",
+        "category": "Edge Cases"
+      },
+      {
+        "severity": "low",
+        "title": "loose equality (aina-out/barnboard/app/static/js/htmx.min.js:1)",
+        "description": "Loose equality (==) — use === / !== to avoid type-coercion surprises.",
+        "filePath": "aina-out/barnboard/app/static/js/htmx.min.js",
+        "lineNumber": 1,
+        "fixSuggestion": "Use `===` / `!==`. `== null` is the one accepted exception (and is allowed by this analyzer).",
+        "category": "Edge Cases"
+      }
+    ]
+  },
+  "propertyBased": {
+    "score": 50,
+    "invariantsDetected": 51,
+    "findings": [
+      {
+        "severity": "medium",
+        "title": "No property-based testing framework detected",
+        "description": "No `fast-check` / `jsverify` / `@fast-check/vitest` import found. Property-based testing generates inputs over a domain and asserts invariants — strong fit for parsers, encoders, math, and stateful reducers.",
+        "fixSuggestion": "Install `fast-check` and write a few `fc.assert(fc.property(fc.integer(), n => sortRoundTrip([n]) === [n]))`-style tests against your most invariant-heavy code.",
+        "category": "Property-Based Testing"
+      }
+    ]
+  },
+  "chaos": {
+    "score": 100,
+    "resilienceLevel": "High — application has graceful shutdown, error handler, and retry/timeout patterns.",
+    "findings": []
+  },
+  "mutation": {
+    "score": 39,
+    "estimatedMutationScore": 39,
+    "totalMutants": 317,
+    "killedMutants": 123,
+    "findings": [
+      {
+        "severity": "high",
+        "title": "Estimated mutation score: ~39% (heuristic)",
+        "description": "Inputs: 2 test files / 14 source files (ratio 0.14), 0 assertions (0 strong, 0 weak, 0 snapshot), 0 distinct strong-matcher type(s). ~123/317 candidate mutants likely killed. Run Stryker for the exact number.",
+        "fixSuggestion": "Boost the kill rate: replace `toBeTruthy()` with `toBe(specificValue)`, add boundary-condition tests, vary the matcher types you use.",
+        "category": "Mutation Testing"
+      },
+      {
+        "severity": "low",
+        "title": "Mutation testing tool not configured",
+        "description": "Stryker Mutator or similar not found in devDependencies. Install to get real mutation scores.",
+        "fixSuggestion": "npm install -D @stryker-mutator/core && npx stryker init",
+        "category": "Mutation Testing"
+      }
+    ]
+  },
+  "predictive": {
+    "score": 100,
+    "riskLevel": "Low — no concentrated risk in any single file.",
+    "predictedFailures": 0,
+    "findings": []
+  },
+  "supplyChain": {
+    "score": 58,
+    "knownVulnerable": 2,
+    "criticalVulns": 2,
+    "findings": [
+      {
+        "severity": "low",
+        "title": "No package-lock.json found",
+        "description": "Without a lockfile, every install can pull different transitive versions. Only direct-dep CVEs were checked.",
+        "fixSuggestion": "Commit a `package-lock.json` (npm), `pnpm-lock.yaml` (pnpm), or `yarn.lock` (yarn). Treat lockfile changes as security-sensitive in code review.",
+        "category": "Supply Chain"
+      },
+      {
+        "severity": "high",
+        "title": "jinja2@3.1.5 — 2 known vulnerabilities (OSV, PyPI)",
+        "description": "OSV reports 2 advisory/advisories affecting this exact version: GHSA-cpwx-vrp4-4pq7, PYSEC-2026-1471.",
+        "fixSuggestion": "Upgrade jinja2 past the affected range; details at https://osv.dev/vulnerability/GHSA-cpwx-vrp4-4pq7.",
+        "category": "Supply Chain"
+      },
+      {
+        "severity": "high",
+        "title": "python-multipart@0.0.20 — 14 known vulnerabilities (OSV, PyPI)",
+        "description": "OSV reports 14 advisory/advisories affecting this exact version: GHSA-5rvq-cxj2-64vf, GHSA-6jv3-5f52-599m, GHSA-mj87-hwqh-73pj, ….",
+        "fixSuggestion": "Upgrade python-multipart past the affected range; details at https://osv.dev/vulnerability/GHSA-5rvq-cxj2-64vf.",
+        "category": "Supply Chain"
+      }
+    ]
+  },
+  "nPlusOne": {
+    "score": 71,
+    "potentialNPlusOne": 2,
+    "findings": [
+      {
+        "severity": "high",
+        "title": "Potential N+1 Query in while",
+        "description": "`Ge.exec()` is invoked inside a `while` loop at aina-out/barnboard/app/static/js/htmx.min.js:1. Each iteration issues its own DB round-trip.\nLine: var htmx=function(){\"use strict\";const Q={onLoad:null,process:null,on:null,off:null,trigger:null,ajax:null,find:null,findAll:null,closest:nu",
+        "filePath": "aina-out/barnboard/app/static/js/htmx.min.js",
+        "lineNumber": 1,
+        "fixSuggestion": "Batch the query: pre-build the id list, fire one query with `WHERE id IN (...)`, or use eager-loading (`.include()` / `.populate()` / `JOIN`). For parallelisation only, wrap in `Promise.all([...].map(...))` so the round-trips overlap.",
+        "category": "N+1 Query"
+      },
+      {
+        "severity": "high",
+        "title": "Potential N+1 Query in while",
+        "description": "`We.exec()` is invoked inside a `while` loop at aina-out/barnboard/app/static/js/htmx.min.js:1. Each iteration issues its own DB round-trip.\nLine: var htmx=function(){\"use strict\";const Q={onLoad:null,process:null,on:null,off:null,trigger:null,ajax:null,find:null,findAll:null,closest:nu",
+        "filePath": "aina-out/barnboard/app/static/js/htmx.min.js",
+        "lineNumber": 1,
+        "fixSuggestion": "Batch the query: pre-build the id list, fire one query with `WHERE id IN (...)`, or use eager-loading (`.include()` / `.populate()` / `JOIN`). For parallelisation only, wrap in `Promise.all([...].map(...))` so the round-trips overlap.",
+        "category": "N+1 Query"
+      }
+    ]
+  },
+  "deadCode": {
+    "score": 100,
+    "unusedDeps": [],
+    "deadFunctions": 0,
+    "findings": []
+  },
+  "license": {
+    "score": 89,
+    "copyleftDeps": [],
+    "findings": [
+      {
+        "severity": "low",
+        "title": "License audit could not run — no node_modules/ found",
+        "description": "License compliance requires reading each installed package's `license` field, but no `node_modules/` directory was present.",
+        "fixSuggestion": "Run `npm install` (or your package manager's equivalent) before the analysis, or supply pre-installed dependencies. Without this, 0 declared deps are unchecked for license compatibility.",
+        "category": "License Compliance"
+      }
+    ]
+  },
+  "dora": {
+    "score": 30,
+    "deploymentFreq": "Capability: Weak — no CI workflows detected",
+    "leadTime": "Capability: Weak — no CI, manual review/test before merge",
+    "mttr": "Capability: Weak — no observability or structured logging detected",
+    "changeFailRate": "Capability: Partial — tests present, no feature-flag platform",
+    "findings": [
+      {
+        "severity": "high",
+        "title": "No CI/CD workflow detected",
+        "description": "No `.github/workflows/*.yml`, `.gitlab-ci.yml`, `.circleci/config.yml`, or similar found. Without automated CI, every change is gated by human attention only.",
+        "fixSuggestion": "Create `.github/workflows/ci.yml` running tests on push and PR. Add lint and type-check jobs. Block merge until all jobs pass.",
+        "category": "DORA Metrics"
+      },
+      {
+        "severity": "medium",
+        "title": "No observability dependency detected",
+        "description": "No Sentry / Datadog / NewRelic / OpenTelemetry / Honeycomb / Rollbar / Bugsnag dep. MTTR depends on knowing something broke before customers report it.",
+        "fixSuggestion": "Add error-tracking (Sentry is the easiest) and ideally a tracing stack (OpenTelemetry → Honeycomb / Datadog / Jaeger). Wire up alerts to a notification channel that humans actually read.",
+        "category": "DORA Metrics"
+      },
+      {
+        "severity": "low",
+        "title": "No feature-flag platform detected",
+        "description": "A test framework is in place, but no LaunchDarkly / Statsig / Unleash / Flagsmith / Growthbook / Posthog SDK was found. Feature flags decouple deploy from release, enabling kill-switches and staged rollouts — proven CFR reducer.",
+        "fixSuggestion": "For early-stage projects: Posthog has a free tier and is JS-SDK-only. For larger teams: LaunchDarkly / Statsig. Even a homegrown flags table beats no kill-switch.",
+        "category": "DORA Metrics"
+      },
+      {
+        "severity": "low",
+        "title": "No CODEOWNERS file detected",
+        "description": "No `.github/CODEOWNERS` (or `CODEOWNERS` / `docs/CODEOWNERS`). Code reviews route by chance; sensitive areas (auth, billing, infra) lack named approvers.",
+        "fixSuggestion": "Create `.github/CODEOWNERS` with at minimum: `*.tsx @ui-team`, `src/auth/ @security`, `infra/ @platform`. Make CODEOWNERS-required a branch protection rule.",
+        "category": "DORA Metrics"
+      }
+    ]
+  },
+  "owasp": {
+    "coverage": 80,
+    "coveredCategories": [
+      "A01:2021 — Broken Access Control",
+      "A02:2021 — Cryptographic Failures",
+      "A03:2021 — Injection",
+      "A04:2021 — Insecure Design",
+      "A05:2021 — Security Misconfiguration",
+      "A06:2021 — Vulnerable and Outdated Components",
+      "A07:2021 — Identification and Authentication Failures",
+      "A09:2021 — Security Logging and Monitoring Failures"
+    ],
+    "missingCategories": [
+      "A08:2021 — Software and Data Integrity Failures",
+      "A10:2021 — Server-Side Request Forgery"
+    ],
+    "findings": [
+      {
+        "severity": "low",
+        "title": "OWASP Top 10 analyzer coverage: 80% (8/10)",
+        "description": "TestForge ships rules for 8 of the 10 OWASP 2021 categories. Categories without dedicated rules yet: A08:2021 — Software and Data Integrity Failures, A10:2021 — Server-Side Request Forgery. These are gaps in the analyzer itself — your project may still have issues in these areas that this report won't surface.",
+        "fixSuggestion": "For the un-covered categories, complement TestForge with: dependency-track for A08 (software integrity), an SSRF-focused fuzzer or proxy-based runtime scan for A10. Track the gap in your threat model.",
+        "category": "OWASP Coverage"
+      },
+      {
+        "severity": "high",
+        "title": "A03:2021 — Injection: 3 finding(s)",
+        "description": "Severity breakdown: 0 critical, 3 high, 0 medium, 0 low. Detector categories that contributed: SQL Injection, XSS, Dangerous Functions, Open Redirect.",
+        "fixSuggestion": "Triage the underlying findings in the Security section. OWASP framing is a roll-up; act on the per-file findings.",
+        "category": "OWASP Coverage"
+      }
+    ]
+  },
+  "agentic": {
+    "score": 83,
+    "resilienceLevel": "Agent-Ready — Your API can handle 2000+ concurrent AI agents",
+    "maxPredictedAgents": 100,
+    "predictedBottleneck": "Database connection pool",
+    "failurePatterns": [
+      "Cache-less architecture means 10 agents searching = 10x DB load for identical queries",
+      "Auth endpoint saturation: agents refreshing tokens every request = 2x load amplification"
+    ],
+    "recommendations": [
+      "Implement token bucket rate limiting (100 req/min per agent identity)",
+      "Add Redis caching with 30s TTL for all GET endpoints",
+      "Increase database connection pool to 50+ with PgBouncer",
+      "Add Retry-After headers and 429 status codes",
+      "Implement circuit breaker for external API calls",
+      "Paginate all list endpoints (max 50 items per page)",
+      "Rate limit auth endpoints separately (5/min)",
+      "Monitor for agentic traffic patterns (bursty, exploratory, retry-heavy)"
+    ],
+    "findings": [
+      {
+        "severity": "high",
+        "title": "No Caching — Agents Will Repeat-Query Same Endpoints",
+        "description": "AI agents often re-query the same endpoints (list, search, detail). Without caching, every agent request hits the database — exponential load amplification.",
+        "fixSuggestion": "Add Redis caching with 30s TTL for list endpoints. Implement ETag/304 responses. Use CDN for static resources.",
+        "category": "Agentic Scale"
+      },
+      {
+        "severity": "high",
+        "title": "Auth Endpoints Not Rate Limited",
+        "description": "AI agents frequently re-authenticate (token refresh, retry on 401). Without auth rate limiting, agents can brute-force or DoS your auth system.",
+        "fixSuggestion": "Rate limit auth endpoints separately: 5 attempts/min per IP. Add account locking after 10 failures. Monitor for unusual auth patterns.",
+        "category": "Agentic Scale"
+      }
+    ]
+  },
+  "kubernetes": {
+    "applicable": false,
+    "score": 0,
+    "manifestsParsed": 0,
+    "documents": 0,
+    "kinds": {},
+    "findings": [],
+    "naReason": "No Kubernetes manifests or Helm charts found in the repo."
+  }
+}

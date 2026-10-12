@@ -129,3 +129,61 @@ def test_oc_apps_shared_guest_login(client):
         assert _db.authenticate(con, "guest-000101-abcd", password) is None  # expired issue date
     r = client.post("/login", data={"username": username, "password": password}, follow_redirects=False)
     assert r.status_code in (302, 303)
+
+
+# ── data exports + JSON API (TestForge-fix arc F0.3) ────────────────────────
+
+@pytest.fixture(scope="module")
+def authed(client):
+    c = TestClient(main.app)
+    r = c.post("/login", data={"username": "tester", "password": "testpass123"},
+               headers={"x-forwarded-for": "203.0.113.20"}, follow_redirects=False)
+    assert r.status_code == 303
+    return c
+
+
+def test_table_columns_binds_name(client):
+    with db.get_db() as con:
+        names = [c[1] for c in db.table_columns(con, "cows")]
+        assert {"id", "tag"} <= set(names)
+        assert db.table_columns(con, "cows; DROP TABLE cows") == []
+    assert set(db.EXPORT_SELECT) == set(db.EXPORT_TABLES)
+
+
+def test_export_csv_whitelist(authed):
+    r = authed.get("/export/cows.csv")
+    assert r.status_code == 200 and r.text.splitlines()[0].startswith("id")
+    assert authed.get("/export/users.csv").status_code == 404
+    assert authed.get("/export/sessions.csv").status_code == 404
+
+
+def test_api_v1_schema_and_table(authed):
+    s = authed.get("/api/v1/schema").json()
+    assert set(s["tables"]) == set(db.EXPORT_TABLES)
+    assert all(cols for cols in s["tables"].values())
+    t = authed.get("/api/v1/cows.json")
+    assert t.status_code == 200 and t.json()["table"] == "cows"
+    assert authed.get("/api/v1/users.json").status_code == 404
+
+
+# ── runtime: compression, cache headers, documented API (arc F2) ───────────
+
+def test_gzip_on_pages(authed):
+    r = authed.get("/", headers={"accept-encoding": "gzip"})
+    assert r.status_code == 200
+    assert r.headers.get("content-encoding") == "gzip"
+
+
+def test_api_get_is_privately_cacheable(authed):
+    for path in ("/api/v1/schema", "/api/v1/cows.json"):
+        assert authed.get(path).headers.get("cache-control") == "private, max-age=30"
+
+
+def test_openapi_documents_json_api(client):
+    paths = main.app.openapi()["paths"]
+    routes = [("/api/v1/schema", "get"), ("/api/v1/{table}.json", "get"),
+              ("/api/v1/demo-credentials", "post"), ("/api/v1/metrics", "get"),
+              ("/api/v1/metrics/{metric_id}", "get"), ("/api/v1/predict/yield/{cow_id}", "get")]
+    for path, verb in routes:
+        schema = paths[path][verb]["responses"]["200"]["content"]["application/json"]["schema"]
+        assert schema.get("$ref"), path

@@ -1,0 +1,29 @@
+{
+  "services": [
+    {"name": "TestForge-fix arc cockpit (this window)", "url": "http://127.0.0.1:6808", "manager": "pm2: phasedoc-testforge", "note": "shared cockpit code hub/phasedoc/cockpit.py"},
+    {"name": "MilkPost live twin", "url": "https://milkpost.ajaykongala.online", "manager": "Vercel (CLI deploys only)", "note": "F0.2 lands here"},
+    {"name": "MilkPost mirror repo", "url": "https://github.com/ajay-453/milkpost", "manager": "tools/mirror_repos.sh milkpost (user-run)", "note": "what testforge.run scans"},
+    {"name": "testforge.run", "url": "https://testforge.run", "manager": "external SaaS", "note": "scanner used for before/after"},
+    {"name": "Gap-Closure arc cockpit", "url": "http://127.0.0.1:6792", "manager": "pm2: phasedoc-gaps", "note": "previous MilkPost arc (closed); G3.3 holds the rate-limit decision"}
+  ],
+  "documents": [
+    {"name": "Plan of record (incl. not-fixed list)", "path": "phasedoc-testforge/plan-of-record.md"},
+    {"name": "Architecture", "path": "phasedoc-testforge/architecture.md"},
+    {"name": "Buildplan mirror (generated)", "path": "phasedoc-testforge/buildplan.md"},
+    {"name": "Scan before (raw JSON)", "path": "phasedoc-testforge/scans/before-2026-10-12.json"},
+    {"name": "Triage doc (Claude Docs)", "path": "https://claude.ai/code/artifact/c041d671-16be-4f27-8bf8-cadded246e06"},
+    {"name": "TestForge analysis doc", "path": "https://claude.ai/code/artifact/6f3643ff-16fa-4c1c-857a-ca34775c20e0"}
+  ],
+  "code": [
+    {"name": "Plan script (this arc)", "path": "phasedoc-testforge/plan.py"},
+    {"name": "Cockpit (shared, one codebase)", "path": "phasedoc/cockpit.py"},
+    {"name": "App code", "path": "aina-out/barnboard/app/app/"},
+    {"name": "Vercel entry", "path": "api/index.py"},
+    {"name": "Mirror script", "path": "tools/mirror_repos.sh"}
+  ],
+  "ports": {
+    "6808": "phasedoc cockpit — MilkPost TestForge-fix arc",
+    "8321": "MilkPost (Barnboard) app",
+    "6792": "phasedoc cockpit — Gap-Closure arc (closed)"
+  }
+}

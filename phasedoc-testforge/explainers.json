@@ -1,0 +1,6 @@
+{
+  "F0": "Security: upgrade jinja2 (3.1.5 to 3.1.6) and python-multipart (0.0.20 to 0.0.32), which have published advisories, in both requirements files, and ship to the live twin with vercel --prod. Also replace the whitelisted-table f-string SQL in main.py and backup.py with literal queries and pragma_table_info(?), so the pattern can't become a real injection later.",
+  "F1": "Mirror hygiene: the milkpost repo is cut from the hub with git-filter-repo, so it lacks the README, CI and pinned deps the hub has. Add a root README (renamed during the cut), a MilkPost-only CI workflow, coverage measurement and a hash-locked requirements file, then the user re-runs the mirror.",
+  "F2": "Runtime: gzip compression, a 30-second private Cache-Control on the read-only /api/v1 JSON routes, declared response schemas for those five routes in the OpenAPI document, and the user's yes/no on error tracking (Sentry).",
+  "F3": "Close-out: re-scan github.com/ajay-453/milkpost on testforge.run, save the report next to the first, and write a before/after comparison. The arc closes at zero SQL-injection and zero supply-chain findings, with README and CI detected."
+}

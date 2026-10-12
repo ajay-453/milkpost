@@ -20,11 +20,12 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from . import db, i18n
+from . import api_models as api, db, i18n
 
 APP_NAME = os.environ.get("APP_NAME", "MilkPost")
 APP_TAGLINE = os.environ.get("APP_TAGLINE", "Your dairy farm's daily command center.")
@@ -32,6 +33,7 @@ CURRENCY = os.environ.get("CURRENCY", "₹")  # ₹ — override for other marke
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 app = FastAPI(title=APP_NAME)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
@@ -176,7 +178,11 @@ async def require_login(request: Request, call_next):
             user = db.session_user(con, request.cookies.get(SESSION_COOKIE))
             expected = db.feed_token(con)
         if user or (tok and expected and secrets.compare_digest(tok, expected)):
-            return await call_next(request)
+            resp = await call_next(request)
+            if request.method == "GET":
+                # Read-only data: let the consumer reuse it briefly, never a shared cache.
+                resp.headers.setdefault("Cache-Control", "private, max-age=30")
+            return resp
         return Response(json.dumps({"error": "unauthorized"}), status_code=401,
                         media_type="application/json")
     with db.get_db() as con:
@@ -1058,14 +1064,14 @@ def export_csv(table: str):
     if table not in db.EXPORT_TABLES:
         return PlainTextResponse("unknown table", status_code=404)
     with db.get_db() as con:
-        rows = con.execute(f"SELECT * FROM {table}").fetchall()  # table from whitelist
+        rows = con.execute(db.EXPORT_SELECT[table]).fetchall()
     buf = io.StringIO()
     writer = csv.writer(buf)
     if rows:
         writer.writerow(rows[0].keys())
         writer.writerows([list(r) for r in rows])
     else:
-        cols = [c[1] for c in con.execute(f"PRAGMA table_info({table})").fetchall()]
+        cols = [c[1] for c in db.table_columns(con, table)]
         writer.writerow(cols)
     return Response(buf.getvalue(), media_type="text/csv",
                     headers={"Content-Disposition": f'attachment; filename="{table}.csv"'})
@@ -1084,23 +1090,23 @@ def _json(payload: dict, status: int = 200) -> Response:
                     media_type="application/json")
 
 
-@app.get("/api/v1/schema")
+@app.get("/api/v1/schema", response_model=api.SchemaOut)
 def api_schema():
     tables = {}
     with db.get_db() as con:
         for t in db.EXPORT_TABLES:
             tables[t] = [
                 {"name": c[1], "type": c[2], "notnull": bool(c[3]), "pk": bool(c[5])}
-                for c in con.execute(f"PRAGMA table_info({t})").fetchall()]  # t from whitelist
+                for c in db.table_columns(con, t)]
     return _json({"schema_version": DATA_SCHEMA_VERSION, "tables": tables})
 
 
-@app.get("/api/v1/{table}.json")
+@app.get("/api/v1/{table}.json", response_model=api.TableOut)
 def api_table(table: str):
     if table not in db.EXPORT_TABLES:
         return _json({"error": "unknown table"}, 404)
     with db.get_db() as con:
-        rows = [dict(r) for r in con.execute(f"SELECT * FROM {table}").fetchall()]
+        rows = [dict(r) for r in con.execute(db.EXPORT_SELECT[table]).fetchall()]
     return _json({"schema_version": DATA_SCHEMA_VERSION, "table": table,
                   "row_count": len(rows), "rows": rows})
 
@@ -1110,7 +1116,7 @@ def api_table(table: str):
 # requests demo access: issues a disposable login that self-destructs after
 # two logouts. Never listed in /team pages beyond its short life.
 
-@app.post("/api/v1/demo-credentials")
+@app.post("/api/v1/demo-credentials", response_model=api.DemoCredentialsOut)
 def api_demo_credentials():
     with db.get_db() as con:
         username, password = db.create_temp_user(con)
@@ -1173,7 +1179,7 @@ def _golden_sql(m: dict, by: str | None) -> str | None:
     return f'SELECT {expr} AS "{m["metric"]}" FROM "{table}"'
 
 
-@app.get("/api/v1/metrics")
+@app.get("/api/v1/metrics", response_model=api.MetricsOut)
 def api_metrics():
     defs = _metric_defs()
     return _json({"schema_version": DATA_SCHEMA_VERSION, "count": len(defs), "metrics": [
@@ -1183,7 +1189,7 @@ def api_metrics():
         for k, v in sorted(defs.items())]})
 
 
-@app.get("/api/v1/metrics/{metric_id}")
+@app.get("/api/v1/metrics/{metric_id}", response_model=api.MetricOut)
 def api_metric(metric_id: str, by: str = ""):
     m = _metric_defs().get(metric_id)
     if not m:
@@ -1241,7 +1247,7 @@ def _holt_path(level: float, trend: float, horizon: int, damp: float) -> list[fl
     return out
 
 
-@app.get("/api/v1/predict/yield/{cow_id}")
+@app.get("/api/v1/predict/yield/{cow_id}", response_model=api.YieldForecastOut)
 def api_predict_yield(cow_id: int, days: int = 7):
     model = _load_yield_model()
     if not model:

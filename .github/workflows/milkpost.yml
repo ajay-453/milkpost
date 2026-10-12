@@ -1,0 +1,37 @@
+name: milkpost
+# MilkPost only. Travels with the ajay-453/milkpost mirror (tools/mirror_repos.sh);
+# in the hub it runs only when MilkPost files change.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "aina-out/barnboard/**"
+      - "api/**"
+      - "data-team-out/barnboard/**"
+      - "semantic-metrics/**"
+      - "models/**"
+      - "data/**"
+      - "tools/train_models.py"
+      - "requirements.txt"
+      - "requirements.lock"
+      - ".github/workflows/milkpost.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install locked dependencies (hash-checked)
+        run: |
+          pip install --require-hashes -r requirements.lock
+          pip install pytest pytest-cov httpx
+      - name: Test suite with coverage
+        working-directory: aina-out/barnboard/app
+        run: python -m pytest -q --cov=app --cov-report=term
+      - name: Model baseline gate (trainer exits non-zero if Holt stops beating naive)
+        run: python tools/train_models.py

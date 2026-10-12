@@ -23,6 +23,16 @@ from datetime import datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("DB_PATH", os.path.join(HERE, "barnboard.db"))
 TABLES = ["cows", "milk_logs", "treatments", "breedings", "sales", "users", "sessions"]
+# One literal query per table: no table name is ever formatted into SQL.
+COUNT_SQL = {
+    "cows": "SELECT COUNT(*) FROM cows",
+    "milk_logs": "SELECT COUNT(*) FROM milk_logs",
+    "treatments": "SELECT COUNT(*) FROM treatments",
+    "breedings": "SELECT COUNT(*) FROM breedings",
+    "sales": "SELECT COUNT(*) FROM sales",
+    "users": "SELECT COUNT(*) FROM users",
+    "sessions": "SELECT COUNT(*) FROM sessions",
+}
 
 
 def counts(path: str) -> dict:
@@ -30,7 +40,7 @@ def counts(path: str) -> dict:
     out = {}
     for t in TABLES:
         try:
-            out[t] = con.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+            out[t] = con.execute(COUNT_SQL[t]).fetchone()[0]
         except sqlite3.Error:
             out[t] = "-"
     con.close()

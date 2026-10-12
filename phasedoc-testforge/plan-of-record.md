@@ -1,0 +1,81 @@
+# MilkPost TestForge-fix (F) arc — Plan of Record
+
+Internal, builders-facing. Started 2026-10-12. The MilkPost repo
+(github.com/ajay-453/milkpost) was scanned on testforge.run; the raw report is
+[scans/before-2026-10-12.json](scans/before-2026-10-12.json). Every finding was
+checked against the code in the hub (`aina-out/barnboard/app`, `api/index.py`,
+commit 174ddf1). Of 50 findings, **2 are real security issues**, **7 are real
+but low-risk gaps**, and **41 are false positives or don't apply**. This arc fixes
+the real ones and proves it with a re-scan. Nothing is pre-ticked.
+
+Triage write-up (shareable doc): https://claude.ai/code/artifact/c041d671-16be-4f27-8bf8-cadded246e06
+
+## F0 — Security
+
+Two dependencies pinned in both `requirements.txt` files have published
+advisories. jinja2 3.1.5 has two (GHSA-cpwx-vrp4-4pq7, PYSEC-2026-1471);
+python-multipart 0.0.20, which parses every login and form post, has fourteen.
+They move to 3.1.6 and 0.0.32. A pip-audit (Python dependency vulnerability
+check) run catches anything transitive, such as starlette under fastapi.
+The upgrade then ships to the live twin with `vercel --prod` (pushes don't deploy).
+
+The three "SQL injection" findings are false positives. The table name is
+checked against a fixed five-name whitelist before it reaches the f-string, and
+anything else gets a 404. We still remove the f-strings: one literal query per
+table, plus the bound form `pragma_table_info(?)`. That makes a future edit
+safe by construction and clears nine findings.
+
+## F1 — Mirror hygiene
+
+Most of the remaining real findings come from packaging, not code. The hub
+already has a README, a CI workflow that runs the MilkPost tests, and pinned
+deps. The mirror is cut with git-filter-repo from a fixed path list
+(`MILKPOST_PATHS`), so it carries none of them. This phase adds a root README
+(renamed into place during the cut) and a MilkPost-only CI workflow inside the
+mirrored paths. It also adds coverage measurement (the scan reported 0%
+because nothing measured it; there are 27 tests with 62 asserts) and a
+hash-locked dependency file. The re-mirror itself has to be run by the user,
+because the auto-mode classifier blocks Claude from running git-filter-repo.
+
+## F2 — Runtime
+
+Small improvements prompted by the scan's generic load advice, kept only
+where they fit a SQLite-backed demo: gzip compression, a short `Cache-Control`
+on the read-only `/api/v1` JSON routes, and declared response schemas for
+those five routes so the OpenAPI document describes them. The 43 HTML routes
+are left alone. Error tracking (Sentry or similar) is the user's call: the leaf
+closes either with it wired and a test exception seen, or with "declined" and a
+reason written here.
+
+**Decision (2026-10-12, user): error tracking declined for now.** MilkPost is
+a solo-maintained demo; Vercel function logs and the local pm2 logs are enough,
+and Sentry would add a dependency and an external account. Revisit if MilkPost
+gets real users or a second maintainer.
+
+The login rate limit is in-memory, so each serverless instance counts
+separately. That trade-off was already recorded as a decision in the
+Gap-Closure arc (G3.3), so it gets no leaf here.
+
+## F3 — Close-out
+
+After the re-mirror, scan the repo again on testforge.run and save the report
+next to the first. The arc closes when SQL injection and supply-chain advisories
+are at zero and the README and CI findings are gone. A short before/after
+comparison names every finding still present, each with its triage verdict.
+
+## Deliberately not fixed (41 findings)
+
+| Finding group | Count | Why no task |
+| --- | --- | --- |
+| SQL injection / OWASP A03 / SQL interpolation | 9 | Whitelisted or hardcoded table names (F0.3/F0.4 removes the pattern anyway) |
+| `int()`/`float()` unchecked | 16 | Env-var defaults, sha256 hex slices, `time.time()`, FastAPI-validated `Form(int)` |
+| htmx.min.js: N+1 and loose equality | 3 | Minified vendored library, not a database |
+| Mutation ~39% | 2 | Analyzer counted 0 assertions; it reads only JS matchers (tests have 62 asserts) |
+| No API versioning | 1 | `/api/v1/*` exists |
+| Auth not rate limited | 1 | `POST /login` has a per-IP sliding window (5 per 60 s) |
+| No caching for agents | 1 | Partly addressed by F2.2; no Redis for SQLite |
+| Feature flags ×2, product analytics, CODEOWNERS | 4 | Wrong scale for a solo-maintained demo |
+| Property-based, visual regression, license, OWASP analyzer coverage | 4 | JS-only checks or notes about the analyzer itself |
+
+The report's accessibility score of 100 is hollow: the analyzer found 0 HTML
+files and skipped the Jinja templates. It is not evidence either way.

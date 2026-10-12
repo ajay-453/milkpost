@@ -18,6 +18,8 @@ import sys
 VERDICTS = [
     ("SQL Injection", "false positive (whitelisted table), pattern removed in F0.3"),
     ("sql string interpolation", "false positive (hardcoded table list), pattern removed in F0.3/F0.4"),
+    ("check_coverage.py", "real, very low: CI-only script; a malformed coverage.xml fails with a traceback "
+     "instead of a message (F4.5)"),
     ("int coercion", "false positive: env defaults, time.time(), hex-digest slices, typed Form(int), internal metric config (all re-checked on the after scan)"),
     ("loose equality", "false positive: vendored htmx.min.js"),
     ("N+1", "false positive: vendored htmx.min.js"),

@@ -128,3 +128,18 @@ check all three.
 | Feature flags ×2, analytics, CODEOWNERS | Wrong scale for a solo demo |
 | License, visual regression, OWASP coverage, package-lock | JS-only checks or notes about the analyzer |
 | htmx.min.js N+1 ×2, loose equality | Vendored minified library |
+
+## F4 result (second re-scan 2026-10-12, 10:06 UTC)
+
+Report: [scans/after2-2026-10-12.md](scans/after2-2026-10-12.md). Overall
+score went from 78 to 83. Unit Tests went from 0 to 71: the scanner now reads the
+committed `coverage.xml` (71.43%) instead of guessing. The type-check finding
+is gone and DORA rose 55 → 65. There are still 37 findings: one left, one
+arrived. The 17 int-coercion flags are the same sites as before, shifted down
+one line by the new `typing` import, plus one new site: `check_coverage.py:18`,
+the stale-guard script added in F4.3. It reads the report's `line-rate` with
+a bare `float()`, so a malformed file fails CI with a Python traceback instead
+of a sentence. CI still fails either way, so the risk is very low. It's real
+and takes five lines, so it gets leaf F4.5. Everything else is on the
+not-fixed lists above. Comparisons: [compare.md](scans/compare.md) (first scan →
+latest), [compare-r1.md](scans/compare-r1.md), [compare-r2.md](scans/compare-r2.md).

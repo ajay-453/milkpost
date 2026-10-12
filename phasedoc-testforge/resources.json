@@ -53,8 +53,16 @@
       "path": "phasedoc-testforge/scans/after-2026-10-12.md"
     },
     {
-      "name": "Before/after comparison",
+      "name": "Before/after comparison (first scan -> latest)",
       "path": "phasedoc-testforge/scans/compare.md"
+    },
+    {
+      "name": "Scan after F4 (Markdown export)",
+      "path": "phasedoc-testforge/scans/after2-2026-10-12.md"
+    },
+    {
+      "name": "Round comparisons",
+      "path": "phasedoc-testforge/scans/compare-r1.md, compare-r2.md"
     },
     {
       "name": "Triage doc (Claude Docs)",

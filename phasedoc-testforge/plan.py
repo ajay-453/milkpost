@@ -114,7 +114,10 @@ TASKS = [
     ("F4.4", "F4", "Re-scan and refresh the comparison",
      "after a re-mirror, a new scan saved under scans/; no 'type-check' finding; Unit Tests reads Measured "
      ">= 60% from coverage.xml; SQL-injection and known-vulnerable still 0; scans/compare.md regenerated "
-     "with no untriaged rows", "verify", "open"),
+     "with no untriaged rows", "verify", "open"),    # added 2026-10-12 from the second re-scan (scans/after2-2026-10-12.md)
+    ("F4.5", "F4", "check_coverage.py: clear error on a malformed report",
+     "check_coverage.py exits 1 with a one-line message (no traceback) for a missing file, non-XML, and a "
+     "root without line-rate; exits 0 on the real coverage.xml; both workflows green", "ci", "open"),
 ]
 
 SCHEMA = """

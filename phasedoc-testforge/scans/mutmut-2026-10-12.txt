@@ -1,0 +1,56 @@
+MilkPost mutation test (TestForge-fix arc F5.2), 2026-10-12
+Tool: mutmut 3.8.0 over aina-out/barnboard/app/app/db.py; suite = test_auth_flows, test_barnboard, test_farm_flows
+(test_data_platform excluded: it imports hub tools/ by relative path, absent in the scratch copy)
+
+Mutants: 1288  killed 805  survived 218  no tests 265
+Score, mutants the tests reach: 805/1023 = 78.7%
+Score, all mutants:             805/1288 = 62.5%
+
+Withholding core (decides when a treated cow's milk may go to the tank):
+  withhold_clear_date          killed 4
+  active_withholdings          killed 21
+  withheld_cow_ids             killed 6
+
+Per function (sorted by survivors + no tests):
+  seed_demo                        killed   0  survived   0  no tests 217
+  heat_watch                       killed  50  survived  47  no tests   0
+  yield_drop_alerts                killed  49  survived  45  no tests   0
+  _read_stateless_token            killed   0  survived   0  no tests  30
+  _migrate_users                   killed  26  survived  26  no tests   0
+  _temp_password_for               killed  20  survived  22  no tests   0
+  _make_stateless_token            killed   0  survived   0  no tests  18
+  daily_totals                     killed  33  survived  11  no tests   0
+  create_temp_user                 killed  29  survived   9  no tests   0
+  init_db                          killed  12  survived   7  no tests   0
+  reset_locked_minutes             killed  19  survived   7  no tests   0
+  burn_temp_logout                 killed  26  survived   6  no tests   0
+  _oc_guest_password               killed   8  survived   6  no tests   0
+  consume_reset                    killed  28  survived   6  no tests   0
+  try_security_reset               killed  78  survived   6  no tests   0
+  set_setting                      killed   5  survived   5  no tests   0
+  authenticate                     killed 120  survived   5  no tests   0
+  create_reset                     killed  20  survived   3  no tests   0
+  session_logs                     killed  10  survived   3  no tests   0
+  table_columns                    killed   5  survived   2  no tests   0
+  hash_password                    killed  13  survived   1  no tests   0
+  inserted_id                      killed   4  survived   1  no tests   0
+  get_db                           killed   7  survived   0  no tests   0
+  get_setting                      killed  12  survived   0  no tests   0
+  feed_token                       killed  12  survived   0  no tests   0
+  verify_password                  killed  25  survived   0  no tests   0
+  has_users                        killed   8  survived   0  no tests   0
+  create_user                      killed  22  survived   0  no tests   0
+  _stateless_secret                killed  10  survived   0  no tests   0
+  create_session                   killed  30  survived   0  no tests   0
+  session_user                     killed  21  survived   0  no tests   0
+  owner_count                      killed   6  survived   0  no tests   0
+  reset_user                       killed   8  survived   0  no tests   0
+  _norm_answer                     killed   5  survived   0  no tests   0
+  set_security                     killed  12  survived   0  no tests   0
+  get_recovery                     killed  14  survived   0  no tests   0
+  delete_session                   killed   7  survived   0  no tests   0
+  parse_date                       killed   2  survived   0  no tests   0
+  withhold_clear_date              killed   4  survived   0  no tests   0
+  active_withholdings              killed  21  survived   0  no tests   0
+  withheld_cow_ids                 killed   6  survived   0  no tests   0
+  upcoming_calvings                killed  18  survived   0  no tests   0

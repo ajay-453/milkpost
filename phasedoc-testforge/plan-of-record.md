@@ -181,3 +181,20 @@ so Vercel's function logs become searchable by path and status) with no
 external account. This keeps to the F2.4 reasoning and is worth +15. The
 other 20 points need Sentry and a feature-flag service, which stay declined.
 The honest ceiling is 80.
+
+### F5 results (2026-10-12)
+
+- **Coverage 71% → 88%** (main.py 92%, db.py 73%), with the CI floor at 75%.
+  Writing the auth tests found a **real bug**: removing a team member who had
+  an unused password-reset link hit the `password_resets` foreign key and
+  returned a 500. Removal now deletes the member's reset links along with their
+  sessions, and a regression test covers it.
+- **Real mutation score** ([scans/mutmut-2026-10-12.txt](scans/mutmut-2026-10-12.txt)):
+  mutmut generated 1,288 mutants in `db.py`. The tests killed 805 and 218
+  survived, so 78.7% of the mutants the tests reach were caught. Another 265 sit
+  in code no test runs, mostly `seed_demo`. The withholding core is 31/31 killed.
+  The weakest functions are the dashboard alerts `heat_watch` and
+  `yield_drop_alerts`, at about 50% each. They're candidates for later.
+- **JSON request logs** are live on Vercel and in pm2. They log the route
+  template, never raw paths that carry tokens, and print a JSON traceback on
+  errors. The FK bug above showed up in this format during its reproduction.

@@ -210,7 +210,7 @@ def create_user(con: sqlite3.Connection, username: str, password: str,
         "VALUES (?,?,?,?,?)",
         (username, hash_password(password), datetime.now().isoformat(timespec="seconds"),
          role, 1 if approved else 0))
-    return cur.lastrowid
+    return inserted_id(cur)
 
 
 _TEMP_WORDS = ("milk", "calf", "barn", "gir", "moo", "hay", "churn", "ghee")
@@ -487,6 +487,13 @@ def iso(d: date) -> str:
     return d.isoformat()
 
 
+def inserted_id(cur: sqlite3.Cursor) -> int:
+    """Row id from a just-run INSERT (sqlite3 types lastrowid as optional)."""
+    if cur.lastrowid is None:
+        raise RuntimeError("INSERT produced no row id")
+    return cur.lastrowid
+
+
 def parse_date(s: str | None, default: date | None = None) -> date | None:
     if not s:
         return default
@@ -664,7 +671,7 @@ def seed_demo(con: sqlite3.Connection, today: date) -> None:
         cur = con.execute(
             "INSERT INTO cows (tag, name, breed, dob, status) VALUES (?,?,?,?,?)",
             (tag, name, breed, iso(dob), status))
-        ids[tag] = cur.lastrowid
+        ids[tag] = inserted_id(cur)
     for day_off in range(21, -1, -1):
         d = today - timedelta(days=day_off)
         for tag, name, _breed, status, base in _SEED_COWS:

@@ -29,9 +29,15 @@ jobs:
       - name: Install locked dependencies (hash-checked)
         run: |
           pip install --require-hashes -r requirements.lock
-          pip install pytest pytest-cov httpx
-      - name: Test suite with coverage
+          pip install pytest pytest-cov httpx mypy
+      - name: Type check (mypy)
         working-directory: aina-out/barnboard/app
-        run: python -m pytest -q --cov=app --cov-report=term
+        run: mypy --ignore-missing-imports -p app
+      - name: Test suite with coverage (floor 60%)
+        working-directory: aina-out/barnboard/app
+        run: python -m pytest -q --cov=app --cov-report=term --cov-report=xml:/tmp/fresh.xml --cov-fail-under=60
+      - name: Committed coverage.xml is current
+        working-directory: aina-out/barnboard/app
+        run: python check_coverage.py coverage.xml /tmp/fresh.xml
       - name: Model baseline gate (trainer exits non-zero if Holt stops beating naive)
         run: python tools/train_models.py

@@ -38,13 +38,16 @@ Open http://localhost:8000. The first visit offers to create the owner account.
 
 ```bash
 cd aina-out/barnboard/app
-pip install pytest pytest-cov httpx
-python -m pytest -q --cov=app
+pip install pytest pytest-cov httpx mypy
+mypy --ignore-missing-imports -p app
+python -m pytest -q --cov=app --cov-report=xml:coverage.xml
 ```
 
-CI (`.github/workflows/milkpost.yml`) runs the same suite with coverage, plus
-`tools/train_models.py`, which fails if the forecast stops beating the naive
-baseline.
+CI (`.github/workflows/milkpost.yml`) runs mypy, then the suite with a 60%
+coverage floor. It also checks that the committed `coverage.xml` is within one
+point of a fresh run (`check_coverage.py`), so refresh it with the last command
+above whenever tests or code change. Finally it runs `tools/train_models.py`,
+which fails if the forecast stops beating the naive baseline.
 
 ## Deploy
 

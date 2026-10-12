@@ -18,6 +18,7 @@ import os
 import secrets
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, Form, Request
 from fastapi.middleware.gzip import GZipMiddleware
@@ -51,7 +52,7 @@ def inr_format(n: float, decimals: int = 0) -> str:
     s = str(whole)
     if len(s) > 3:
         head, tail = s[:-3], s[-3:]
-        parts = []
+        parts: list[str] = []
         while len(head) > 2:
             parts.insert(0, head[-2:])
             head = head[:-2]
@@ -209,7 +210,7 @@ _ICONS = {
     "team": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.2 3.4-5 6.5-5s5.7 1.8 6.5 5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M16.5 15.2c2.6.3 4.4 1.8 5 4.3"/></svg>',
 }
 
-NAV = [
+NAV: list[dict[str, Any]] = [
     {"key": "dashboard", "label": "Dashboard", "href": "/", "icon": _ICONS["grid"]},
     {"key": "milk", "label": "Milk Log", "href": "/milk", "icon": _ICONS["drop"]},
     {"key": "cows", "label": "Herd", "href": "/cows", "icon": _ICONS["cow"]},
@@ -819,7 +820,7 @@ def create_cow(request: Request, tag: str = Form(...), name: str = Form(""),
         cur = con.execute(
             "INSERT INTO cows (tag, name, breed, dob, status) VALUES (?,?,?,?,?)",
             (tag, name.strip(), breed.strip(), dob or None, status))
-        html = _cow_row_html(request, con, cur.lastrowid)
+        html = _cow_row_html(request, con, db.inserted_id(cur))
     return _toast(html, f"Added #{tag} {name.strip()}".strip())
 
 
@@ -851,7 +852,7 @@ def _milk_page_data(con, log_date: date, session: str):
 
 @app.get("/milk", response_class=HTMLResponse)
 def milk_page(request: Request, d: str | None = None, session: str | None = None):
-    log_date = db.parse_date(d, date.today())
+    log_date = db.parse_date(d) or date.today()
     if session not in ("AM", "PM"):
         session = "AM" if datetime.now().hour < 12 else "PM"
     with db.get_db() as con:
@@ -1209,6 +1210,7 @@ def api_metric(metric_id: str, by: str = ""):
     finally:
         con.close()
     rnd = int(m.get("round", 2))
+    value: Any
     if dim:
         value = [[r[0], round(r[1], rnd) if r[1] is not None else None] for r in rows]
     else:

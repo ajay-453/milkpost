@@ -232,3 +232,36 @@ was added only to match a scanner rule.
 Ratio note: splitting the tests raises TestForge's number without changing a
 single test. We did it because per-feature files are easier to work in, and
 we say so here. The test content was moved as-is.
+
+## F7 — STE skill (Simplified Technical English)
+
+The user asked for a global skill that writes in Simplified Technical English
+(STE). STE comes from the ASD-STE100 specification. Each word has one meaning,
+and each sentence gives one fact or one instruction. The goal is output that
+the reader cannot read in two ways, as with fenced code.
+
+The skill is in `~/.claude/skills/ste`. It has a `SKILL.md`, three word lists
+and a checker, `ste_check.py`, with 14 tests. The word list is our own list,
+based on ASD-STE100. It is not the official ASD dictionary.
+
+**Calibration (F7.3).** We ran the checker on three real texts. Then we wrote
+each text again in STE and ran the checker again. The samples are in `ste/`.
+
+| Text | Words approved | Long sentences | Passive | -ing | Contractions | Result |
+| --- | --- | --- | --- | --- | --- | --- |
+| plan-of-record.md (this file, F0 to F6) | 84.8% | 11 | 13 | 21 | 10 | FAIL |
+| MilkPost README, original | 88.0% | 2 | 2 | 3 | 0 | FAIL |
+| MilkPost README, STE | 100% | 0 | 0 | 0 | 0 | PASS |
+| Agent summary, original | 96.6% | 0 | 2 | 2 | 1 | FAIL |
+| Agent summary, STE | 100% | 0 | 0 | 0 | 0 | PASS |
+
+Normal text gets 84 to 97% approved words. Thus a limit of 80/20 by words does
+not change the text. The rules show the difference. The decision:
+
+<!-- ste:strict -->
+- Strict zones: 100% approved or technical words. 0 rule errors.
+- Strict zones are task lists, acceptance tests, actions, procedures, logs, events, choices and warnings.
+- Prose zones: a minimum of 90% approved or technical words.
+- Prose zones: a maximum of 25 words in a sentence. No contractions.
+- Prose zones: a maximum of 1 passive or -ing form in 10 sentences.
+<!-- ste:end -->

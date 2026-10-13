@@ -71,6 +71,12 @@ from task state (grey = untouched, amber = in progress, green = done and verifie
   <text class="sub" x="538" y="258">README + CI detected</text>
   <text class="sub" x="538" y="273">scans/compare.md</text>
 
+  <rect id="comp-ste" class="box" x="524" y="306" width="162" height="90" rx="8" fill="#e5e7eb"/>
+  <text class="lbl" x="538" y="328">STE skill (F7)</text>
+  <text class="sub" x="538" y="346">~/.claude/skills/ste</text>
+  <text class="sub" x="538" y="361">word lists · ste_check.py</text>
+  <text class="sub" x="538" y="376">strict zones 100% · prose 80/20</text>
+
   <path class="arrow" d="M254 94 H280 V230 H302"/>
   <path class="arrow" d="M254 185 H280"/>
   <path class="arrow" d="M254 269 H280"/>

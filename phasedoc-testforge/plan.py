@@ -124,6 +124,15 @@ TASKS = [
     ('F5.2', 'F5', 'Real mutation testing (mutmut) on the withholding core', 'mutmut run over app/db.py; results saved under scans/mutmut-<date>.txt with the real score; every surviving mutant in withhold_clear_date / withheld_cow_ids / active_withholdings is killed by a new test or listed as equivalent with a reason in plan-of-record', 'verify', 'open'),
     ('F5.3', 'F5', 'Structured JSON request logs (python-json-logger)', 'one JSON log line per request (method, path, status, duration_ms, request id) and JSON tracebacks on errors, to stdout only (no external service); a test asserts the record; requirements.lock regenerated with hashes, pip-audit clean; deployed and a JSON line seen in Vercel logs', 'ops', 'open'),
     ('F5.4', 'F5', 'Re-mirror and re-scan', 'after the user re-mirrors, a new scan saved under scans/: Unit Tests >= 80, DORA 80 (structured logging detected), no new untriaged findings in compare.md', 'verify', 'open'),
+
+    # ── F6 Target scores (added 2026-10-13: user asked for Unit 100, DORA 100/80, Mutation 80) ──
+    ('F6', '', 'Target scores — Unit 100, DORA 90, Mutation 80+ (honest routes only)', '', '', 'open'),
+    ('F6.1', 'F6', 'Line coverage 100% of the app package', 'pytest --cov=app --cov-fail-under=100 passes locally and in both workflows; every `pragma: no cover` (if any) listed with its reason in plan-of-record; coverage.xml refreshed', 'ci', 'open'),
+    ('F6.2', 'F6', 'Prometheus metrics endpoint (DORA observability)', 'prometheus-fastapi-instrumentator instruments the app; GET /metrics serves Prometheus text to an owner session or a METRICS_TOKEN bearer, 303/401 otherwise (tests); lock regenerated, pip-audit clean; deployed, live /metrics with the token returns http_requests_total', 'ops', 'open'),
+    ('F6.3', 'F6', 'Client JS: tested helpers + palette XSS fix', 'palette/theme logic moved to static/js/ui.js (browser global + CommonJS); palette labels HTML-escaped (a cow named <img onerror> renders as text, test); vitest tests in 2 files with >=5 distinct strong matchers pass; root package.json + package-lock.json; npm ci && npx vitest run in both workflows; palette still works in a headless browser with 0 console errors', 'ci', 'open'),
+    ('F6.4', 'F6', 'Stryker mutation testing of the client JS', 'stryker run on static/js/ui.js with the vitest runner, break threshold 80, runs in CI and passes; report summary saved under scans/', 'verify', 'open'),
+    ('F6.5', 'F6', 'Python tests split into per-feature files', "test_barnboard.py and test_farm_flows.py split into coherent per-feature files (no test changed, same count); full suite and each file alone pass; plan-of-record says this also lifts TestForge's file-ratio formula", 'ci', 'open'),
+    ('F6.6', 'F6', 'Re-mirror (force) and re-scan', 'user re-mirrors with MILKPOST_FORCE=1 (package.json paths added); new scan saved under scans/: Unit Tests 100, DORA 90, Mutation >= 80, no new untriaged findings in compare.md', 'verify', 'open'),
 ]
 
 SCHEMA = """

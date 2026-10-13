@@ -1,0 +1,13 @@
+MilkPost client-JS mutation test (TestForge-fix arc F6.4), 2026-10-13
+Tool: Stryker 10.0.0 + @stryker-mutator/vitest-runner 10.0.0, vitest 4.1.11 (vitest 5.0.2 is not yet supported by the runner: mutants were never activated, 5% score)
+Target: aina-out/barnboard/app/static/js/ui.js; tests: aina-out/barnboard/app/tests/js/{palette,theme}.test.js
+
+----------|------------------|----------|-----------|------------|----------|----------|
+File      |  total | covered | # killed | # timeout | # survived | # no cov | # errors |
+----------|--------|---------|----------|-----------|------------|----------|----------|
+All files | 100.00 |  100.00 |      106 |         0 |          0 |        0 |        0 |
+ ui.js    | 100.00 |  100.00 |      106 |         0 |          0 |        0 |        0 |
+----------|--------|---------|----------|-----------|------------|----------|----------|
+
+First full run: 112/114 killed (98.25%). The 2 survivors were equivalent mutants in redundant code
+(an early return for an empty query, and a fallback string that also ends as '/'); the code was removed.

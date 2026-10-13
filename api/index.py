@@ -353,9 +353,10 @@ async def app(scope, receive, send):
     path = scope["path"]
     has_pin = _valid(_cookie(scope))
 
-    if path.startswith("/api/v1/") or path == "/healthz":
-        # Machine consumers can't hold a PIN cookie. The app's own middleware
-        # enforces session-or-feed-token auth and answers JSON 401 (G0.1).
+    if path.startswith("/api/v1/") or path in ("/healthz", "/metrics"):
+        # Machine consumers can't hold a PIN cookie. The app enforces its own
+        # auth: session-or-feed-token on /api/v1 (G0.1), owner-or-METRICS_TOKEN
+        # on /metrics (F6.2).
         return await barnboard(scope, receive, send)
 
     if path == "/" and not has_pin:

@@ -1,6 +1,8 @@
-/* Barnboard client glue: theme toggle + command palette. No dependencies. */
+/* Barnboard client glue: theme toggle + command palette. The logic lives in
+   ui.js (tested); this module only wires it to the DOM. */
+import * as ui from "./ui.js";
+
 (function () {
-  "use strict";
 
   /* ── Theme ─────────────────────────────────────────────────────────── */
   var root = document.documentElement;
@@ -9,18 +11,17 @@
   if (stored === "dark" || stored === "light") root.setAttribute("data-theme", stored);
 
   function effectiveTheme() {
-    var t = root.getAttribute("data-theme");
-    if (t) return t;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    return ui.effectiveTheme(root.getAttribute("data-theme"),
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
   }
 
   function paintThemeBtn() {
     var btn = document.getElementById("theme-toggle");
-    if (btn) btn.textContent = effectiveTheme() === "dark" ? "☀️" : "🌙";
+    if (btn) btn.textContent = ui.themeIcon(effectiveTheme());
   }
 
   window.bbToggleTheme = function () {
-    var next = effectiveTheme() === "dark" ? "light" : "dark";
+    var next = ui.nextTheme(effectiveTheme());
     root.setAttribute("data-theme", next);
     try { localStorage.setItem("bb-theme", next); } catch (e) { /* ignore */ }
     paintThemeBtn();
@@ -40,23 +41,12 @@
   function input() { return document.getElementById("palette-input"); }
   function list() { return document.getElementById("palette-list"); }
 
-  function filtered() {
-    var q = (input().value || "").trim().toLowerCase();
-    if (!q) return items.slice(0, 12);
-    return items.filter(function (it) {
-      return it.label.toLowerCase().indexOf(q) !== -1;
-    }).slice(0, 12);
-  }
+  function filtered() { return ui.filterItems(items, input().value); }
 
   function render() {
     var f = filtered();
-    if (sel >= f.length) sel = Math.max(0, f.length - 1);
-    var html = f.map(function (it, i) {
-      return '<div class="palette__item' + (i === sel ? " sel" : "") +
-        '" data-href="' + it.href + '"><span>' + it.label +
-        '</span><span class="kind">' + it.kind + "</span></div>";
-    }).join("");
-    list().innerHTML = html || '<div class="palette__empty">No matches</div>';
+    sel = ui.clampSelection(sel, f.length);
+    list().innerHTML = ui.renderItems(f, sel);
   }
 
   window.bbOpenPalette = function () {
@@ -73,7 +63,7 @@
     var f = filtered();
     if (!f.length) return;
     closePalette();
-    window.location.href = f[sel].href;
+    window.location.href = ui.safeHref(f[sel].href);
   }
 
   document.addEventListener("keydown", function (e) {
@@ -86,8 +76,9 @@
     var o = overlay();
     if (!o || !o.classList.contains("open")) return;
     if (e.key === "Escape") { closePalette(); }
-    else if (e.key === "ArrowDown") { e.preventDefault(); sel += 1; render(); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); render(); }
+    else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault(); sel = ui.moveSelection(sel, e.key, filtered().length); render();
+    }
     else if (e.key === "Enter") { e.preventDefault(); go(); }
   });
 
@@ -99,7 +90,7 @@
       o.addEventListener("click", function (e) { if (e.target === o) closePalette(); });
       list().addEventListener("click", function (e) {
         var item = e.target.closest(".palette__item");
-        if (item) { closePalette(); window.location.href = item.dataset.href; }
+        if (item) { closePalette(); window.location.href = ui.safeHref(item.dataset.href); }
       });
       input().addEventListener("input", function () { sel = 0; render(); });
     }

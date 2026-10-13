@@ -14,6 +14,10 @@ on:
       - "tools/train_models.py"
       - "requirements.txt"
       - "requirements.lock"
+      - "package.json"
+      - "package-lock.json"
+      - "vitest.config.mjs"
+      - "stryker.config.json"
       - ".github/workflows/milkpost.yml"
   pull_request:
   workflow_dispatch:
@@ -33,11 +37,27 @@ jobs:
       - name: Type check (mypy)
         working-directory: aina-out/barnboard/app
         run: mypy --ignore-missing-imports -p app
-      - name: Test suite with coverage (floor 75%)
+      - name: Test suite with coverage (floor 100%)
         working-directory: aina-out/barnboard/app
-        run: python -m pytest -q --cov=app --cov-report=term --cov-report=xml:/tmp/fresh.xml --cov-fail-under=75
+        run: python -m pytest -q --cov=app --cov-report=term --cov-report=xml:/tmp/fresh.xml --cov-fail-under=100
       - name: Committed coverage.xml is current
         working-directory: aina-out/barnboard/app
         run: python check_coverage.py coverage.xml /tmp/fresh.xml
       - name: Model baseline gate (trainer exits non-zero if Holt stops beating naive)
         run: python tools/train_models.py
+
+  client-js:
+    # The browser helpers in static/js/ui.js: unit tests, then Stryker mutation
+    # testing (fails below an 80% mutation score).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Unit tests (vitest)
+        run: npx vitest run
+      - name: Mutation testing (Stryker, break < 80%)
+        run: npx stryker run

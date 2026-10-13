@@ -22,6 +22,7 @@ Live: https://milkpost.ajaykongala.online
 | `betadoc-data/` | The client-facing documentation site |
 | `phasedoc-*/` | Internal build trackers, one per arc of work |
 | `requirements.txt`, `requirements.lock` | Top-level pins (what Vercel installs) and the hash-locked full set |
+| `package.json`, `vitest.config.mjs`, `stryker.config.json` | Tests and mutation testing for the browser JS (`static/js/ui.js`); nothing here is deployed |
 
 ## Run locally
 
@@ -43,11 +44,19 @@ mypy --ignore-missing-imports -p app
 python -m pytest -q --cov=app --cov-report=xml:coverage.xml
 ```
 
-CI (`.github/workflows/milkpost.yml`) runs mypy, then the suite with a 75%
-coverage floor. It also checks that the committed `coverage.xml` is within one
+CI (`.github/workflows/milkpost.yml`) runs mypy, then the suite with a 100%
+line-coverage floor. It also checks that the committed `coverage.xml` is within one
 point of a fresh run (`check_coverage.py`), so refresh it with the last command
 above whenever tests or code change. Finally it runs `tools/train_models.py`,
 which fails if the forecast stops beating the naive baseline.
+
+The browser JS has its own job (Node 24):
+
+```bash
+npm ci
+npx vitest run      # unit tests for static/js/ui.js
+npx stryker run     # mutation testing; fails below an 80% mutation score
+```
 
 ## Deploy
 

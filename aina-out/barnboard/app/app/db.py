@@ -616,7 +616,7 @@ def heat_watch(con: sqlite3.Connection, today: date) -> list[dict]:
         """SELECT b.cow_id, c.tag, c.name, MAX(b.inseminated_on) AS anchor
            FROM breedings b JOIN cows c ON c.id = b.cow_id
            WHERE c.status = 'milking'
-             AND b.outcome = 'failed'
+             AND b.outcome IN ('lost', 'failed')   -- the app records a failed AI as 'lost'
              AND NOT EXISTS (SELECT 1 FROM breedings b2 WHERE b2.cow_id = b.cow_id
                              AND b2.inseminated_on > b.inseminated_on
                              AND b2.outcome IN ('open','confirmed'))

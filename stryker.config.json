@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "Mutation testing for MilkPost's browser JS. inPlace: the hub is large, so mutate the one file where it is instead of copying a sandbox.",
+  "testRunner": "vitest",
+  "vitest": {
+    "configFile": "vitest.config.mjs"
+  },
+  "mutate": [
+    "aina-out/barnboard/app/static/js/ui.js"
+  ],
+  "inPlace": true,
+  "coverageAnalysis": "perTest",
+  "reporters": [
+    "clear-text",
+    "progress",
+    "json"
+  ],
+  "jsonReporter": {
+    "fileName": "reports/mutation/mutation.json"
+  },
+  "thresholds": {
+    "high": 90,
+    "low": 80,
+    "break": 80
+  },
+  "disableTypeChecks": false
+}

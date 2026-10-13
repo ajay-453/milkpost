@@ -43,3 +43,9 @@ tools/make_sources.py
 tools/port_registry.py
 tools/*.sh
 vendor/
+node_modules
+.stryker-tmp
+package.json
+package-lock.json
+stryker.config.json
+vitest.config.mjs

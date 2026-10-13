@@ -19,7 +19,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 _ips = (f"198.51.100.{i}" for i in itertools.count(1))   # fresh IP per login: no rate-limit bleed
 Q = "What is your village name?"
-MEMBERS = ("founder", "ravi", "sita", "gopal", "lakshmi", "anil", "meena")
+MEMBERS = ("founder", "ravi", "sita", "gopal", "lakshmi", "anil", "meena", "kiran")
 
 
 def _login(username, password):
@@ -128,9 +128,15 @@ def test_roles_keep_at_least_one_owner(boss):
     assert up.status_code == 200 and "now a owner" in up.headers["x-toast"]
     assert boss.post(f"/team/{uid}/role", data={"role": "helper"}).status_code == 200
     with db.get_db() as con:   # make boss the only approved owner, then try to demote
+        others = [r["id"] for r in con.execute(
+            "SELECT id FROM users WHERE role='owner' AND username != 'boss'")]
         con.execute("UPDATE users SET role='helper' WHERE role='owner' AND username != 'boss'")
-    last = boss.post(f"/team/{_uid('boss')}/role", data={"role": "helper"})
-    assert last.status_code == 422 and "at least one owner" in last.headers["x-toast"]
+    try:
+        last = boss.post(f"/team/{_uid('boss')}/role", data={"role": "helper"})
+        assert last.status_code == 422 and "at least one owner" in last.headers["x-toast"]
+    finally:   # other test files' owners (tester, farmer) get their role back
+        with db.get_db() as con:
+            con.executemany("UPDATE users SET role='owner' WHERE id = ?", [(i,) for i in others])
     assert boss.post(f"/team/{_uid('boss')}/remove").status_code == 422   # not yourself
 
 
@@ -218,3 +224,15 @@ def test_password_change_and_logout(boss):
     out = c.post("/logout", follow_redirects=False)
     assert out.headers["location"] == "/login"
     assert c.get("/", follow_redirects=False).status_code in (302, 303)
+
+
+def test_remove_refuses_the_last_owner(boss, monkeypatch):
+    # Only reachable if owner approval could be revoked mid-session; simulate that state.
+    _signup("kiran")
+    uid = _uid("kiran")
+    boss.post(f"/team/{uid}/approve")
+    boss.post(f"/team/{uid}/role", data={"role": "owner"})
+    monkeypatch.setattr(db, "owner_count", lambda con: 1)
+    r = boss.post(f"/team/{uid}/remove")
+    assert r.status_code == 422 and "at least one owner" in r.headers["x-toast"]
+    assert _uid("kiran") is not None

@@ -1,0 +1,14 @@
+{
+  "name": "milkpost-client-tests",
+  "private": true,
+  "description": "Tests and mutation testing for MilkPost's browser JS (aina-out/barnboard/app/static/js). The app itself is Python; nothing here is deployed.",
+  "scripts": {
+    "test": "vitest run",
+    "mutation": "stryker run"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "10.0.0",
+    "@stryker-mutator/vitest-runner": "10.0.0",
+    "vitest": "4.1.11"
+  }
+}

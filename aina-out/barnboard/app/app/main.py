@@ -115,7 +115,8 @@ def _toast(html: str, message: str, status_code: int = 200) -> HTMLResponse:
 # feed (calendar apps cannot log in; the token IS the credential).
 
 SESSION_COOKIE = "bb_session"
-_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset", "/welcome", "/demo"}
+_PUBLIC_PATHS = {"/login", "/setup", "/signup", "/healthz", "/forgot", "/forgot/reset", "/welcome", "/demo",
+                 "/metrics"}   # /metrics checks its own auth (owner session or METRICS_TOKEN)
 
 # Secure cookies when served over TLS (set SECURE_COOKIES=1 behind HTTPS/a TLS proxy).
 SECURE_COOKIES = os.environ.get("SECURE_COOKIES", "0") == "1"
@@ -238,6 +239,30 @@ async def log_requests(request: Request, call_next):
             "request_id": request_id})
 
 
+# ── Prometheus metrics (request counts and latency per route) ──────────────
+# Self-hosted, no external service. Scrapers send `Authorization: Bearer
+# $METRICS_TOKEN`; an owner can also open it in the browser. On Vercel each
+# serverless instance keeps its own counters.
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+from prometheus_fastapi_instrumentator import Instrumentator
+
+Instrumentator(excluded_handlers=["/metrics", "/static/.*"]).instrument(app)
+
+
+@app.get("/metrics", include_in_schema=False)
+def metrics(request: Request):
+    token = os.environ.get("METRICS_TOKEN", "")
+    ok = bool(token) and secrets.compare_digest(
+        request.headers.get("authorization", ""), f"Bearer {token}")
+    if not ok:
+        with db.get_db() as con:
+            user = db.session_user(con, request.cookies.get(SESSION_COOKIE))
+        ok = bool(user and user["role"] == "owner")
+    if not ok:
+        return PlainTextResponse("unauthorized", status_code=401)
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
 # Inline SVG icons (stroke=currentColor) — no external asset deps.
 _ICONS = {
     "grid": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>',
@@ -276,6 +301,13 @@ ROADMAP = [
 ]
 
 
+def _script_json(value) -> str:
+    """JSON safe to embed in a <script> tag: a cow named `</script>...` can't
+    close the tag early (the escapes still parse as the same string)."""
+    return (json.dumps(value).replace("<", "\\u003c").replace(">", "\\u003e")
+            .replace("&", "\\u0026"))
+
+
 def ctx(request: Request, active: str, **extra):
     with db.get_db() as con:
         cows = con.execute(
@@ -290,7 +322,7 @@ def ctx(request: Request, active: str, **extra):
     lang = i18n.get_lang(request)
     return {
         "request": request, "app_name": APP_NAME, "app_tagline": APP_TAGLINE,
-        "nav": nav, "active": active, "palette_json": json.dumps(palette),
+        "nav": nav, "active": active, "palette_json": _script_json(palette),
         "today": db.iso(date.today()), "user": user, "currency": CURRENCY,
         "feed_url": f"/calendar/{feed_token}.ics",
         "lang": lang, "t": i18n.make_t(lang), **extra,
